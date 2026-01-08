@@ -41,15 +41,15 @@ Merge feature back to dev:
 ```bash
 git checkout dev
 git pull origin dev  # ensure dev is up to date
-git merge feature/whatsapp
+git merge feature
 git push origin dev
 
 git checkout main
 git pull origin main # ensure main is up to date
-git merge feature/whatsapp
+git merge feature
 git push origin main
 
-git checkout feature/whatsapp
+git checkout feature
 
 
 
