@@ -1,0 +1,220 @@
+@media (max-width: 1200px) {
+
+    .mainHeadSec h6,
+    .mainHeadSec h2 {
+        font-size: 60px;
+    }
+
+    .mainHeadSec p {
+        font-size: 18px;
+    }
+
+    .w-space-70 {
+        height: 40px;
+    }
+}
+
+@media (max-width: 990px) {
+    .side-menu {
+        display: block;
+    }
+
+    .deskNavigation {
+        display: none;
+    }
+
+    .mobNavigation {
+        display: block;
+    }
+
+    .mobMenuOverlay {
+        cursor: pointer;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all .2s ease-in-out;
+        -webkit-transition: all .2s ease-in-out;
+    }
+
+    .mobMenuOverlay.in {
+        opacity: .5;
+        visibility: visible;
+    }
+
+    .mobMenuBox {
+        display: block;
+        position: fixed;
+        right: -230px;
+        top: 0;
+        box-shadow: 0 0 #0000;
+        width: 230px;
+        height: 100%;
+        z-index: 999;
+        background: #fff;
+        padding: 50px 20px 20px;
+        transition: all .2s ease-in-out;
+        -webkit-transition: all .2s ease-in-out;
+    }
+
+    .mobMenuBox.in {
+        right: 0;
+        box-shadow: 0 0 20px #0000001a;
+    }
+
+    .nav-left li {
+        margin-left: 0;
+        margin-bottom: 15px;
+    }
+
+    .nav-left li a.button {
+        display: block;
+        margin-top: 20px;
+    }
+
+    .homeAbout {
+        padding-bottom: 50px;
+    }
+
+    .homeAbout h2 {
+        font-size: 24px;
+    }
+
+    .mainHeadSec h6,
+    .mainHeadSec h2 {
+        font-size: 48px;
+    }
+
+    .w-info-box {
+        margin-bottom: 0;
+    }
+
+    .footer-v2 #footer-bottom,
+    .footer-v3 #footer-bottom {
+        padding: 0;
+    }
+
+    div#footer-bottom .col-6 {
+        padding: 0;
+    }
+
+    .mapFlex {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .mapFlexIn {
+        padding-right: 0;
+    }
+
+    .w-gmaps {
+        flex: auto;
+        width: 100%;
+        height: 200px;
+        margin-top: 30px;
+    }
+
+    .w-space-80 {
+        height: 50px;
+    }
+}
+
+@media (max-width: 768px) {
+    .createTicketSec {
+        flex-direction: column;
+    }
+
+    .createTicketSec h5 {
+        margin-right: 0;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .createTicketSec h5 {
+        font-size: 30px;
+    }
+
+    .deskBannerVideo {
+        display: none;
+    }
+
+    .mobBannerVideo {
+        display: block;
+    }
+
+    .w-image img.serviceDeskImg {
+        display: none;
+    }
+
+    .w-image img.serviceMobImg {
+        display: block;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .mainHeadSec h6,
+    .mainHeadSec h2 {
+        font-size: 36px;
+    }
+
+    .mainHeadSec p {
+        font-size: 16px;
+        line-height: 1.6;
+    }
+
+    .homeAbout h2 {
+        font-size: 20px;
+    }
+
+    .homeAbout h6 {
+        font-size: 18px;
+    }
+
+    .homeAbout p {
+        font-size: 16px;
+    }
+
+    .swiperAbout {
+        height: 200px;
+    }
+
+    .w-content p {
+        font-size: 14px;
+    }
+
+    .w-info-box.w-medium .w-icon {
+        font-size: 70px;
+        line-height: 70px;
+    }
+
+    .w-section {
+        padding: 30px 0;
+    }
+
+    .homeAbout .col.l-padding {
+        padding: 40px 0;
+    }
+
+    .homeAbout {
+        padding-bottom: 0;
+    }
+
+    .createTicketSec h5 {
+        font-size: 24px;
+    }
+
+    :root {
+        --headerHeight: 50px;
+    }
+
+    .side-menu {
+        width: 30px;
+        height: 30px;
+    }
+}
