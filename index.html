@@ -346,51 +346,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
-    <!-- <script type="text/javascript" src="js/script1.js"></script>
-    <script type="text/javascript" src="js/jquery.nicescroll.min.js"></script>
-    <script type="text/javascript" src="js/script2.js"></script>
-    <script type="text/javascript" src="js/script3.js"></script>
-    <script type="text/javascript" src="js/script4.js"></script>
-    <script type="text/javascript" src="js/script6.js"></script>
-    <script type="text/javascript" src="js/script5.js"></script>
-    <script type='text/javascript' src='https://maps.googleapis.com/maps/api/js'></script> -->
-    <script type="text/javascript">
-        $(document).ready(function () {
-            // $("html").niceScroll();
-
-            $('#preloader').hide();
-            $('body').addClass("loaded");
-
-            // Mobile Head
-            $(".side-menu").click(function () {
-                $('.mobMenuBox').addClass('in');
-                $('.mobMenuOverlay').addClass('in');
-            });
-
-            $(".menuClose, .mobMenuOverlay").click(function () {
-                $('.mobMenuBox').removeClass('in');
-                $('.mobMenuOverlay').removeClass('in');
-            });
-            // Mobile Head end
-
-            const swiperAbout = new Swiper('.swiperAbout', {
-                loop: true,
-                pagination: {
-                    el: '.swiper-pagination',
-                },
-            });
-            let headerHeaight = $('#header').height();
-            $('a[href^="#"]').on('click', function (event) {
-                event.preventDefault();
-                var hash = this.hash;
-                $('html, body').animate({
-                    scrollTop: $(hash).offset().top - headerHeaight
-                }, 800);
-                $('.menuClose').trigger('click');
-            });
-
-        });
-    </script>
+    <script type="module" src="js/app.js"></script>
 
 </body>
 
