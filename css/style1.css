@@ -4915,31 +4915,23 @@ body.loaded:not(.changing) #footer {
     z-index: 100000;
     right: 25px;
     bottom: 25px;
+    position: fixed !important;
     display: flex !important;
     align-items: center;
-    gap: 10px;
-    text-decoration: none;
-    color: inherit;
-    -webkit-transition: -webkit-transform 0.2s ease-in-out;
-    transition: transform 0.2s ease-in-out
-}
-
-.whatsapp-float__icon {
-    position: relative;
+    justify-content: center;
     width: 54px;
     height: 54px;
     border-radius: 50%;
     background: linear-gradient(145deg, #25d366 0%, #1ebe57 55%, #128C7E 100%);
     color: #fff;
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
+    text-decoration: none;
     box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
     -webkit-transition: all 0.2s ease-in-out;
-    transition: all 0.2s ease-in-out
+    transition: all 0.2s ease-in-out;
+    overflow: hidden
 }
 
-.whatsapp-float__icon:before {
+.whatsapp-float:before {
     content: '';
     position: absolute;
     inset: 2px;
@@ -4948,7 +4940,7 @@ body.loaded:not(.changing) #footer {
     pointer-events: none
 }
 
-.whatsapp-float__icon:after {
+.whatsapp-float:after {
     content: '';
     position: absolute;
     inset: -6px;
@@ -4981,20 +4973,7 @@ body.loaded:not(.changing) #footer {
     background: #25d366
 }
 
-.whatsapp-float__text {
-    background: #fff;
-    color: #111;
-    padding: 10px 12px;
-    border-radius: 999px;
-    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 1;
-    -webkit-transition: all 0.2s ease-in-out;
-    transition: all 0.2s ease-in-out
-}
-
-.whatsapp-float__icon i {
+.whatsapp-float i {
     position: relative;
     font-size: 28px;
     line-height: 1
@@ -5006,13 +4985,13 @@ body.loaded:not(.changing) #footer {
     transform: translateY(-2px)
 }
 
-.whatsapp-float:hover .whatsapp-float__icon,
-.whatsapp-float:focus .whatsapp-float__icon {
+.whatsapp-float:hover,
+.whatsapp-float:focus {
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22)
 }
 
-.whatsapp-float:hover .whatsapp-float__icon:after,
-.whatsapp-float:focus .whatsapp-float__icon:after {
+.whatsapp-float:hover:after,
+.whatsapp-float:focus:after {
     opacity: 1;
     -webkit-transform: scale(1);
     transform: scale(1)
@@ -5020,21 +4999,14 @@ body.loaded:not(.changing) #footer {
 
 @media (max-width: 767px) {
     .whatsapp-float {
+        width: 48px;
+        height: 48px;
         right: 18px;
         bottom: 18px
     }
 
-    .whatsapp-float__icon {
-        width: 48px;
-        height: 48px
-    }
-
-    .whatsapp-float__icon i {
+    .whatsapp-float i {
         font-size: 24px
-    }
-
-    .whatsapp-float__text {
-        display: none
     }
 }
 
