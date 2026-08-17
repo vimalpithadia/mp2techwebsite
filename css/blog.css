@@ -68,109 +68,247 @@
 }
 
 /* --------------------------------------------------------------------------
-   Storefront Header Bar (No Bulky Dark Banner)
+   Elite Storefront Hero & Search Showcase
    -------------------------------------------------------------------------- */
 .storefront-header-bar {
-  background: #ffffff;
-  padding: 24px 0 18px;
-  border-bottom: 1px solid var(--slate-200);
+  background: linear-gradient(135deg, #09111e 0%, #0f1d38 50%, #13274c 100%);
+  padding: 36px 0 30px;
+  position: relative;
+  overflow: hidden;
+  color: #ffffff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.storefront-header-bar::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -20%;
+  width: 140%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 20%, rgba(90, 163, 206, 0.18) 0%, transparent 60%),
+              radial-gradient(circle at 80% 80%, rgba(255, 153, 0, 0.12) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 .storefront-toolbar {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 28px;
   flex-wrap: wrap;
 }
 
-.storefront-title-box h1 {
-  font-size: 24px;
-  font-weight: 800;
-  color: var(--dark);
-  margin: 0 0 4px;
-  display: flex;
+.storefront-title-box {
+  flex: 1 1 480px;
+}
+
+.hero-tech-badge {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #93c5fd;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.storefront-title-box h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 8px;
+  line-height: 1.25;
+  letter-spacing: -0.5px;
+}
+
+.gradient-text-gold {
+  background: linear-gradient(90deg, #ffdf6d 0%, #ff9900 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .storefront-title-box p {
-  font-size: 13.5px;
-  color: var(--slate-500);
-  margin: 0;
+  font-size: 14px;
+  color: #94a3b8;
+  margin: 0 0 16px;
+  line-height: 1.5;
+  max-width: 580px;
 }
 
-.store-trust-pill {
+/* Trust Badges Strip in Hero */
+.hero-trust-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.hero-trust-item {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  background: #ecfdf5;
-  color: #059669;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: var(--radius-full);
-  border: 1px solid #a7f3d0;
-  margin-left: 8px;
-  vertical-align: middle;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #cbd5e1;
 }
 
-/* Search Box */
+.hero-trust-item i {
+  color: #38bdf8;
+}
+
+/* Search Box Container */
+.store-search-box-wrap {
+  flex: 1 1 360px;
+  max-width: 460px;
+}
+
 .store-search-box {
   position: relative;
-  min-width: 320px;
-  max-width: 420px;
-  flex-grow: 1;
+  width: 100%;
 }
 
-.store-search-box i {
+.store-search-box i.search-icon {
   position: absolute;
-  left: 16px;
+  left: 18px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--slate-400);
-  font-size: 14px;
+  color: #38bdf8;
+  font-size: 16px;
+  pointer-events: none;
+  z-index: 3;
 }
 
 .store-search-input {
   width: 100%;
-  padding: 10px 18px 10px 42px;
-  background: var(--slate-50);
-  border: 1.5px solid var(--slate-200);
+  padding: 13px 44px 13px 50px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
   border-radius: var(--radius-full);
-  font-size: 14px;
-  color: var(--dark);
+  font-size: 14.5px;
+  color: #ffffff;
   outline: none;
-  transition: var(--transition);
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.store-search-input::placeholder {
+  color: #94a3b8;
 }
 
 .store-search-input:focus {
-  background: #ffffff;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(90, 163, 206, 0.15);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.25), 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #cbd5e1;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.clear-search-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+/* Trending search chips */
+.trending-search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #94a3b8;
+  flex-wrap: wrap;
+}
+
+.trend-pill {
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.trend-pill:hover {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #38bdf8;
+  transform: translateY(-1px);
 }
 
 /* --------------------------------------------------------------------------
-   Sticky Category Filter Pills
+   Sticky Category Filter Nav + Sorting
    -------------------------------------------------------------------------- */
 .category-filter-nav {
   background: #ffffff;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--slate-200);
+  padding: 12px 0;
+  border-bottom: 1px solid #e2e8f0;
   position: sticky;
   top: var(--headerHeight, 65px);
   z-index: 100;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.category-nav-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .category-pills-wrap {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
+  gap: 8px;
   overflow-x: auto;
   padding: 2px 0;
   scrollbar-width: none;
+  flex-grow: 1;
 }
 
 .category-pills-wrap::-webkit-scrollbar {
@@ -178,32 +316,104 @@
 }
 
 .category-pill {
-  background: var(--slate-100);
-  border: 1px solid var(--slate-200);
-  color: var(--slate-700);
-  padding: 7px 16px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  padding: 8px 16px;
   font-size: 13px;
   font-weight: 700;
   border-radius: var(--radius-full);
   cursor: pointer;
   white-space: nowrap;
-  transition: var(--transition);
+  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
 }
 
 .category-pill:hover {
-  background: var(--primary-light);
-  color: var(--primary-dark);
-  border-color: var(--primary);
+  background: #e0f2fe;
+  color: #0369a1;
+  border-color: #bae6fd;
+  transform: translateY(-1px);
 }
 
 .category-pill.active {
   background: #0f172a;
   color: #ffffff;
   border-color: #0f172a;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+}
+
+.sort-filter-select {
+  padding: 8px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #334155;
+  background: #ffffff;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.sort-filter-select:focus {
+  border-color: #0284c7;
+}
+
+/* --------------------------------------------------------------------------
+   Assurance Pillars (Value Proposition Bar)
+   -------------------------------------------------------------------------- */
+.assurance-bar {
+  background: #ffffff;
+  padding: 16px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.assurance-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.assurance-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+}
+
+.assurance-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.assurance-icon.blue { background: #e0f2fe; color: #0284c7; }
+.assurance-icon.orange { background: #fff7ed; color: #ea580c; }
+.assurance-icon.green { background: #dcfce7; color: #16a34a; }
+
+.assurance-text h4 {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 2px;
+}
+
+.assurance-text p {
+  font-size: 11.5px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
 }
 
 /* --------------------------------------------------------------------------
