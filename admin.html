@@ -3,12 +3,12 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MP2TECH Admin Studio | Manage Blogs & Amazon Affiliate Products</title>
+    <title>MP2TECH Enterprise Admin Console | Manage Blogs & Hardware Store</title>
     <link rel="icon" href="img/favicon.png" type="image/png" />
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-    <link rel="stylesheet" type="text/css" href="css/admin.css?v=20260817">
-    <link rel="stylesheet" type="text/css" href="css/blog.css?v=20260817">
+    <link rel="stylesheet" type="text/css" href="css/admin.css?v=20260817b">
+    <link rel="stylesheet" type="text/css" href="css/blog.css?v=20260817c">
 </head>
 <body>
 
@@ -87,6 +87,22 @@
                 </div>
             </header>
 
+            <!-- Unpublished Changes Alert Banner -->
+            <div id="draftBanner" class="draft-banner">
+                <div class="draft-banner-text">
+                    <i class="fa fa-exclamation-triangle"></i>
+                    <span>You have unpublished changes in your catalog. Save to GitHub or Deploy Live to update the live site.</span>
+                </div>
+                <div class="draft-banner-actions">
+                    <button onclick="window.publishDirectlyToGitHub()" class="btn-draft-publish">
+                        <i class="fa fa-cloud-upload"></i> Save to Feature
+                    </button>
+                    <button onclick="window.mergeAndDeployToProduction()" class="btn-draft-deploy">
+                        <i class="fa fa-rocket"></i> Deploy Live to Main
+                    </button>
+                </div>
+            </div>
+
             <div class="admin-content">
 
                 <!-- TAB 1: OVERVIEW -->
@@ -97,7 +113,7 @@
                         <div class="metric-card">
                             <div class="metric-icon orange"><i class="fa fa-amazon"></i></div>
                             <div class="metric-data">
-                                <h3 id="metricTotalProds">13</h3>
+                                <h3 id="metricTotalProds">12</h3>
                                 <p>Amazon Affiliate Items</p>
                             </div>
                         </div>
@@ -152,6 +168,7 @@
                 <!-- TAB 2: AMAZON PRODUCTS STUDIO -->
                 <div id="tab-products" class="tab-panel">
                     
+                    <!-- Product Form & Live Preview -->
                     <div class="admin-panel-card" id="productFormCard">
                         <div class="panel-header">
                             <h2>Add / Edit Amazon Affiliate Product</h2>
@@ -181,7 +198,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="prodBrand">Brand</label>
-                                        <input type="text" id="prodBrand" placeholder="e.g. Crucial, Samsung, iFixit" />
+                                        <input type="text" id="prodBrand" placeholder="e.g. Crucial, Samsung, EVM, iFixit" />
                                     </div>
                                 </div>
 
@@ -234,29 +251,27 @@
                             <div class="preview-panel">
                                 <div class="preview-title">
                                     <span><i class="fa fa-eye"></i> Live Card Preview</span>
-                                    <span style="font-size:11px;color:#10b981;">Updates in real time</span>
+                                    <span style="font-size:11px;color:#10b981;">Real-time</span>
                                 </div>
 
                                 <div class="product-card" style="max-width: 320px; margin: 0 auto;">
                                     <div class="product-card-top">
-                                        <span class="product-badge" id="prevProdBadge">Technician Verified</span>
-                                        <span class="product-brand" id="prevProdBrand">Brand Name</span>
+                                        <span class="product-brand-tag" id="prevProdBrand">Brand</span>
+                                        <span class="product-verified-badge"><i class="fa fa-shield"></i> <span id="prevProdBadge">Verified</span></span>
                                     </div>
                                     <div class="product-image-wrap">
                                         <img id="prevProdImg" src="img/service.jpg" alt="Preview" />
                                     </div>
                                     <div class="product-body">
-                                        <div class="product-rating">
+                                        <div class="product-rating-row">
                                             <span class="stars"><i class="fa fa-star" style="color:#ff9900;"></i><i class="fa fa-star" style="color:#ff9900;"></i><i class="fa fa-star" style="color:#ff9900;"></i><i class="fa fa-star" style="color:#ff9900;"></i><i class="fa fa-star-half-o" style="color:#ff9900;"></i></span>
-                                            <span class="rating-number" id="prevProdRating">4.6</span>
+                                            <span class="rating-val" id="prevProdRating">4.6</span>
+                                            <span class="review-count">(1,500)</span>
                                         </div>
                                         <h3 class="product-title"><a id="prevProdName">Sample Product Title Preview</a></h3>
-                                        <div class="product-pricing">
-                                            <div class="price-box">
-                                                <span class="price-label">Approx. Price</span>
-                                                <span class="price-val" id="prevProdPrice">₹2,499</span>
-                                            </div>
-                                            <span class="prime-tag"><i class="fa fa-check"></i> Amazon Verified</span>
+                                        <div class="product-pricing-row">
+                                            <span class="product-price-val" id="prevProdPrice">₹2,499</span>
+                                            <span class="prime-badge"><i class="fa fa-check"></i> Amazon Prime</span>
                                         </div>
                                     </div>
                                     <div class="product-footer">
@@ -270,16 +285,63 @@
                         </div>
                     </div>
 
-                    <!-- Existing Products Table -->
+                    <!-- Existing Products Table with Search, Filter & Bulk Selection -->
                     <div class="admin-panel-card">
                         <div class="panel-header">
                             <h2>All Amazon Products in Catalog</h2>
+                            <span id="tableProdCounter" style="font-size:13px; color:#64748b; font-weight:600;"></span>
                         </div>
+
+                        <!-- Table Toolbar -->
+                        <div class="table-toolbar">
+                            <div class="table-search-box">
+                                <i class="fa fa-search"></i>
+                                <input type="text" id="prodTableSearch" class="table-search-input" placeholder="Search products by title, brand, or specs..." />
+                            </div>
+                            <div class="table-filters-group">
+                                <select id="prodTableCategoryFilter" class="table-filter-select">
+                                    <option value="all">All Categories</option>
+                                    <option value="storage">SSDs & Storage</option>
+                                    <option value="ram">RAM Modules</option>
+                                    <option value="cooling">Cooling & Thermal</option>
+                                    <option value="tools">Diagnostic Tools</option>
+                                    <option value="accessories">Accessories</option>
+                                </select>
+                                <select id="prodTableSort" class="table-filter-select">
+                                    <option value="default">Default Order</option>
+                                    <option value="price-asc">Price: Low to High</option>
+                                    <option value="price-desc">Price: High to Low</option>
+                                    <option value="rating">Highest Rated</option>
+                                    <option value="title">Alphabetical (A-Z)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Floating Bulk Actions Bar -->
+                        <div id="prodBulkBar" class="bulk-actions-bar">
+                            <div class="bulk-count-label">
+                                <i class="fa fa-check-square-o"></i>
+                                <span><strong id="prodBulkCount" class="bulk-count-badge">0</strong> products selected</span>
+                            </div>
+                            <div class="bulk-action-buttons">
+                                <button onclick="window.bulkDeleteProducts()" class="btn-bulk-delete">
+                                    <i class="fa fa-trash"></i> Delete Selected
+                                </button>
+                                <button onclick="window.deselectAllProducts()" class="btn-bulk-cancel">
+                                    Deselect All
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Data Table -->
                         <div class="table-responsive">
                             <table class="admin-table">
                                 <thead>
                                     <tr>
-                                        <th>Image</th>
+                                        <th style="width: 40px; text-align: center;">
+                                            <input type="checkbox" id="selectAllProds" class="admin-checkbox" onchange="window.toggleSelectAllProducts(this.checked)" title="Select All Products" />
+                                        </th>
+                                        <th style="width: 60px;">Image</th>
                                         <th>Product & Category</th>
                                         <th>Badge</th>
                                         <th>Price</th>
@@ -396,16 +458,55 @@
                         </div>
                     </div>
 
-                    <!-- Existing Articles Table -->
+                    <!-- Existing Articles Table with Search, Filter & Bulk Selection -->
                     <div class="admin-panel-card">
                         <div class="panel-header">
                             <h2>All Published Articles</h2>
+                            <span id="tablePostCounter" style="font-size:13px; color:#64748b; font-weight:600;"></span>
                         </div>
+
+                        <!-- Table Toolbar -->
+                        <div class="table-toolbar">
+                            <div class="table-search-box">
+                                <i class="fa fa-search"></i>
+                                <input type="text" id="postTableSearch" class="table-search-input" placeholder="Search articles by title or excerpt..." />
+                            </div>
+                            <div class="table-filters-group">
+                                <select id="postTableCategoryFilter" class="table-filter-select">
+                                    <option value="all">All Categories</option>
+                                    <option value="diagnostics">Diagnostics & Repairs</option>
+                                    <option value="upgrades">Hardware Upgrades</option>
+                                    <option value="maintenance">Maintenance & Care</option>
+                                    <option value="refurbished">Refurbished Systems</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Floating Bulk Actions Bar -->
+                        <div id="postBulkBar" class="bulk-actions-bar">
+                            <div class="bulk-count-label">
+                                <i class="fa fa-check-square-o"></i>
+                                <span><strong id="postBulkCount" class="bulk-count-badge">0</strong> articles selected</span>
+                            </div>
+                            <div class="bulk-action-buttons">
+                                <button onclick="window.bulkDeletePosts()" class="btn-bulk-delete">
+                                    <i class="fa fa-trash"></i> Delete Selected
+                                </button>
+                                <button onclick="window.deselectAllPosts()" class="btn-bulk-cancel">
+                                    Deselect All
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Data Table -->
                         <div class="table-responsive">
                             <table class="admin-table">
                                 <thead>
                                     <tr>
-                                        <th>Image</th>
+                                        <th style="width: 40px; text-align: center;">
+                                            <input type="checkbox" id="selectAllPosts" class="admin-checkbox" onchange="window.toggleSelectAllPosts(this.checked)" title="Select All Articles" />
+                                        </th>
+                                        <th style="width: 60px;">Image</th>
                                         <th>Title & Category</th>
                                         <th>Date</th>
                                         <th>Linked Products</th>

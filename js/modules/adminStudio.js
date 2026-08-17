@@ -1,7 +1,8 @@
 /**
- * MP2TECH Admin Studio Logic
- * Handles Authentication, CRUD for Amazon Products & Blog Posts,
- * Live Preview Rendering, and One-Click GitHub Sync.
+ * MP2TECH Enterprise Admin Studio Logic
+ * Handles Authentication, CRUD with Bulk Selection & Actions,
+ * Live Table Search & Filters, Real-Time Preview,
+ * and One-Click GitHub Sync & Live Deployment.
  */
 
 import { DEFAULT_PRODUCTS, DEFAULT_POSTS } from "../../data/defaultData.js";
@@ -16,6 +17,19 @@ let posts = [...DEFAULT_POSTS];
 let editingProductId = null;
 let editingPostId = null;
 
+// Bulk selection sets
+let selectedProductIds = new Set();
+let selectedPostIds = new Set();
+
+// Table filter states
+let prodSearchQuery = "";
+let prodCategoryFilter = "all";
+let prodSortOrder = "default";
+
+let postSearchQuery = "";
+let postCategoryFilter = "all";
+
+let hasUnpublishedChanges = false;
 
 /**
  * SHA-256 cryptographic hash helper
@@ -38,6 +52,19 @@ export function showToast(message, type = "success") {
   setTimeout(() => {
     toast.className = "admin-toast";
   }, 3500);
+}
+
+/**
+ * Update Draft Notification Banner
+ */
+function updateDraftBanner() {
+  const banner = document.getElementById("draftBanner");
+  if (!banner) return;
+  if (hasUnpublishedChanges) {
+    banner.classList.add("show");
+  } else {
+    banner.classList.remove("show");
+  }
 }
 
 /**
@@ -103,13 +130,20 @@ export async function loadData() {
   // Check if local modified state exists in session
   const localProds = sessionStorage.getItem("mp2tech_draft_products");
   const localPosts = sessionStorage.getItem("mp2tech_draft_posts");
-  if (localProds) products = JSON.parse(localProds);
-  if (localPosts) posts = JSON.parse(localPosts);
+  if (localProds) {
+    products = JSON.parse(localProds);
+    hasUnpublishedChanges = true;
+  }
+  if (localPosts) {
+    posts = JSON.parse(localPosts);
+    hasUnpublishedChanges = true;
+  }
 
   updateMetrics();
   renderProductsTable();
   renderPostsTable();
   populateRelatedProductsSelect();
+  updateDraftBanner();
 
   try {
     const timestamp = Date.now();
@@ -140,59 +174,193 @@ export async function loadData() {
  * Update Metric Cards
  */
 function updateMetrics() {
-  document.getElementById("metricTotalProds").textContent = products.length;
-  document.getElementById("metricTotalPosts").textContent = posts.length;
+  const prodEl = document.getElementById("metricTotalProds");
+  const postEl = document.getElementById("metricTotalPosts");
+  const catEl = document.getElementById("metricCategories");
+
+  if (prodEl) prodEl.textContent = products.length;
+  if (postEl) postEl.textContent = posts.length;
   
   const categories = new Set(products.map((p) => p.category));
-  document.getElementById("metricCategories").textContent = categories.size;
+  if (catEl) catEl.textContent = categories.size;
 }
 
 /**
  * Save draft state to sessionStorage
  */
 function saveDraftState() {
+  hasUnpublishedChanges = true;
   sessionStorage.setItem("mp2tech_draft_products", JSON.stringify(products));
   sessionStorage.setItem("mp2tech_draft_posts", JSON.stringify(posts));
   updateMetrics();
+  updateDraftBanner();
 }
 
 /* ==========================================================================
-   AMAZON PRODUCTS CRUD
+   AMAZON PRODUCTS CRUD & BULK ACTIONS
    ========================================================================== */
+
+/**
+ * Parse numeric price for sorting
+ */
+function parsePrice(priceStr) {
+  if (!priceStr) return 0;
+  const num = parseInt(priceStr.replace(/[^0-9]/g, ""), 10);
+  return isNaN(num) ? 0 : num;
+}
+
+/**
+ * Get filtered & sorted products list
+ */
+function getFilteredProducts() {
+  let list = [...products];
+
+  // Category filter
+  if (prodCategoryFilter && prodCategoryFilter !== "all") {
+    list = list.filter((p) => p.category === prodCategoryFilter);
+  }
+
+  // Search filter
+  if (prodSearchQuery && prodSearchQuery.trim() !== "") {
+    const q = prodSearchQuery.toLowerCase().trim();
+    list = list.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        (p.brand && p.brand.toLowerCase().includes(q)) ||
+        p.category.toLowerCase().includes(q) ||
+        (p.highlights && p.highlights.some((h) => h.toLowerCase().includes(q)))
+    );
+  }
+
+  // Sorting
+  if (prodSortOrder === "price-asc") {
+    list.sort((a, b) => parsePrice(a.priceEstimate) - parsePrice(b.priceEstimate));
+  } else if (prodSortOrder === "price-desc") {
+    list.sort((a, b) => parsePrice(b.priceEstimate) - parsePrice(a.priceEstimate));
+  } else if (prodSortOrder === "rating") {
+    list.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  } else if (prodSortOrder === "title") {
+    list.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  return list;
+}
 
 export function renderProductsTable() {
   const tbody = document.getElementById("productsTableBody");
   if (!tbody) return;
 
-  if (products.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:24px;">No products added yet.</td></tr>`;
+  const filtered = getFilteredProducts();
+  const counterEl = document.getElementById("tableProdCounter");
+  if (counterEl) {
+    counterEl.textContent = `Showing ${filtered.length} of ${products.length} products`;
+  }
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:32px;"><i class="fa fa-search" style="font-size:24px;margin-bottom:8px;display:block;"></i>No products match your search/filter criteria.</td></tr>`;
+    updateBulkBar();
     return;
   }
 
-  tbody.innerHTML = products
-    .map(
-      (p) => `
-    <tr>
-      <td><img src="${p.image}" alt="${p.name}" class="table-thumb" onerror="this.src='img/service.jpg'" /></td>
-      <td><strong>${p.name}</strong><br><small style="color:#64748b;">${p.brand} &bull; ${p.category}</small></td>
-      <td><span class="product-badge">${p.badge || "Verified"}</span></td>
-      <td><strong>${p.priceEstimate}</strong></td>
-      <td><i class="fa fa-star" style="color:#ff9900"></i> ${p.rating} (${p.reviewCount?.toLocaleString() || 0})</td>
-      <td>
-        <a href="${p.amazonUrl}" target="_blank" rel="noopener" class="action-btn" title="Open Amazon Link">
-          <i class="fa fa-external-link"></i>
-        </a>
-      </td>
-      <td>
-        <div class="action-btns">
-          <button class="action-btn" onclick="window.editProduct('${p.id}')" title="Edit Product"><i class="fa fa-pencil"></i></button>
-          <button class="action-btn delete" onclick="window.deleteProduct('${p.id}')" title="Delete Product"><i class="fa fa-trash"></i></button>
-        </div>
-      </td>
-    </tr>
-  `
-    )
+  // Check if all visible are selected
+  const allVisibleSelected = filtered.every((p) => selectedProductIds.has(p.id));
+  const selectAllBox = document.getElementById("selectAllProds");
+  if (selectAllBox) {
+    selectAllBox.checked = filtered.length > 0 && allVisibleSelected;
+  }
+
+  tbody.innerHTML = filtered
+    .map((p) => {
+      const isChecked = selectedProductIds.has(p.id);
+      return `
+        <tr class="${isChecked ? "selected" : ""}">
+          <td style="width: 40px; text-align: center;">
+            <input type="checkbox" class="admin-checkbox prod-checkbox" value="${p.id}" ${isChecked ? "checked" : ""} onchange="window.toggleProductCheck('${p.id}', this.checked)" />
+          </td>
+          <td style="width: 60px;">
+            <img src="${p.image}" alt="${p.name}" class="table-thumb" onerror="this.src='img/service.jpg'" />
+          </td>
+          <td>
+            <strong>${p.name}</strong><br>
+            <small style="color:#64748b;">${p.brand || "Generic"} &bull; <span class="table-badge badge-gray">${p.category}</span></small>
+          </td>
+          <td><span class="table-badge badge-gold">${p.badge || "Verified"}</span></td>
+          <td><strong>${p.priceEstimate || "₹2,499"}</strong></td>
+          <td><i class="fa fa-star" style="color:#ff9900"></i> ${p.rating} <small style="color:#94a3b8">(${p.reviewCount?.toLocaleString() || 0})</small></td>
+          <td>
+            <a href="${p.amazonUrl}" target="_blank" rel="noopener" class="action-btn" title="Open Amazon Link">
+              <i class="fa fa-external-link"></i>
+            </a>
+          </td>
+          <td>
+            <div class="action-btns">
+              <button class="action-btn" onclick="window.editProduct('${p.id}')" title="Edit Product"><i class="fa fa-pencil"></i></button>
+              <button class="action-btn delete" onclick="window.deleteProduct('${p.id}')" title="Delete Product"><i class="fa fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+      `;
+    })
     .join("");
+
+  updateBulkBar();
+}
+
+/**
+ * Bulk Selection Handlers
+ */
+export function toggleSelectAllProducts(checked) {
+  const filtered = getFilteredProducts();
+  if (checked) {
+    filtered.forEach((p) => selectedProductIds.add(p.id));
+  } else {
+    filtered.forEach((p) => selectedProductIds.delete(p.id));
+  }
+  renderProductsTable();
+}
+
+export function toggleProductCheck(id, checked) {
+  if (checked) {
+    selectedProductIds.add(id);
+  } else {
+    selectedProductIds.delete(id);
+  }
+  renderProductsTable();
+}
+
+export function deselectAllProducts() {
+  selectedProductIds.clear();
+  renderProductsTable();
+}
+
+function updateBulkBar() {
+  const bar = document.getElementById("prodBulkBar");
+  const countEl = document.getElementById("prodBulkCount");
+  if (!bar) return;
+
+  if (selectedProductIds.size > 0) {
+    bar.classList.add("show");
+    if (countEl) countEl.textContent = selectedProductIds.size;
+  } else {
+    bar.classList.remove("show");
+  }
+}
+
+/**
+ * Bulk Delete Selected Products
+ */
+export function bulkDeleteProducts() {
+  const count = selectedProductIds.size;
+  if (count === 0) return;
+
+  if (confirm(`Are you sure you want to delete all ${count} selected product(s)?`)) {
+    products = products.filter((p) => !selectedProductIds.has(p.id));
+    selectedProductIds.clear();
+    saveDraftState();
+    renderProductsTable();
+    populateRelatedProductsSelect();
+    showToast(`Deleted ${count} product(s) successfully!`);
+  }
 }
 
 export function saveProductFromForm() {
@@ -254,6 +422,7 @@ export function saveProductFromForm() {
   saveDraftState();
   renderProductsTable();
   resetProductForm();
+  populateRelatedProductsSelect();
 }
 
 export function editProduct(id) {
@@ -263,27 +432,28 @@ export function editProduct(id) {
   editingProductId = id;
   document.getElementById("prodName").value = prod.name;
   document.getElementById("prodCategory").value = prod.category;
-  document.getElementById("prodBrand").value = prod.brand;
-  document.getElementById("prodPrice").value = prod.priceEstimate.replace("₹", "");
+  document.getElementById("prodBrand").value = prod.brand || "";
+  document.getElementById("prodPrice").value = (prod.priceEstimate || "").replace("₹", "");
   document.getElementById("prodRating").value = prod.rating;
   document.getElementById("prodReviews").value = prod.reviewCount || 1000;
-  document.getElementById("prodBadge").value = prod.badge;
-  document.getElementById("prodImage").value = prod.image;
-  document.getElementById("prodAmazonUrl").value = prod.amazonUrl;
+  document.getElementById("prodBadge").value = prod.badge || "Technician Verified";
+  document.getElementById("prodImage").value = prod.image || "";
+  document.getElementById("prodAmazonUrl").value = prod.amazonUrl || "";
   document.getElementById("prodHighlights").value = (prod.highlights || []).join("\n");
 
   document.getElementById("productFormSubmitBtn").textContent = "Save Changes";
   updateProductLivePreview();
 
-  // Scroll to form
   document.getElementById("productFormCard").scrollIntoView({ behavior: "smooth" });
 }
 
 export function deleteProduct(id) {
   if (confirm("Are you sure you want to remove this product from the catalog?")) {
     products = products.filter((p) => p.id !== id);
+    selectedProductIds.delete(id);
     saveDraftState();
     renderProductsTable();
+    populateRelatedProductsSelect();
     showToast("Product removed");
   }
 }
@@ -312,36 +482,125 @@ export function updateProductLivePreview() {
 }
 
 /* ==========================================================================
-   BLOG POSTS CRUD
+   BLOG POSTS CRUD & BULK ACTIONS
    ========================================================================== */
+
+function getFilteredPosts() {
+  let list = [...posts];
+
+  if (postCategoryFilter && postCategoryFilter !== "all") {
+    list = list.filter((p) => p.category === postCategoryFilter);
+  }
+
+  if (postSearchQuery && postSearchQuery.trim() !== "") {
+    const q = postSearchQuery.toLowerCase().trim();
+    list = list.filter(
+      (p) =>
+        p.title.toLowerCase().includes(q) ||
+        p.excerpt.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q)
+    );
+  }
+
+  return list;
+}
 
 export function renderPostsTable() {
   const tbody = document.getElementById("postsTableBody");
   if (!tbody) return;
 
-  if (posts.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:24px;">No articles added yet.</td></tr>`;
+  const filtered = getFilteredPosts();
+  const counterEl = document.getElementById("tablePostCounter");
+  if (counterEl) {
+    counterEl.textContent = `Showing ${filtered.length} of ${posts.length} articles`;
+  }
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:32px;"><i class="fa fa-search" style="font-size:24px;margin-bottom:8px;display:block;"></i>No articles match your search/filter criteria.</td></tr>`;
+    updatePostBulkBar();
     return;
   }
 
-  tbody.innerHTML = posts
-    .map(
-      (p) => `
-    <tr>
-      <td><img src="${p.image}" alt="${p.title}" class="table-thumb" onerror="this.src='img/service.jpg'" /></td>
-      <td><strong>${p.title}</strong><br><small style="color:#64748b;">${p.categoryName || p.category} &bull; ${p.readTime}</small></td>
-      <td>${p.date}</td>
-      <td><span class="product-badge">${p.relatedProductIds?.length || 0} Products Linked</span></td>
-      <td>
-        <div class="action-btns">
-          <button class="action-btn" onclick="window.editPost(${p.id})" title="Edit Article"><i class="fa fa-pencil"></i></button>
-          <button class="action-btn delete" onclick="window.deletePost(${p.id})" title="Delete Article"><i class="fa fa-trash"></i></button>
-        </div>
-      </td>
-    </tr>
-  `
-    )
+  const allVisibleSelected = filtered.every((p) => selectedPostIds.has(p.id));
+  const selectAllBox = document.getElementById("selectAllPosts");
+  if (selectAllBox) {
+    selectAllBox.checked = filtered.length > 0 && allVisibleSelected;
+  }
+
+  tbody.innerHTML = filtered
+    .map((p) => {
+      const isChecked = selectedPostIds.has(p.id);
+      return `
+        <tr class="${isChecked ? "selected" : ""}">
+          <td style="width: 40px; text-align: center;">
+            <input type="checkbox" class="admin-checkbox post-checkbox" value="${p.id}" ${isChecked ? "checked" : ""} onchange="window.togglePostCheck(${p.id}, this.checked)" />
+          </td>
+          <td style="width: 60px;"><img src="${p.image}" alt="${p.title}" class="table-thumb" onerror="this.src='img/service.jpg'" /></td>
+          <td><strong>${p.title}</strong><br><small style="color:#64748b;"><span class="table-badge badge-blue">${p.categoryName || p.category}</span> &bull; ${p.readTime}</small></td>
+          <td>${p.date}</td>
+          <td><span class="table-badge badge-green">${p.relatedProductIds?.length || 0} Products Linked</span></td>
+          <td>
+            <div class="action-btns">
+              <button class="action-btn" onclick="window.editPost(${p.id})" title="Edit Article"><i class="fa fa-pencil"></i></button>
+              <button class="action-btn delete" onclick="window.deletePost(${p.id})" title="Delete Article"><i class="fa fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+      `;
+    })
     .join("");
+
+  updatePostBulkBar();
+}
+
+export function toggleSelectAllPosts(checked) {
+  const filtered = getFilteredPosts();
+  if (checked) {
+    filtered.forEach((p) => selectedPostIds.add(p.id));
+  } else {
+    filtered.forEach((p) => selectedPostIds.delete(p.id));
+  }
+  renderPostsTable();
+}
+
+export function togglePostCheck(id, checked) {
+  if (checked) {
+    selectedPostIds.add(Number(id));
+  } else {
+    selectedPostIds.delete(Number(id));
+  }
+  renderPostsTable();
+}
+
+export function deselectAllPosts() {
+  selectedPostIds.clear();
+  renderPostsTable();
+}
+
+function updatePostBulkBar() {
+  const bar = document.getElementById("postBulkBar");
+  const countEl = document.getElementById("postBulkCount");
+  if (!bar) return;
+
+  if (selectedPostIds.size > 0) {
+    bar.classList.add("show");
+    if (countEl) countEl.textContent = selectedPostIds.size;
+  } else {
+    bar.classList.remove("show");
+  }
+}
+
+export function bulkDeletePosts() {
+  const count = selectedPostIds.size;
+  if (count === 0) return;
+
+  if (confirm(`Are you sure you want to delete all ${count} selected article(s)?`)) {
+    posts = posts.filter((p) => !selectedPostIds.has(p.id));
+    selectedPostIds.clear();
+    saveDraftState();
+    renderPostsTable();
+    showToast(`Deleted ${count} article(s) successfully!`);
+  }
 }
 
 export function populateRelatedProductsSelect() {
@@ -349,7 +608,7 @@ export function populateRelatedProductsSelect() {
   if (!select) return;
 
   select.innerHTML = products
-    .map((p) => `<option value="${p.id}">${p.name} (${p.brand} - ${p.priceEstimate})</option>`)
+    .map((p) => `<option value="${p.id}">${p.name} (${p.brand || "Hardware"} - ${p.priceEstimate || ""})</option>`)
     .join("");
 }
 
@@ -363,7 +622,6 @@ export function savePostFromForm() {
   const excerpt = document.getElementById("postExcerpt").value.trim();
   const body = document.getElementById("postBody").value.trim();
 
-  // Selected related products
   const select = document.getElementById("postRelatedProds");
   const selectedProducts = Array.from(select.selectedOptions).map((o) => o.value);
 
@@ -428,7 +686,6 @@ export function editPost(id) {
   document.getElementById("postExcerpt").value = post.excerpt;
   document.getElementById("postBody").value = post.body;
 
-  // Set selected related products
   const select = document.getElementById("postRelatedProds");
   Array.from(select.options).forEach((opt) => {
     opt.selected = (post.relatedProductIds || []).includes(opt.value);
@@ -442,6 +699,7 @@ export function editPost(id) {
 export function deletePost(id) {
   if (confirm("Are you sure you want to delete this blog article?")) {
     posts = posts.filter((p) => p.id !== Number(id));
+    selectedPostIds.delete(Number(id));
     saveDraftState();
     renderPostsTable();
     showToast("Article deleted");
@@ -470,12 +728,9 @@ export function updatePostLivePreview() {
 }
 
 /* ==========================================================================
-   EXPORT & GITHUB DIRECT SYNC
+   EXPORT & GITHUB DIRECT SYNC & ONE-CLICK LIVE DEPLOYMENT
    ========================================================================== */
 
-/**
- * Download updated JSON files to computer
- */
 export function exportDataFiles() {
   downloadJson("affiliate-products.json", products);
   setTimeout(() => {
@@ -496,16 +751,14 @@ function downloadJson(filename, data) {
   URL.revokeObjectURL(url);
 }
 
-/**
- * Direct Publish to GitHub using Personal Access Token (PAT)
- */
 export async function publishDirectlyToGitHub() {
   const tokenInput = document.getElementById("githubTokenInput");
   const branchInput = document.getElementById("githubBranchInput");
   const statusEl = document.getElementById("githubSyncStatus");
 
-  // Remember token in session
-  const token = tokenInput ? tokenInput.value.trim() : "";
+  let token = tokenInput ? tokenInput.value.trim() : "";
+  if (!token) token = sessionStorage.getItem("mp2tech_github_pat") || "";
+
   const branch = branchInput ? branchInput.value.trim() : "feature";
 
   if (!token) {
@@ -514,10 +767,11 @@ export async function publishDirectlyToGitHub() {
   }
   sessionStorage.setItem("mp2tech_github_pat", token);
 
-  statusEl.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Committing changes to GitHub repo (${GITHUB_REPO} on branch '${branch}')...`;
+  if (statusEl) {
+    statusEl.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Committing changes to GitHub repo (${GITHUB_REPO} on branch '${branch}')...`;
+  }
 
   try {
-    // 1. Commit affiliate-products.json
     await commitFileToGitHub(
       token,
       branch,
@@ -526,7 +780,6 @@ export async function publishDirectlyToGitHub() {
       "feat(affiliate): update amazon products catalog via admin portal"
     );
 
-    // 2. Commit blog-posts.json
     await commitFileToGitHub(
       token,
       branch,
@@ -535,21 +788,27 @@ export async function publishDirectlyToGitHub() {
       "feat(blog): update articles via admin portal"
     );
 
-    statusEl.innerHTML = `
-      <div style="background:rgba(16, 185, 129, 0.15); border:1px solid #10b981; padding:10px 14px; border-radius:8px; color:#34d399; margin-top:10px;">
-        <i class="fa fa-check-circle"></i> Successfully published to GitHub '<strong>${branch}</strong>' branch!
-      </div>
-    `;
+    hasUnpublishedChanges = false;
+    sessionStorage.removeItem("mp2tech_draft_products");
+    sessionStorage.removeItem("mp2tech_draft_posts");
+    updateDraftBanner();
+
+    if (statusEl) {
+      statusEl.innerHTML = `
+        <div style="background:rgba(16, 185, 129, 0.15); border:1px solid #10b981; padding:10px 14px; border-radius:8px; color:#34d399; margin-top:10px;">
+          <i class="fa fa-check-circle"></i> Successfully published to GitHub '<strong>${branch}</strong>' branch!
+        </div>
+      `;
+    }
     showToast(`Published to GitHub '${branch}' branch!`);
   } catch (err) {
-    statusEl.innerHTML = `<span style="color:#ef4444;"><i class="fa fa-times-circle"></i> Sync failed: ${err.message}</span>`;
+    if (statusEl) {
+      statusEl.innerHTML = `<span style="color:#ef4444;"><i class="fa fa-times-circle"></i> Sync failed: ${err.message}</span>`;
+    }
     showToast(`GitHub sync failed: ${err.message}`, "error");
   }
 }
 
-/**
- * One-Click Merge & Live Production Deployment (Feature -> Dev -> Main)
- */
 export async function mergeAndDeployToProduction() {
   const tokenInput = document.getElementById("githubTokenInput");
   let token = tokenInput ? tokenInput.value.trim() : "";
@@ -568,20 +827,45 @@ export async function mergeAndDeployToProduction() {
     sessionStorage.setItem("mp2tech_github_pat", token);
   }
 
+  // If there are draft changes in session, publish them to feature first!
+  if (hasUnpublishedChanges) {
+    try {
+      showToast("Saving pending changes to feature branch before deploy...");
+      await commitFileToGitHub(
+        token,
+        "feature",
+        "data/affiliate-products.json",
+        JSON.stringify(products, null, 2),
+        "feat(affiliate): update products before production deployment"
+      );
+      await commitFileToGitHub(
+        token,
+        "feature",
+        "data/blog-posts.json",
+        JSON.stringify(posts, null, 2),
+        "feat(blog): update articles before production deployment"
+      );
+      hasUnpublishedChanges = false;
+      sessionStorage.removeItem("mp2tech_draft_products");
+      sessionStorage.removeItem("mp2tech_draft_posts");
+      updateDraftBanner();
+    } catch (e) {
+      console.warn("Could not pre-commit draft:", e);
+    }
+  }
+
   const statusEl = document.getElementById("deployLiveStatus") || document.getElementById("githubSyncStatus");
   if (statusEl) {
     statusEl.innerHTML = `<div style="color:#38bdf8; padding:8px 0;"><i class="fa fa-spinner fa-spin"></i> Step 1/2: Merging 'feature' branch into 'dev'...</div>`;
   }
 
   try {
-    // Step 1: Merge feature -> dev
     await mergeBranchesOnGitHub(token, "dev", "feature", "feat: merge feature into dev via admin studio");
 
     if (statusEl) {
       statusEl.innerHTML = `<div style="color:#38bdf8; padding:8px 0;"><i class="fa fa-spinner fa-spin"></i> Step 2/2: Merging 'dev' into 'main' (Production)...</div>`;
     }
 
-    // Step 2: Merge dev -> main
     await mergeBranchesOnGitHub(token, "main", "dev", "feat: deploy to production (merge dev into main) via admin studio");
 
     if (statusEl) {
@@ -621,7 +905,6 @@ async function mergeBranchesOnGitHub(token, base, head, commit_message) {
     }),
   });
 
-  // 201 = Merged successfully, 204 = Already up to date (no merge needed)
   if (res.status === 201 || res.status === 204) {
     return true;
   }
@@ -633,7 +916,6 @@ async function mergeBranchesOnGitHub(token, base, head, commit_message) {
 async function commitFileToGitHub(token, branch, path, content, message) {
   const apiUrl = `https://api.github.com/repos/${GITHUB_REPO}/contents/${path}?ref=${branch}`;
 
-  // Get current file SHA
   let currentSha = null;
   try {
     const getRes = await fetch(apiUrl, {
@@ -650,7 +932,6 @@ async function commitFileToGitHub(token, branch, path, content, message) {
     console.warn("No existing SHA found:", e);
   }
 
-  // Base64 encode content
   const base64Content = btoa(unescape(encodeURIComponent(content)));
 
   const putRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`, {
@@ -680,7 +961,6 @@ async function commitFileToGitHub(token, branch, path, content, message) {
 export function initAdminStudio() {
   checkAuth();
 
-  // Restore stored token if present
   const savedToken = sessionStorage.getItem("mp2tech_github_pat");
   const tokenInput = document.getElementById("githubTokenInput");
   if (savedToken && tokenInput) {
@@ -719,6 +999,48 @@ export function initAdminStudio() {
     });
   });
 
+  // Table Search & Filter - Products
+  const prodSearch = document.getElementById("prodTableSearch");
+  if (prodSearch) {
+    prodSearch.addEventListener("input", function () {
+      prodSearchQuery = this.value;
+      renderProductsTable();
+    });
+  }
+
+  const prodCatFilter = document.getElementById("prodTableCategoryFilter");
+  if (prodCatFilter) {
+    prodCatFilter.addEventListener("change", function () {
+      prodCategoryFilter = this.value;
+      renderProductsTable();
+    });
+  }
+
+  const prodSort = document.getElementById("prodTableSort");
+  if (prodSort) {
+    prodSort.addEventListener("change", function () {
+      prodSortOrder = this.value;
+      renderProductsTable();
+    });
+  }
+
+  // Table Search & Filter - Posts
+  const postSearch = document.getElementById("postTableSearch");
+  if (postSearch) {
+    postSearch.addEventListener("input", function () {
+      postSearchQuery = this.value;
+      renderPostsTable();
+    });
+  }
+
+  const postCatFilter = document.getElementById("postTableCategoryFilter");
+  if (postCatFilter) {
+    postCatFilter.addEventListener("change", function () {
+      postCategoryFilter = this.value;
+      renderPostsTable();
+    });
+  }
+
   // Product Form Live preview bindings
   ["prodName", "prodBrand", "prodPrice", "prodRating", "prodBadge", "prodImage"].forEach((id) => {
     const el = document.getElementById(id);
@@ -736,14 +1058,21 @@ export function initAdminStudio() {
   window.deleteProduct = deleteProduct;
   window.saveProductFromForm = saveProductFromForm;
   window.resetProductForm = resetProductForm;
+  window.toggleSelectAllProducts = toggleSelectAllProducts;
+  window.toggleProductCheck = toggleProductCheck;
+  window.deselectAllProducts = deselectAllProducts;
+  window.bulkDeleteProducts = bulkDeleteProducts;
 
   window.editPost = editPost;
   window.deletePost = deletePost;
   window.savePostFromForm = savePostFromForm;
   window.resetPostForm = resetPostForm;
+  window.toggleSelectAllPosts = toggleSelectAllPosts;
+  window.togglePostCheck = togglePostCheck;
+  window.deselectAllPosts = deselectAllPosts;
+  window.bulkDeletePosts = bulkDeletePosts;
 
   window.exportDataFiles = exportDataFiles;
   window.publishDirectlyToGitHub = publishDirectlyToGitHub;
   window.mergeAndDeployToProduction = mergeAndDeployToProduction;
 }
-
