@@ -19,23 +19,6 @@ export const DEFAULT_PRODUCTS = [
     ]
   },
   {
-    "id": "prod-1",
-    "name": "Crucial BX500 500GB 3D NAND SATA 2.5-inch Internal SSD",
-    "category": "storage",
-    "brand": "Crucial by Micron",
-    "rating": 4.5,
-    "reviewCount": 18450,
-    "priceEstimate": "₹2,899",
-    "badge": "Top Upgrade Pick",
-    "image": "https://m.media-amazon.com/images/I/61H4P7OqW2L._SX679_.jpg",
-    "amazonUrl": "https://www.amazon.in/dp/B07G3KGYMQ",
-    "highlights": [
-      "Up to 540 MB/s Sequential Read Speed",
-      "300% faster than standard laptop HDDs",
-      "Compatible with all SATA 2.5-inch laptops & desktops"
-    ]
-  },
-  {
     "id": "prod-2",
     "name": "Samsung 980 500GB PCIe 3.0 M.2 NVMe Internal SSD",
     "category": "storage",
