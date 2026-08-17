@@ -5,13 +5,18 @@
  * and appends Amazon Affiliate tracking tags.
  */
 
+import { DEFAULT_PRODUCTS, DEFAULT_POSTS } from "../../data/defaultData.js";
+
 export const AMAZON_CONFIG = {
   defaultAffiliateTag: "mp2tech-21",
   siteCountry: "in",
 };
 
-let allProducts = [];
-let allPosts = [];
+let allProducts = [...DEFAULT_PRODUCTS];
+let allPosts = [...DEFAULT_POSTS];
+let currentProdCategory = "all";
+let currentSearch = "";
+
 
 /**
  * Appends the Amazon affiliate tag and tracking parameters to any Amazon URL
@@ -269,27 +274,12 @@ export function closeArticleModal() {
  * Initialize dynamic hub
  */
 export async function initAffiliateHub() {
-  try {
-    const [prodRes, postRes] = await Promise.all([
-      fetch("data/affiliate-products.json"),
-      fetch("data/blog-posts.json"),
-    ]);
-
-    if (prodRes.ok) allProducts = await prodRes.json();
-    if (postRes.ok) allPosts = await postRes.json();
-  } catch (err) {
-    console.warn("Could not fetch JSON datasets, using fallback", err);
-  }
-
-  // Render initially
+  // Render default embedded data immediately without delay
   renderProducts("all");
   renderBlogPosts("all");
 
   // Product Category Filters
   const prodFilterBtns = document.querySelectorAll(".product-filter-btn");
-  let currentProdCategory = "all";
-  let currentSearch = "";
-
   prodFilterBtns.forEach((btn) => {
     btn.addEventListener("click", function () {
       prodFilterBtns.forEach((b) => b.classList.remove("active"));
@@ -306,6 +296,32 @@ export async function initAffiliateHub() {
       currentSearch = this.value;
       renderProducts(currentProdCategory, currentSearch);
     });
+  }
+
+  // Fetch updated JSON datasets in background with cache buster
+  try {
+    const timestamp = Date.now();
+    const [prodRes, postRes] = await Promise.all([
+      fetch(`data/affiliate-products.json?v=${timestamp}`),
+      fetch(`data/blog-posts.json?v=${timestamp}`),
+    ]);
+
+    if (prodRes.ok) {
+      const p = await prodRes.json();
+      if (Array.isArray(p) && p.length > 0) {
+        allProducts = p;
+        renderProducts(currentProdCategory, currentSearch);
+      }
+    }
+    if (postRes.ok) {
+      const b = await postRes.json();
+      if (Array.isArray(b) && b.length > 0) {
+        allPosts = b;
+        renderBlogPosts("all");
+      }
+    }
+  } catch (err) {
+    console.info("Using embedded product catalog fallback");
   }
 
   // Blog Category Filters

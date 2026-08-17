@@ -4,15 +4,18 @@
  * Live Preview Rendering, and One-Click GitHub Sync.
  */
 
+import { DEFAULT_PRODUCTS, DEFAULT_POSTS } from "../../data/defaultData.js";
+
 // SHA-256 Hash of default password "mp2tech@2026"
 const DEFAULT_PASS_HASH = "81561bfddf7c7da9c1ea49479b19e992b15ca85ec157a3e9c9c36ec3b2fa5676";
 const AUTH_KEY = "mp2tech_admin_authenticated";
 const GITHUB_REPO = "vimalpithadia/mp2techwebsite";
 
-let products = [];
-let posts = [];
+let products = [...DEFAULT_PRODUCTS];
+let posts = [...DEFAULT_POSTS];
 let editingProductId = null;
 let editingPostId = null;
+
 
 /**
  * SHA-256 cryptographic hash helper
@@ -97,27 +100,39 @@ export function handleLogout() {
  * Load initial datasets from JSON files
  */
 export async function loadData() {
+  // Check if local modified state exists in session
+  const localProds = sessionStorage.getItem("mp2tech_draft_products");
+  const localPosts = sessionStorage.getItem("mp2tech_draft_posts");
+  if (localProds) products = JSON.parse(localProds);
+  if (localPosts) posts = JSON.parse(localPosts);
+
+  updateMetrics();
+  renderProductsTable();
+  renderPostsTable();
+  populateRelatedProductsSelect();
+
   try {
+    const timestamp = Date.now();
     const [prodRes, postRes] = await Promise.all([
-      fetch("data/affiliate-products.json"),
-      fetch("data/blog-posts.json"),
+      fetch(`data/affiliate-products.json?v=${timestamp}`),
+      fetch(`data/blog-posts.json?v=${timestamp}`),
     ]);
 
-    if (prodRes.ok) products = await prodRes.json();
-    if (postRes.ok) posts = await postRes.json();
-
-    // Check if local modified state exists in session
-    const localProds = sessionStorage.getItem("mp2tech_draft_products");
-    const localPosts = sessionStorage.getItem("mp2tech_draft_posts");
-    if (localProds) products = JSON.parse(localProds);
-    if (localPosts) posts = JSON.parse(localPosts);
+    if (prodRes.ok) {
+      const p = await prodRes.json();
+      if (Array.isArray(p) && p.length > 0 && !localProds) products = p;
+    }
+    if (postRes.ok) {
+      const b = await postRes.json();
+      if (Array.isArray(b) && b.length > 0 && !localPosts) posts = b;
+    }
 
     updateMetrics();
     renderProductsTable();
     renderPostsTable();
     populateRelatedProductsSelect();
   } catch (err) {
-    console.error("Error loading admin data:", err);
+    console.info("Using embedded default admin datasets");
   }
 }
 
