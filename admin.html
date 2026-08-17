@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MP2TECH Admin Studio | Manage Blogs & Amazon Affiliate Products</title>
+    <link rel="icon" href="img/favicon.png" type="image/png" />
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/admin.css?v=20260817">
+    <link rel="stylesheet" type="text/css" href="css/blog.css?v=20260817">
+</head>
+<body>
+
+    <!-- Notification Toast -->
+    <div id="adminToast" class="admin-toast">Action completed successfully</div>
+
+    <!-- 1. LOGIN GATEKEEPER SCREEN -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-card">
+            <img src="img/logo.jpg" alt="MP2TECH Logo" class="login-logo" />
+            <h2>MP2TECH Admin Studio</h2>
+            <p>Enter your administrator passcode to manage blog articles and Amazon affiliate products.</p>
+            
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="loginPasscode"><i class="fa fa-lock"></i> Admin Passcode</label>
+                    <input type="password" id="loginPasscode" placeholder="Enter admin passcode..." autocomplete="current-password" required autofocus />
+                </div>
+                <button type="submit" class="login-btn">
+                    <i class="fa fa-sign-in"></i> Unlock Admin Studio
+                </button>
+                <div id="loginError" class="login-error">Invalid passcode. Please try again.</div>
+            </form>
+
+            <div class="login-hint">
+                <i class="fa fa-info-circle"></i> Default passcode: <code>mp2tech@2026</code>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. MAIN ADMIN APP -->
+    <div id="adminApp" class="admin-app" style="display: none;">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-brand">
+                <img src="img/logo.jpg" alt="MP2TECH" class="sidebar-logo" />
+                <div class="sidebar-brand-text">
+                    MP2TECH
+                    <span>Admin Studio</span>
+                </div>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li><a data-tab="overview" class="active"><i class="fa fa-dashboard"></i> Overview</a></li>
+                <li><a data-tab="products"><i class="fa fa-amazon"></i> Amazon Products</a></li>
+                <li><a data-tab="articles"><i class="fa fa-file-text-o"></i> Blog Articles</a></li>
+                <li><a data-tab="github"><i class="fa fa-github"></i> GitHub Sync</a></li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="logout-btn">
+                    <i class="fa fa-sign-out"></i> Lock / Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Viewport -->
+        <main class="admin-main">
+            
+            <!-- Topbar -->
+            <header class="admin-topbar">
+                <div class="admin-topbar-title">
+                    <h1 id="pageTitle">Admin Dashboard</h1>
+                </div>
+                <div class="admin-topbar-actions">
+                    <a href="blog.html" target="_blank" rel="noopener" class="view-site-link">
+                        <i class="fa fa-external-link"></i> View Live Blog Hub
+                    </a>
+                    <button onclick="window.exportDataFiles()" class="quick-publish-btn">
+                        <i class="fa fa-download"></i> Export Data Files
+                    </button>
+                </div>
+            </header>
+
+            <div class="admin-content">
+
+                <!-- TAB 1: OVERVIEW -->
+                <div id="tab-overview" class="tab-panel active">
+                    
+                    <!-- Metrics Row -->
+                    <div class="metrics-row">
+                        <div class="metric-card">
+                            <div class="metric-icon orange"><i class="fa fa-amazon"></i></div>
+                            <div class="metric-data">
+                                <h3 id="metricTotalProds">12</h3>
+                                <p>Amazon Affiliate Items</p>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-icon blue"><i class="fa fa-book"></i></div>
+                            <div class="metric-data">
+                                <h3 id="metricTotalPosts">6</h3>
+                                <p>Published Blog Guides</p>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-icon purple"><i class="fa fa-tags"></i></div>
+                            <div class="metric-data">
+                                <h3 id="metricCategories">5</h3>
+                                <p>Hardware Categories</p>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-icon green"><i class="fa fa-check-circle"></i></div>
+                            <div class="metric-data">
+                                <h3>Active</h3>
+                                <p>GitHub Pages Sync</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Action Cards -->
+                    <div class="admin-panel-card">
+                        <div class="panel-header">
+                            <h2>Quick Actions</h2>
+                        </div>
+                        <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                            <button onclick="document.querySelector('[data-tab=products]').click()" class="btn-primary">
+                                <i class="fa fa-plus"></i> Add New Amazon Product
+                            </button>
+                            <button onclick="document.querySelector('[data-tab=articles]').click()" class="btn-primary" style="background:#0284c7;">
+                                <i class="fa fa-pencil"></i> Write New Blog Article
+                            </button>
+                            <button onclick="document.querySelector('[data-tab=github]').click()" class="btn-primary" style="background:#10b981;">
+                                <i class="fa fa-cloud-upload"></i> Sync to GitHub Repository
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: AMAZON PRODUCTS STUDIO -->
+                <div id="tab-products" class="tab-panel">
+                    
+                    <div class="admin-panel-card" id="productFormCard">
+                        <div class="panel-header">
+                            <h2>Add / Edit Amazon Affiliate Product</h2>
+                            <button onclick="window.resetProductForm()" class="btn-secondary">Clear Form</button>
+                        </div>
+
+                        <div class="studio-layout">
+                            
+                            <!-- Left: Product Form -->
+                            <form id="prodForm" class="studio-form" onsubmit="event.preventDefault(); window.saveProductFromForm();">
+                                
+                                <div class="form-group">
+                                    <label for="prodName">Product Title *</label>
+                                    <input type="text" id="prodName" placeholder="e.g. Crucial BX500 500GB 3D NAND SATA 2.5-inch SSD" required />
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="prodCategory">Category</label>
+                                        <select id="prodCategory">
+                                            <option value="storage">SSDs & Storage</option>
+                                            <option value="ram">RAM Modules</option>
+                                            <option value="cooling">Cooling & Thermal</option>
+                                            <option value="tools">Diagnostic Tools</option>
+                                            <option value="accessories">Accessories & Hubs</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="prodBrand">Brand</label>
+                                        <input type="text" id="prodBrand" placeholder="e.g. Crucial, Samsung, iFixit" />
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="prodPrice">Approx. Price (₹)</label>
+                                        <input type="text" id="prodPrice" placeholder="e.g. 2,899" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="prodRating">Rating (1 to 5)</label>
+                                        <input type="number" id="prodRating" step="0.1" min="1" max="5" value="4.6" />
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="prodReviews">Review Count</label>
+                                        <input type="number" id="prodReviews" placeholder="e.g. 15400" value="1500" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="prodBadge">Badge Label</label>
+                                        <input type="text" id="prodBadge" placeholder="e.g. Top Upgrade Pick, Best Seller" value="Technician Verified" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="prodAmazonUrl">Amazon Product Link (Affiliate URL) *</label>
+                                    <input type="url" id="prodAmazonUrl" placeholder="https://www.amazon.in/dp/B07G3KGYMQ" required />
+                                    <span class="form-hint">Your affiliate tag (<code>tag=mp2tech-21</code>) will automatically attach on the live site.</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="prodImage">Product Image URL</label>
+                                    <input type="text" id="prodImage" placeholder="https://m.media-amazon.com/images/I/..." />
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="prodHighlights">Key Specs / Highlights (1 per line)</label>
+                                    <textarea id="prodHighlights" rows="3" placeholder="Up to 540 MB/s Read Speed&#10;300% faster than standard HDDs"></textarea>
+                                </div>
+
+                                <div>
+                                    <button type="submit" id="productFormSubmitBtn" class="btn-primary" style="background:var(--amz-orange); color:#111;">
+                                        <i class="fa fa-save"></i> Add Product to Catalog
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Right: Live Card Preview -->
+                            <div class="preview-panel">
+                                <div class="preview-title">
+                                    <span><i class="fa fa-eye"></i> Live Card Preview</span>
+                                    <span style="font-size:11px;color:#10b981;">Updates in real time</span>
+                                </div>
+
+                                <div class="product-card" style="max-width: 320px; margin: 0 auto;">
+                                    <div class="product-card-top">
+                                        <span class="product-badge" id="prevProdBadge">Technician Verified</span>
+                                        <span class="product-brand" id="prevProdBrand">Brand Name</span>
+                                    </div>
+                                    <div class="product-image-wrap">
+                                        <img id="prevProdImg" src="img/service.jpg" alt="Preview" />
+                                    </div>
+                                    <div class="product-body">
+                                        <div class="product-rating">
+                                            <span class="stars"><i class="fa fa-star" style="color:#ff9900;"></i><i class="fa fa-star" style="color:#ff9900;"></i><i class="fa fa-star" style="color:#ff9900;"></i><i class="fa fa-star" style="color:#ff9900;"></i><i class="fa fa-star-half-o" style="color:#ff9900;"></i></span>
+                                            <span class="rating-number" id="prevProdRating">4.6</span>
+                                        </div>
+                                        <h3 class="product-title"><a id="prevProdName">Sample Product Title Preview</a></h3>
+                                        <div class="product-pricing">
+                                            <div class="price-box">
+                                                <span class="price-label">Approx. Price</span>
+                                                <span class="price-val" id="prevProdPrice">₹2,499</span>
+                                            </div>
+                                            <span class="prime-tag"><i class="fa fa-check"></i> Amazon Verified</span>
+                                        </div>
+                                    </div>
+                                    <div class="product-footer">
+                                        <div class="buy-amazon-btn">
+                                            <i class="fa fa-shopping-cart"></i> Buy on Amazon <i class="fa fa-external-link"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Existing Products Table -->
+                    <div class="admin-panel-card">
+                        <div class="panel-header">
+                            <h2>All Amazon Products in Catalog</h2>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Image</th>
+                                        <th>Product & Category</th>
+                                        <th>Badge</th>
+                                        <th>Price</th>
+                                        <th>Rating</th>
+                                        <th>Link</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productsTableBody">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- TAB 3: BLOG ARTICLES STUDIO -->
+                <div id="tab-articles" class="tab-panel">
+                    
+                    <div class="admin-panel-card" id="postFormCard">
+                        <div class="panel-header">
+                            <h2>Write / Edit Blog Article</h2>
+                            <button onclick="window.resetPostForm()" class="btn-secondary">Clear Form</button>
+                        </div>
+
+                        <div class="studio-layout">
+                            
+                            <!-- Left: Article Form -->
+                            <form id="postForm" class="studio-form" onsubmit="event.preventDefault(); window.savePostFromForm();">
+                                
+                                <div class="form-group">
+                                    <label for="postTitle">Article Headline *</label>
+                                    <input type="text" id="postTitle" placeholder="e.g. 5 Signs Your Laptop Needs Diagnostic Service" required />
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="postCategory">Category</label>
+                                        <select id="postCategory">
+                                            <option value="diagnostics">Diagnostics & Repairs</option>
+                                            <option value="upgrades">Hardware Upgrades</option>
+                                            <option value="maintenance">Maintenance & Care</option>
+                                            <option value="refurbished">Refurbished Systems</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="postReadTime">Reading Time</label>
+                                        <input type="text" id="postReadTime" placeholder="e.g. 5 min read" value="5 min read" />
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="postDate">Publish Date</label>
+                                        <input type="text" id="postDate" placeholder="e.g. August 17, 2026" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="postImage">Cover Image URL / Path</label>
+                                        <input type="text" id="postImage" placeholder="img/blog1.jpg or image URL" value="img/blog1.jpg" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="postExcerpt">Short Excerpt (Teaser Summary) *</label>
+                                    <textarea id="postExcerpt" rows="2" placeholder="Brief summary of the article that appears on blog cards..." required></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="postRelatedProds">Link Related Amazon Affiliate Products</label>
+                                    <select id="postRelatedProds" multiple style="height: 110px;">
+                                        <!-- Dynamically populated from product catalog -->
+                                    </select>
+                                    <span class="form-hint">Hold <code>Ctrl</code> (or <code>Cmd</code>) to select multiple products to recommend inside this article.</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="postBody">Full Article Content (HTML Supported) *</label>
+                                    <textarea id="postBody" rows="9" placeholder="<p>Write your detailed guide here...</p><h3>Key Subsection</h3><p>More explanation...</p>" required></textarea>
+                                    <span class="form-hint">You can use <code>&lt;p&gt;</code>, <code>&lt;h3&gt;</code>, <code>&lt;ul&gt;</code>, <code>&lt;li&gt;</code>, <code>&lt;strong&gt;</code>, and <code>&lt;div class=&quot;blog-tip-box&quot;&gt;Pro Tip: ...&lt;/div&gt;</code>.</span>
+                                </div>
+
+                                <div>
+                                    <button type="submit" id="postFormSubmitBtn" class="btn-primary">
+                                        <i class="fa fa-paper-plane"></i> Publish Article
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Right: Live Blog Card Preview -->
+                            <div class="preview-panel">
+                                <div class="preview-title">
+                                    <span><i class="fa fa-eye"></i> Live Article Card Preview</span>
+                                </div>
+
+                                <article class="blog-card" style="max-width: 320px; margin: 0 auto;">
+                                    <div class="blog-card-image-wrap">
+                                        <img id="prevPostImg" src="img/blog1.jpg" alt="Preview" />
+                                        <span class="blog-card-category" id="prevPostCat">Diagnostics</span>
+                                    </div>
+                                    <div class="blog-card-body">
+                                        <div class="blog-card-meta">
+                                            <span><i class="fa fa-calendar-o"></i> <span id="prevPostDate">August 2026</span></span>
+                                        </div>
+                                        <h2 class="blog-card-title" id="prevPostTitle" style="font-size:16px;">Article Title Preview</h2>
+                                        <p class="blog-card-excerpt" id="prevPostExcerpt" style="font-size:13px;">Short teaser summary...</p>
+                                        <div class="blog-card-footer">
+                                            <span class="blog-read-btn">Read Full Guide <i class="fa fa-arrow-right"></i></span>
+                                        </div>
+                                    </div>
+                                </article>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Existing Articles Table -->
+                    <div class="admin-panel-card">
+                        <div class="panel-header">
+                            <h2>All Published Articles</h2>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Image</th>
+                                        <th>Title & Category</th>
+                                        <th>Date</th>
+                                        <th>Linked Products</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="postsTableBody">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- TAB 4: GITHUB SYNC & SETTINGS -->
+                <div id="tab-github" class="tab-panel">
+                    
+                    <div class="admin-panel-card">
+                        <div class="panel-header">
+                            <h2>One-Click GitHub Repository Direct Sync</h2>
+                        </div>
+
+                        <div class="sync-box">
+                            <h3><i class="fa fa-github"></i> Direct Publishing to GitHub</h3>
+                            <p>You can push your updated <code>affiliate-products.json</code> and <code>blog-posts.json</code> directly to your GitHub repository using a GitHub Personal Access Token (PAT). This saves changes straight to your feature or main branch!</p>
+
+                            <div class="form-group" style="margin-bottom: 14px;">
+                                <label for="githubBranchInput" style="color:#cbd5e1;">Target GitHub Branch</label>
+                                <input type="text" id="githubBranchInput" value="feature" style="background:#1e293b; color:#fff; border-color:#334155;" />
+                                <span class="form-hint">Recommended: <code>feature</code> (or <code>main</code> to deploy live immediately).</span>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 18px;">
+                                <label for="githubTokenInput" style="color:#cbd5e1;">GitHub Personal Access Token (PAT)</label>
+                                <input type="password" id="githubTokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="background:#1e293b; color:#fff; border-color:#334155;" />
+                                <span class="form-hint">Token requires <code>repo</code> write scope. Never shared; stored in current session only.</span>
+                            </div>
+
+                            <button onclick="window.publishDirectlyToGitHub()" class="btn-primary" style="background:#10b981; padding: 12px 24px; font-size: 15px;">
+                                <i class="fa fa-cloud-upload"></i> Publish & Commit to GitHub
+                            </button>
+
+                            <div id="githubSyncStatus" style="margin-top: 14px; font-size: 14px;"></div>
+                        </div>
+
+                        <div class="panel-header" style="margin-top: 30px;">
+                            <h2>Manual File Export (Alternative)</h2>
+                        </div>
+                        <p style="font-size:14px; color:#64748b; margin-bottom:16px;">
+                            If you prefer committing via Git CLI, click below to download the updated JSON files and replace them in your local <code>data/</code> directory.
+                        </p>
+                        <button onclick="window.exportDataFiles()" class="btn-secondary">
+                            <i class="fa fa-download"></i> Download Updated JSON Data Files
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+        import { initAdminStudio } from "./js/modules/adminStudio.js";
+        document.addEventListener("DOMContentLoaded", initAdminStudio);
+    </script>
+</body>
+</html>
