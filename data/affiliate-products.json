@@ -2,11 +2,11 @@
   {
     "id": "prod-8010",
     "name": "Dell KM3322W Wireless USB Keyboard and Mouse Combo",
-    "category": "storage",
+    "category": "accessories",
     "brand": "",
-    "priceEstimate": "₹",
+    "priceEstimate": "₹1489",
     "rating": 4.6,
-    "reviewCount": 1500,
+    "reviewCount": 15500,
     "badge": "Technician Verified",
     "image": "https://m.media-amazon.com/images/I/711vfmr7pOL._SL1500_.jpg",
     "amazonUrl": "https://www.amazon.in/Dell-Wireless-Keyboard-Mouse-Spill-Resistant/dp/B09T3H12GV?crid=33CQZ7MFB33Z3&dib=eyJ2IjoiMSJ9.i_dBkKIinMRnfFkoOAv1Z_ciOtQRsW0Eg5Wa2Fd8QVD7S4pgThWd1Ih8cSkjmZbexQtewTUmg3JRPpByk8ihyhbyuenPN0TIAp7u3ul8-gOFhWjlyUgmx-TG_ibVgLF44HiwlsS2J3bPhy1fsoSp6Zkg1qwvOnZhLlS0gs6mX7jz0KpRbKV-vFMwhc9RlG0Ii6CQu9MsyQH9nnvQXDQWGLT4vyI1fM9GHdksUg_dRL4.VhN7x-HGoh1QTe7Q29pzkWYTi_XS_9pIkYY-yM2c904&dib_tag=se&keywords=Logitech+MK295+Silent+Wireless+Keyboard+and+Mouse+Combo&nsdOptOutParam=true&qid=1786993798&sprefix=%2Caps%2C660&sr=8-2-spons&aref=7SFLP45YtF&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1&linkCode=ll2&tag=mp2tech20-21&linkId=d2b7806d97e34bd8a0e84490a9b03354&ref_=as_li_ss_tl",
@@ -31,23 +31,6 @@
       "Significant Boot Time & Load Time Improvement: Switch from HDD or SATA SSD to this NVMe drive and experience near-instant OS boot times and dramatically reduced game load screens for PS5, Xbox, and PC gaming.",
       "Shock Resistant with No Moving Parts – Silent Operation: Fully solid-state design with zero mechanical components delivers whisper-quiet operation with exceptional durability against drops and physical impacts.",
       "5 Year Warranty with Doorstep Pickup Service: Every unit passes EVM's quality checks before shipping. Backed by a 5-Year warranty with convenient doorstep pickup and replacement support across India."
-    ]
-  },
-  {
-    "id": "prod-12",
-    "name": "Logitech MK295 Silent Wireless Keyboard and Mouse Combo",
-    "category": "accessories",
-    "brand": "Logitech",
-    "priceEstimate": "₹1489",
-    "rating": 4.5,
-    "reviewCount": 15500,
-    "badge": "Wireless Combo",
-    "image": "https://m.media-amazon.com/images/I/61pUul1oDlL._SX679_.jpg",
-    "amazonUrl": "https://www.amazon.in/dp/B0895L7587",
-    "highlights": [
-      "SilentTouch technology reduces 90% typing & clicking noise",
-      "Lag-free 2.4GHz wireless connection up to 10 meters",
-      "Long battery life: 36 months keyboard, 18 months mouse"
     ]
   }
 ]
