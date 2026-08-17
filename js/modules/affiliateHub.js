@@ -2,7 +2,7 @@
  * MP2TECH Elite Amazon Affiliate & Blog Dynamic Hub
  * Handles real-time search, category filtering,
  * in-article product recommendation embeds,
- * and appends Amazon Affiliate tracking tags.
+ * dynamic sorting, and appends Amazon Affiliate tracking tags.
  */
 
 import { DEFAULT_PRODUCTS, DEFAULT_POSTS } from "../../data/defaultData.js";
@@ -16,6 +16,7 @@ let allProducts = [...DEFAULT_PRODUCTS];
 let allPosts = [...DEFAULT_POSTS];
 let currentProdCategory = "all";
 let currentSearch = "";
+let currentSort = "default";
 
 /**
  * Appends the Amazon affiliate tag and tracking parameters to any Amazon URL
@@ -36,12 +37,21 @@ export function buildAffiliateUrl(url, tag = AMAZON_CONFIG.defaultAffiliateTag) 
 }
 
 /**
+ * Parse numeric price for sorting
+ */
+function parsePrice(priceStr) {
+  if (!priceStr) return 0;
+  const num = parseInt(priceStr.replace(/[^0-9]/g, ""), 10);
+  return isNaN(num) ? 0 : num;
+}
+
+/**
  * Render star ratings dynamically
  */
 function renderStars(rating = 4.5) {
   const fullStars = Math.floor(rating);
   const hasHalf = rating % 1 >= 0.3 && rating % 1 <= 0.8;
-  const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+  const emptyStars = Math.max(0, 5 - fullStars - (hasHalf ? 1 : 0));
 
   let html = "";
   for (let i = 0; i < fullStars; i++) {
@@ -59,11 +69,11 @@ function renderStars(rating = 4.5) {
 /**
  * Render Amazon Affiliate Product Cards
  */
-export function renderProducts(category = "all", searchQuery = "") {
+export function renderProducts(category = "all", searchQuery = "", sortOrder = "default") {
   const container = document.getElementById("affiliateProductGrid");
   if (!container) return;
 
-  let filtered = allProducts;
+  let filtered = [...allProducts];
 
   // Filter by category
   if (category && category !== "all") {
@@ -77,8 +87,20 @@ export function renderProducts(category = "all", searchQuery = "") {
       (p) =>
         p.name.toLowerCase().includes(q) ||
         (p.brand && p.brand.toLowerCase().includes(q)) ||
+        p.category.toLowerCase().includes(q) ||
         (p.highlights && p.highlights.some((h) => h.toLowerCase().includes(q)))
     );
+  }
+
+  // Sorting
+  if (sortOrder === "price-asc") {
+    filtered.sort((a, b) => parsePrice(a.priceEstimate) - parsePrice(b.priceEstimate));
+  } else if (sortOrder === "price-desc") {
+    filtered.sort((a, b) => parsePrice(b.priceEstimate) - parsePrice(a.priceEstimate));
+  } else if (sortOrder === "rating") {
+    filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  } else if (sortOrder === "name") {
+    filtered.sort((a, b) => a.name.localeCompare(b.name));
   }
 
   // Update product count indicator if present
@@ -89,10 +111,11 @@ export function renderProducts(category = "all", searchQuery = "") {
 
   if (filtered.length === 0) {
     container.innerHTML = `
-      <div class="affiliate-empty-state">
-        <i class="fa fa-search"></i>
-        <h3>No Hardware Found</h3>
-        <p>No products match your search "${searchQuery}". Try selecting "All Deals" or clearing your search.</p>
+      <div class="affiliate-empty-state" style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: #ffffff; border-radius: 16px; border: 1.5px dashed #cbd5e1;">
+        <i class="fa fa-search" style="font-size: 32px; color: #94a3b8; margin-bottom: 12px; display: block;"></i>
+        <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">No Hardware Found</h3>
+        <p style="font-size: 14px; color: #64748b; margin-bottom: 18px;">No products match your search "${searchQuery}".</p>
+        <button onclick="window.quickSearch('')" class="btn-primary" style="background:#0284c7; padding: 9px 20px; font-size: 13px;">View All Hardware Deals</button>
       </div>
     `;
     return;
@@ -163,10 +186,10 @@ export function renderBlogPosts(category = "all") {
 
   if (filtered.length === 0) {
     container.innerHTML = `
-      <div class="affiliate-empty-state">
-        <i class="fa fa-file-text-o"></i>
-        <h3>No Articles Found</h3>
-        <p>No guides published in this category yet.</p>
+      <div class="affiliate-empty-state" style="grid-column: 1 / -1; text-align: center; padding: 48px 20px;">
+        <i class="fa fa-file-text-o" style="font-size: 32px; color: #94a3b8; margin-bottom: 12px; display: block;"></i>
+        <h3 style="font-size: 18px; font-weight: 800; color: #0f172a;">No Articles Found</h3>
+        <p style="font-size: 14px; color: #64748b;">No guides published in this category yet.</p>
       </div>
     `;
     return;
@@ -277,11 +300,42 @@ export function closeArticleModal() {
 }
 
 /**
+ * Quick Search Helper (triggered from trending chips or script)
+ */
+export function quickSearch(term = "") {
+  const searchInput = document.getElementById("heroSearchInput") || document.getElementById("productSearchInput");
+  const clearBtn = document.getElementById("clearSearchBtn");
+  
+  if (searchInput) {
+    searchInput.value = term;
+    if (clearBtn) clearBtn.style.display = term ? "flex" : "none";
+  }
+  
+  currentSearch = term;
+  
+  // Reset category pill to "All" if searching
+  if (term) {
+    currentProdCategory = "all";
+    document.querySelectorAll(".category-pill").forEach((btn) => {
+      if (btn.getAttribute("data-category") === "all") btn.classList.add("active");
+      else btn.classList.remove("active");
+    });
+  }
+
+  renderProducts(currentProdCategory, currentSearch, currentSort);
+
+  const productsSection = document.getElementById("products");
+  if (productsSection && term) {
+    productsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+/**
  * Initialize dynamic hub
  */
 export async function initAffiliateHub() {
   // Render default embedded data immediately without delay
-  renderProducts("all");
+  renderProducts("all", "", "default");
   renderBlogPosts("all");
 
   // Product Category Filters (Pills)
@@ -291,16 +345,40 @@ export async function initAffiliateHub() {
       prodFilterBtns.forEach((b) => b.classList.remove("active"));
       this.classList.add("active");
       currentProdCategory = this.getAttribute("data-category") || "all";
-      renderProducts(currentProdCategory, currentSearch);
+      renderProducts(currentProdCategory, currentSearch, currentSort);
     });
   });
 
-  // Product Search Input
+  // Product Search Input & Clear Button
   const searchInput = document.getElementById("heroSearchInput") || document.getElementById("productSearchInput");
+  const clearBtn = document.getElementById("clearSearchBtn");
+
   if (searchInput) {
     searchInput.addEventListener("input", function () {
       currentSearch = this.value;
-      renderProducts(currentProdCategory, currentSearch);
+      if (clearBtn) clearBtn.style.display = this.value ? "flex" : "none";
+      renderProducts(currentProdCategory, currentSearch, currentSort);
+    });
+  }
+
+  if (clearBtn) {
+    clearBtn.addEventListener("click", function () {
+      if (searchInput) {
+        searchInput.value = "";
+        searchInput.focus();
+      }
+      currentSearch = "";
+      clearBtn.style.display = "none";
+      renderProducts(currentProdCategory, "", currentSort);
+    });
+  }
+
+  // Product Sort Select
+  const sortSelect = document.getElementById("productSortSelect");
+  if (sortSelect) {
+    sortSelect.addEventListener("change", function () {
+      currentSort = this.value;
+      renderProducts(currentProdCategory, currentSearch, currentSort);
     });
   }
 
@@ -316,7 +394,7 @@ export async function initAffiliateHub() {
       const p = await prodRes.json();
       if (Array.isArray(p) && p.length > 0) {
         allProducts = p;
-        renderProducts(currentProdCategory, currentSearch);
+        renderProducts(currentProdCategory, currentSearch, currentSort);
       }
     }
     if (postRes.ok) {
@@ -344,6 +422,7 @@ export async function initAffiliateHub() {
   // Modal helpers on window
   window.openArticleModal = openArticleModal;
   window.closeArticleModal = closeArticleModal;
+  window.quickSearch = quickSearch;
   window.handleModalBackdropClick = function (e) {
     if (e.target.id === "blogModal") {
       closeArticleModal();

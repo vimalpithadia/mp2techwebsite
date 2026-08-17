@@ -22,7 +22,7 @@
     <link rel="stylesheet" type="text/css" href="css/style1.css?v=20260109" media="all" />
     <link rel="stylesheet" type="text/css" href="css/dynamic.css">
     <link rel="stylesheet" type="text/css" href="css/responsive.css">
-    <link rel="stylesheet" type="text/css" href="css/blog.css?v=20260817c">
+    <link rel="stylesheet" type="text/css" href="css/blog.css?v=20260818e">
 </head>
 
 <body>
@@ -77,40 +77,99 @@
     </header>
     <!-- Header Ends -->
 
-    <!-- STOREFRONT TOOLBAR & SEARCH (CLEAN MINIMAL HEADER) -->
+    <!-- ELITE TECH STOREFRONT HERO -->
     <section class="storefront-header-bar">
         <div class="container">
             <div class="storefront-toolbar">
                 <div class="storefront-title-box">
+                    <div class="hero-tech-badge">
+                        <span class="pulse-dot"></span>
+                        <i class="fa fa-amazon" style="color:var(--amz-orange);"></i> MP2TECH Certified Hardware & Benchmarks
+                    </div>
                     <h1>
-                        <i class="fa fa-amazon" style="color:var(--amz-orange);"></i> Technician-Tested Hardware
-                        <span class="store-trust-pill"><i class="fa fa-shield"></i> 100% Genuine</span>
+                        Technician-Tested <span class="gradient-text-gold">Hardware & Upgrades</span>
                     </h1>
-                    <p>Genuine SSDs, RAM, cooling components & diagnostic tools tested by MP2TECH engineers.</p>
+                    <p>Hand-picked and stress-tested in our repair lab for peak data transfer rates, thermal stability, and 100% motherboard compatibility.</p>
+                    
+                    <div class="hero-trust-row">
+                        <div class="hero-trust-item"><i class="fa fa-shield"></i> 100% Genuine Silicon</div>
+                        <div class="hero-trust-item"><i class="fa fa-bolt"></i> Zero Bottleneck Tested</div>
+                        <div class="hero-trust-item"><i class="fa fa-truck"></i> Official Amazon Prime</div>
+                    </div>
                 </div>
                 
-                <!-- Live Search Box -->
-                <div class="store-search-box">
-                    <i class="fa fa-search"></i>
-                    <input type="text" id="heroSearchInput" class="store-search-input" placeholder="Search SSDs, RAM, thermal paste, tools..." />
+                <!-- Live Search Box & Trending Keywords -->
+                <div class="store-search-box-wrap">
+                    <div class="store-search-box">
+                        <i class="fa fa-search search-icon"></i>
+                        <input type="text" id="heroSearchInput" class="store-search-input" placeholder="Search SSDs, RAM, thermal paste, tools..." autocomplete="off" />
+                        <button type="button" id="clearSearchBtn" class="clear-search-btn" title="Clear Search">&times;</button>
+                    </div>
+                    <div class="trending-search-row">
+                        <span>🔥 Trending:</span>
+                        <a class="trend-pill" onclick="window.quickSearch('Crucial')">Crucial RAM</a>
+                        <a class="trend-pill" onclick="window.quickSearch('NVMe')">NVMe SSDs</a>
+                        <a class="trend-pill" onclick="window.quickSearch('Arctic')">Arctic Thermal</a>
+                        <a class="trend-pill" onclick="window.quickSearch('iFixit')">iFixit Tools</a>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- STICKY CATEGORY PILLS BAR -->
+    <!-- STICKY CATEGORY PILLS BAR WITH SORTING -->
     <nav class="category-filter-nav">
         <div class="container">
-            <div class="category-pills-wrap">
-                <button class="category-pill active" data-category="all"><i class="fa fa-th-large"></i> All Deals</button>
-                <button class="category-pill" data-category="storage"><i class="fa fa-hdd-o"></i> SSDs & Storage</button>
-                <button class="category-pill" data-category="ram"><i class="fa fa-microchip"></i> RAM Modules</button>
-                <button class="category-pill" data-category="cooling"><i class="fa fa-snowflake-o"></i> Cooling & Thermal</button>
-                <button class="category-pill" data-category="tools"><i class="fa fa-wrench"></i> Diagnostic Tools</button>
-                <button class="category-pill" data-category="accessories"><i class="fa fa-usb"></i> Accessories</button>
+            <div class="category-nav-container">
+                <div class="category-pills-wrap">
+                    <button class="category-pill active" data-category="all"><i class="fa fa-th-large"></i> All Deals</button>
+                    <button class="category-pill" data-category="storage"><i class="fa fa-hdd-o"></i> SSDs & Storage</button>
+                    <button class="category-pill" data-category="ram"><i class="fa fa-microchip"></i> RAM Modules</button>
+                    <button class="category-pill" data-category="cooling"><i class="fa fa-snowflake-o"></i> Cooling & Thermal</button>
+                    <button class="category-pill" data-category="tools"><i class="fa fa-wrench"></i> Diagnostic Tools</button>
+                    <button class="category-pill" data-category="accessories"><i class="fa fa-usb"></i> Accessories</button>
+                </div>
+                <div class="category-sort-wrap">
+                    <select id="productSortSelect" class="sort-filter-select" aria-label="Sort products">
+                        <option value="default">Sort: Recommended</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                        <option value="rating">Highest Rated</option>
+                        <option value="name">Product Name (A-Z)</option>
+                    </select>
+                </div>
             </div>
         </div>
     </nav>
+
+    <!-- ASSURANCE PILLARS (3 VALUE PROPOSITIONS) -->
+    <section class="assurance-bar">
+        <div class="container">
+            <div class="assurance-grid">
+                <div class="assurance-card">
+                    <div class="assurance-icon blue"><i class="fa fa-flask"></i></div>
+                    <div class="assurance-text">
+                        <h4>Lab Tested & Benchmarked</h4>
+                        <p>Stress-tested under real heavy thermal workloads before recommendation.</p>
+                    </div>
+                </div>
+                <div class="assurance-card">
+                    <div class="assurance-icon orange"><i class="fa fa-shield"></i></div>
+                    <div class="assurance-text">
+                        <h4>Zero-Risk Compatibility</h4>
+                        <p>Verified pin-outs and slot fits for Dell, HP, Lenovo, ASUS & Acer.</p>
+                    </div>
+                </div>
+                <div class="assurance-card">
+                    <div class="assurance-icon green"><i class="fa fa-amazon"></i></div>
+                    <div class="assurance-text">
+                        <h4>Official Amazon Warranty</h4>
+                        <p>Authentic brand replacement & prompt 10-day return policy.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- MAIN PRODUCTS SHOWCASE -->
     <main class="products-section" id="products">
@@ -236,6 +295,6 @@
 
     <!-- Scripts -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/app.js?v=20260818e"></script>
 </body>
 </html>
