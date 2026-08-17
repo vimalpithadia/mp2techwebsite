@@ -76,10 +76,13 @@
                 </div>
                 <div class="admin-topbar-actions">
                     <a href="blog.html" target="_blank" rel="noopener" class="view-site-link">
-                        <i class="fa fa-external-link"></i> View Live Blog Hub
+                        <i class="fa fa-external-link"></i> View Live Store
                     </a>
-                    <button onclick="window.exportDataFiles()" class="quick-publish-btn">
-                        <i class="fa fa-download"></i> Export Data Files
+                    <button onclick="window.mergeAndDeployToProduction()" class="quick-publish-btn" style="background:#0284c7;">
+                        <i class="fa fa-rocket"></i> Deploy Live
+                    </button>
+                    <button onclick="window.exportDataFiles()" class="quick-publish-btn" style="background:#64748b;">
+                        <i class="fa fa-download"></i> Export Data
                     </button>
                 </div>
             </header>
@@ -94,7 +97,7 @@
                         <div class="metric-card">
                             <div class="metric-icon orange"><i class="fa fa-amazon"></i></div>
                             <div class="metric-data">
-                                <h3 id="metricTotalProds">12</h3>
+                                <h3 id="metricTotalProds">13</h3>
                                 <p>Amazon Affiliate Items</p>
                             </div>
                         </div>
@@ -130,14 +133,17 @@
                             <h2>Quick Actions</h2>
                         </div>
                         <div style="display: flex; gap: 14px; flex-wrap: wrap;">
-                            <button onclick="document.querySelector('[data-tab=products]').click()" class="btn-primary">
+                            <button onclick="document.querySelector('[data-tab=products]').click()" class="btn-primary" style="background:var(--amz-orange); color:#111;">
                                 <i class="fa fa-plus"></i> Add New Amazon Product
                             </button>
-                            <button onclick="document.querySelector('[data-tab=articles]').click()" class="btn-primary" style="background:#0284c7;">
+                            <button onclick="document.querySelector('[data-tab=articles]').click()" class="btn-primary">
                                 <i class="fa fa-pencil"></i> Write New Blog Article
                             </button>
-                            <button onclick="document.querySelector('[data-tab=github]').click()" class="btn-primary" style="background:#10b981;">
-                                <i class="fa fa-cloud-upload"></i> Sync to GitHub Repository
+                            <button onclick="window.mergeAndDeployToProduction()" class="btn-primary" style="background:#0284c7;">
+                                <i class="fa fa-rocket"></i> Deploy Live (Merge to Main)
+                            </button>
+                            <button onclick="document.querySelector('[data-tab=github]').click()" class="btn-secondary">
+                                <i class="fa fa-cog"></i> GitHub Sync Settings
                             </button>
                         </div>
                     </div>
@@ -440,10 +446,22 @@
                             </div>
 
                             <button onclick="window.publishDirectlyToGitHub()" class="btn-primary" style="background:#10b981; padding: 12px 24px; font-size: 15px;">
-                                <i class="fa fa-cloud-upload"></i> Publish & Commit to GitHub
+                                <i class="fa fa-cloud-upload"></i> Publish & Commit to GitHub Branch
                             </button>
 
                             <div id="githubSyncStatus" style="margin-top: 14px; font-size: 14px;"></div>
+                        </div>
+
+                        <!-- ONE-CLICK LIVE PRODUCTION DEPLOYMENT -->
+                        <div class="sync-box" style="background: linear-gradient(135deg, #0b1120 0%, #1e293b 100%); border: 1.5px solid #0284c7; margin-top: 24px;">
+                            <h3 style="color:#38bdf8;"><i class="fa fa-rocket"></i> One-Click Live Production Deployment</h3>
+                            <p>Once you have published changes to your <code>feature</code> branch, click below to automatically merge <code>feature</code> ➔ <code>dev</code> ➔ <code>main</code> and push live to <strong>https://www.mp2tech.co.in/</strong>.</p>
+                            
+                            <button onclick="window.mergeAndDeployToProduction()" class="btn-primary" style="background:#0284c7; padding: 13px 26px; font-size: 15px; font-weight:800;">
+                                <i class="fa fa-rocket"></i> Deploy Live (Merge Feature ➔ Dev ➔ Main)
+                            </button>
+
+                            <div id="deployLiveStatus" style="margin-top: 14px; font-size: 14px;"></div>
                         </div>
 
                         <div class="panel-header" style="margin-top: 30px;">

@@ -504,6 +504,7 @@ export async function publishDirectlyToGitHub() {
   const branchInput = document.getElementById("githubBranchInput");
   const statusEl = document.getElementById("githubSyncStatus");
 
+  // Remember token in session
   const token = tokenInput ? tokenInput.value.trim() : "";
   const branch = branchInput ? branchInput.value.trim() : "feature";
 
@@ -511,6 +512,7 @@ export async function publishDirectlyToGitHub() {
     alert("Please enter your GitHub Personal Access Token (with 'repo' write permission).");
     return;
   }
+  sessionStorage.setItem("mp2tech_github_pat", token);
 
   statusEl.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Committing changes to GitHub repo (${GITHUB_REPO} on branch '${branch}')...`;
 
@@ -533,12 +535,99 @@ export async function publishDirectlyToGitHub() {
       "feat(blog): update articles via admin portal"
     );
 
-    statusEl.innerHTML = `<span style="color:#10b981;"><i class="fa fa-check-circle"></i> Successfully published to GitHub '${branch}' branch!</span>`;
-    showToast("Changes published live to GitHub repository!");
+    statusEl.innerHTML = `
+      <div style="background:rgba(16, 185, 129, 0.15); border:1px solid #10b981; padding:10px 14px; border-radius:8px; color:#34d399; margin-top:10px;">
+        <i class="fa fa-check-circle"></i> Successfully published to GitHub '<strong>${branch}</strong>' branch!
+      </div>
+    `;
+    showToast(`Published to GitHub '${branch}' branch!`);
   } catch (err) {
     statusEl.innerHTML = `<span style="color:#ef4444;"><i class="fa fa-times-circle"></i> Sync failed: ${err.message}</span>`;
     showToast(`GitHub sync failed: ${err.message}`, "error");
   }
+}
+
+/**
+ * One-Click Merge & Live Production Deployment (Feature -> Dev -> Main)
+ */
+export async function mergeAndDeployToProduction() {
+  const tokenInput = document.getElementById("githubTokenInput");
+  let token = tokenInput ? tokenInput.value.trim() : "";
+  if (!token) {
+    token = sessionStorage.getItem("mp2tech_github_pat") || "";
+  }
+  if (!token) {
+    token = prompt("Please enter your GitHub Personal Access Token to deploy live:") || "";
+    if (token) {
+      if (tokenInput) tokenInput.value = token;
+      sessionStorage.setItem("mp2tech_github_pat", token);
+    } else {
+      return;
+    }
+  } else {
+    sessionStorage.setItem("mp2tech_github_pat", token);
+  }
+
+  const statusEl = document.getElementById("deployLiveStatus") || document.getElementById("githubSyncStatus");
+  if (statusEl) {
+    statusEl.innerHTML = `<div style="color:#38bdf8; padding:8px 0;"><i class="fa fa-spinner fa-spin"></i> Step 1/2: Merging 'feature' branch into 'dev'...</div>`;
+  }
+
+  try {
+    // Step 1: Merge feature -> dev
+    await mergeBranchesOnGitHub(token, "dev", "feature", "feat: merge feature into dev via admin studio");
+
+    if (statusEl) {
+      statusEl.innerHTML = `<div style="color:#38bdf8; padding:8px 0;"><i class="fa fa-spinner fa-spin"></i> Step 2/2: Merging 'dev' into 'main' (Production)...</div>`;
+    }
+
+    // Step 2: Merge dev -> main
+    await mergeBranchesOnGitHub(token, "main", "dev", "feat: deploy to production (merge dev into main) via admin studio");
+
+    if (statusEl) {
+      statusEl.innerHTML = `
+        <div style="background:rgba(16, 185, 129, 0.15); border:1px solid #10b981; padding:12px 16px; border-radius:8px; color:#34d399; margin-top:10px;">
+          <strong><i class="fa fa-check-circle"></i> Live Deployment Successful!</strong><br>
+          <span style="font-size:12.5px; color:#cbd5e1;">All changes were merged into 'dev' and 'main'. Your live website (www.mp2tech.co.in) is updating now (~30 seconds).</span>
+        </div>
+      `;
+    }
+    showToast("Successfully deployed to production live site!");
+  } catch (err) {
+    if (statusEl) {
+      statusEl.innerHTML = `
+        <div style="background:rgba(239, 68, 68, 0.15); border:1px solid #ef4444; padding:12px 16px; border-radius:8px; color:#f87171; margin-top:10px;">
+          <strong><i class="fa fa-times-circle"></i> Deployment Failed:</strong> ${err.message}
+        </div>
+      `;
+    }
+    showToast(`Merge failed: ${err.message}`, "error");
+  }
+}
+
+async function mergeBranchesOnGitHub(token, base, head, commit_message) {
+  const url = `https://api.github.com/repos/${GITHUB_REPO}/merges`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `token ${token}`,
+      "Content-Type": "application/json",
+      Accept: "application/vnd.github.v3+json",
+    },
+    body: JSON.stringify({
+      base,
+      head,
+      commit_message,
+    }),
+  });
+
+  // 201 = Merged successfully, 204 = Already up to date (no merge needed)
+  if (res.status === 201 || res.status === 204) {
+    return true;
+  }
+
+  const errData = await res.json();
+  throw new Error(errData.message || `Failed to merge ${head} into ${base}`);
 }
 
 async function commitFileToGitHub(token, branch, path, content, message) {
@@ -590,6 +679,13 @@ async function commitFileToGitHub(token, branch, path, content, message) {
  */
 export function initAdminStudio() {
   checkAuth();
+
+  // Restore stored token if present
+  const savedToken = sessionStorage.getItem("mp2tech_github_pat");
+  const tokenInput = document.getElementById("githubTokenInput");
+  if (savedToken && tokenInput) {
+    tokenInput.value = savedToken;
+  }
 
   // Login form
   const loginForm = document.getElementById("loginForm");
@@ -648,4 +744,6 @@ export function initAdminStudio() {
 
   window.exportDataFiles = exportDataFiles;
   window.publishDirectlyToGitHub = publishDirectlyToGitHub;
+  window.mergeAndDeployToProduction = mergeAndDeployToProduction;
 }
+
