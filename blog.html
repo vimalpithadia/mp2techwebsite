@@ -22,7 +22,7 @@
     <link rel="stylesheet" type="text/css" href="css/style1.css?v=20260109" media="all" />
     <link rel="stylesheet" type="text/css" href="css/dynamic.css">
     <link rel="stylesheet" type="text/css" href="css/responsive.css">
-    <link rel="stylesheet" type="text/css" href="css/blog.css?v=20260818e">
+    <link rel="stylesheet" type="text/css" href="css/blog.css?v=20260818f">
 </head>
 
 <body>
@@ -101,10 +101,11 @@
         </div>
     </section>
 
-    <!-- STICKY CATEGORY PILLS BAR WITH SORTING -->
+    <!-- STICKY UNIFIED CATEGORY & SEARCH TOOLBAR -->
     <nav class="category-filter-nav">
         <div class="container">
             <div class="category-nav-container">
+                <!-- Left: Category Pills -->
                 <div class="category-pills-wrap">
                     <button class="category-pill active" data-category="all"><i class="fa fa-th-large"></i> All Deals</button>
                     <button class="category-pill" data-category="storage"><i class="fa fa-hdd-o"></i> SSDs & Storage</button>
@@ -113,7 +114,14 @@
                     <button class="category-pill" data-category="tools"><i class="fa fa-wrench"></i> Diagnostic Tools</button>
                     <button class="category-pill" data-category="accessories"><i class="fa fa-usb"></i> Accessories</button>
                 </div>
-                <div class="category-sort-wrap">
+
+                <!-- Right: Compact Search & Sort Controls -->
+                <div class="category-controls-wrap">
+                    <div class="nav-search-box">
+                        <i class="fa fa-search nav-search-icon"></i>
+                        <input type="text" id="heroSearchInput" class="nav-search-input" placeholder="Search hardware..." autocomplete="off" />
+                        <button type="button" id="clearSearchBtn" class="nav-search-clear" title="Clear search">&times;</button>
+                    </div>
                     <select id="productSortSelect" class="sort-filter-select" aria-label="Sort products">
                         <option value="default">Sort: Recommended</option>
                         <option value="price-asc">Price: Low to High</option>
@@ -279,6 +287,6 @@
 
     <!-- Scripts -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script type="module" src="js/app.js?v=20260818e"></script>
+    <script type="module" src="js/app.js?v=20260818f"></script>
 </body>
 </html>
