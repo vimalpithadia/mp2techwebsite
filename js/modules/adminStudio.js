@@ -2,7 +2,7 @@
  * MP2TECH Enterprise Admin Studio Logic
  * Handles Authentication, CRUD with Bulk Selection & Actions,
  * Live Table Search & Filters, Real-Time Preview,
- * and One-Click GitHub Sync & Live Deployment.
+ * and Bulletproof One-Click GitHub Sync & Live Deployment.
  */
 
 import { DEFAULT_PRODUCTS, DEFAULT_POSTS } from "../../data/defaultData.js";
@@ -127,7 +127,6 @@ export function handleLogout() {
  * Load initial datasets from JSON files
  */
 export async function loadData() {
-  // Check if local modified state exists in session
   const localProds = sessionStorage.getItem("mp2tech_draft_products");
   const localPosts = sessionStorage.getItem("mp2tech_draft_posts");
   if (localProds) {
@@ -200,27 +199,19 @@ function saveDraftState() {
    AMAZON PRODUCTS CRUD & BULK ACTIONS
    ========================================================================== */
 
-/**
- * Parse numeric price for sorting
- */
 function parsePrice(priceStr) {
   if (!priceStr) return 0;
   const num = parseInt(priceStr.replace(/[^0-9]/g, ""), 10);
   return isNaN(num) ? 0 : num;
 }
 
-/**
- * Get filtered & sorted products list
- */
 function getFilteredProducts() {
   let list = [...products];
 
-  // Category filter
   if (prodCategoryFilter && prodCategoryFilter !== "all") {
     list = list.filter((p) => p.category === prodCategoryFilter);
   }
 
-  // Search filter
   if (prodSearchQuery && prodSearchQuery.trim() !== "") {
     const q = prodSearchQuery.toLowerCase().trim();
     list = list.filter(
@@ -232,7 +223,6 @@ function getFilteredProducts() {
     );
   }
 
-  // Sorting
   if (prodSortOrder === "price-asc") {
     list.sort((a, b) => parsePrice(a.priceEstimate) - parsePrice(b.priceEstimate));
   } else if (prodSortOrder === "price-desc") {
@@ -262,11 +252,10 @@ export function renderProductsTable() {
     return;
   }
 
-  // Check if all visible are selected
-  const allVisibleSelected = filtered.every((p) => selectedProductIds.has(p.id));
+  const allVisibleSelected = filtered.length > 0 && filtered.every((p) => selectedProductIds.has(p.id));
   const selectAllBox = document.getElementById("selectAllProds");
   if (selectAllBox) {
-    selectAllBox.checked = filtered.length > 0 && allVisibleSelected;
+    selectAllBox.checked = allVisibleSelected;
   }
 
   tbody.innerHTML = filtered
@@ -306,9 +295,6 @@ export function renderProductsTable() {
   updateBulkBar();
 }
 
-/**
- * Bulk Selection Handlers
- */
 export function toggleSelectAllProducts(checked) {
   const filtered = getFilteredProducts();
   if (checked) {
@@ -346,9 +332,6 @@ function updateBulkBar() {
   }
 }
 
-/**
- * Bulk Delete Selected Products
- */
 export function bulkDeleteProducts() {
   const count = selectedProductIds.size;
   if (count === 0) return;
@@ -443,7 +426,6 @@ export function editProduct(id) {
 
   document.getElementById("productFormSubmitBtn").textContent = "Save Changes";
   updateProductLivePreview();
-
   document.getElementById("productFormCard").scrollIntoView({ behavior: "smooth" });
 }
 
@@ -521,10 +503,10 @@ export function renderPostsTable() {
     return;
   }
 
-  const allVisibleSelected = filtered.every((p) => selectedPostIds.has(p.id));
+  const allVisibleSelected = filtered.length > 0 && filtered.every((p) => selectedPostIds.has(p.id));
   const selectAllBox = document.getElementById("selectAllPosts");
   if (selectAllBox) {
-    selectAllBox.checked = filtered.length > 0 && allVisibleSelected;
+    selectAllBox.checked = allVisibleSelected;
   }
 
   tbody.innerHTML = filtered
@@ -728,7 +710,7 @@ export function updatePostLivePreview() {
 }
 
 /* ==========================================================================
-   EXPORT & GITHUB DIRECT SYNC & ONE-CLICK LIVE DEPLOYMENT
+   EXPORT & GITHUB DIRECT SYNC & BULLETPROOF LIVE DEPLOYMENT
    ========================================================================== */
 
 export function exportDataFiles() {
@@ -751,24 +733,36 @@ function downloadJson(filename, data) {
   URL.revokeObjectURL(url);
 }
 
+function getStoredToken() {
+  const input = document.getElementById("githubTokenInput");
+  let t = input ? input.value.trim() : "";
+  if (!t) t = sessionStorage.getItem("mp2tech_github_pat") || "";
+  if (!t) t = localStorage.getItem("mp2tech_github_pat") || "";
+  return t;
+}
+
+function storeToken(t) {
+  if (!t) return;
+  sessionStorage.setItem("mp2tech_github_pat", t);
+  localStorage.setItem("mp2tech_github_pat", t);
+  const input = document.getElementById("githubTokenInput");
+  if (input) input.value = t;
+}
+
 export async function publishDirectlyToGitHub() {
-  const tokenInput = document.getElementById("githubTokenInput");
+  let token = getStoredToken();
   const branchInput = document.getElementById("githubBranchInput");
   const statusEl = document.getElementById("githubSyncStatus");
-
-  let token = tokenInput ? tokenInput.value.trim() : "";
-  if (!token) token = sessionStorage.getItem("mp2tech_github_pat") || "";
-
   const branch = branchInput ? branchInput.value.trim() : "feature";
 
   if (!token) {
-    alert("Please enter your GitHub Personal Access Token (with 'repo' write permission).");
-    return;
+    token = prompt("Please enter your GitHub Personal Access Token (PAT):") || "";
+    if (!token) return;
+    storeToken(token);
   }
-  sessionStorage.setItem("mp2tech_github_pat", token);
 
   if (statusEl) {
-    statusEl.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Committing changes to GitHub repo (${GITHUB_REPO} on branch '${branch}')...`;
+    statusEl.innerHTML = `<div style="color:#38bdf8; padding:8px 0;"><i class="fa fa-spinner fa-spin"></i> Committing changes to GitHub (${GITHUB_REPO} on '${branch}')...</div>`;
   }
 
   try {
@@ -803,114 +797,121 @@ export async function publishDirectlyToGitHub() {
     showToast(`Published to GitHub '${branch}' branch!`);
   } catch (err) {
     if (statusEl) {
-      statusEl.innerHTML = `<span style="color:#ef4444;"><i class="fa fa-times-circle"></i> Sync failed: ${err.message}</span>`;
+      statusEl.innerHTML = `<div style="background:rgba(239, 68, 68, 0.15); border:1px solid #ef4444; padding:10px 14px; border-radius:8px; color:#f87171; margin-top:10px;"><i class="fa fa-times-circle"></i> Sync failed: ${err.message}</div>`;
     }
     showToast(`GitHub sync failed: ${err.message}`, "error");
   }
 }
 
+/**
+ * Bulletproof Deploy Live to Production (Feature -> Dev -> Main)
+ */
 export async function mergeAndDeployToProduction() {
-  const tokenInput = document.getElementById("githubTokenInput");
-  let token = tokenInput ? tokenInput.value.trim() : "";
+  let token = getStoredToken();
   if (!token) {
-    token = sessionStorage.getItem("mp2tech_github_pat") || "";
-  }
-  if (!token) {
-    token = prompt("Please enter your GitHub Personal Access Token to deploy live:") || "";
-    if (token) {
-      if (tokenInput) tokenInput.value = token;
-      sessionStorage.setItem("mp2tech_github_pat", token);
-    } else {
-      return;
-    }
-  } else {
-    sessionStorage.setItem("mp2tech_github_pat", token);
+    token = prompt("Please enter your GitHub Personal Access Token (PAT) to deploy live:") || "";
+    if (!token) return;
+    storeToken(token);
   }
 
-  // If there are draft changes in session, publish them to feature first!
-  if (hasUnpublishedChanges) {
-    try {
-      showToast("Saving pending changes to feature branch before deploy...");
-      await commitFileToGitHub(
-        token,
-        "feature",
-        "data/affiliate-products.json",
-        JSON.stringify(products, null, 2),
-        "feat(affiliate): update products before production deployment"
-      );
-      await commitFileToGitHub(
-        token,
-        "feature",
-        "data/blog-posts.json",
-        JSON.stringify(posts, null, 2),
-        "feat(blog): update articles before production deployment"
-      );
-      hasUnpublishedChanges = false;
-      sessionStorage.removeItem("mp2tech_draft_products");
-      sessionStorage.removeItem("mp2tech_draft_posts");
-      updateDraftBanner();
-    } catch (e) {
-      console.warn("Could not pre-commit draft:", e);
-    }
-  }
+  const deployBtns = document.querySelectorAll(".btn-deploy-action, [onclick*='mergeAndDeployToProduction']");
+  deployBtns.forEach((btn) => {
+    btn.dataset.originalText = btn.innerHTML;
+    btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Deploying Live...`;
+    btn.disabled = true;
+  });
 
   const statusEl = document.getElementById("deployLiveStatus") || document.getElementById("githubSyncStatus");
   if (statusEl) {
-    statusEl.innerHTML = `<div style="color:#38bdf8; padding:8px 0;"><i class="fa fa-spinner fa-spin"></i> Step 1/2: Merging 'feature' branch into 'dev'...</div>`;
+    statusEl.innerHTML = `
+      <div style="background:#1e293b; border:1px solid #0284c7; padding:14px; border-radius:8px; color:#38bdf8; margin-top:12px;">
+        <i class="fa fa-spinner fa-spin"></i> <strong>Deploying to Live Site...</strong><br>
+        <span style="font-size:12.5px; color:#94a3b8;">Syncing data catalog across 'feature', 'dev', and 'main' branches...</span>
+      </div>
+    `;
   }
 
   try {
-    await mergeBranchesOnGitHub(token, "dev", "feature", "feat: merge feature into dev via admin studio");
+    // 1. Commit latest catalog to feature branch
+    await commitFileToGitHub(
+      token,
+      "feature",
+      "data/affiliate-products.json",
+      JSON.stringify(products, null, 2),
+      "feat(affiliate): sync products catalog"
+    );
+    await commitFileToGitHub(
+      token,
+      "feature",
+      "data/blog-posts.json",
+      JSON.stringify(posts, null, 2),
+      "feat(blog): sync blog articles"
+    );
 
-    if (statusEl) {
-      statusEl.innerHTML = `<div style="color:#38bdf8; padding:8px 0;"><i class="fa fa-spinner fa-spin"></i> Step 2/2: Merging 'dev' into 'main' (Production)...</div>`;
-    }
+    // 2. Commit latest catalog directly to dev branch
+    await commitFileToGitHub(
+      token,
+      "dev",
+      "data/affiliate-products.json",
+      JSON.stringify(products, null, 2),
+      "feat(affiliate): deploy products to dev"
+    );
+    await commitFileToGitHub(
+      token,
+      "dev",
+      "data/blog-posts.json",
+      JSON.stringify(posts, null, 2),
+      "feat(blog): deploy blog articles to dev"
+    );
 
-    await mergeBranchesOnGitHub(token, "main", "dev", "feat: deploy to production (merge dev into main) via admin studio");
+    // 3. Commit latest catalog directly to main branch (triggers GitHub Pages live deploy!)
+    await commitFileToGitHub(
+      token,
+      "main",
+      "data/affiliate-products.json",
+      JSON.stringify(products, null, 2),
+      "feat(affiliate): deploy products to production main"
+    );
+    await commitFileToGitHub(
+      token,
+      "main",
+      "data/blog-posts.json",
+      JSON.stringify(posts, null, 2),
+      "feat(blog): deploy blog articles to production main"
+    );
+
+    hasUnpublishedChanges = false;
+    sessionStorage.removeItem("mp2tech_draft_products");
+    sessionStorage.removeItem("mp2tech_draft_posts");
+    updateDraftBanner();
 
     if (statusEl) {
       statusEl.innerHTML = `
-        <div style="background:rgba(16, 185, 129, 0.15); border:1px solid #10b981; padding:12px 16px; border-radius:8px; color:#34d399; margin-top:10px;">
-          <strong><i class="fa fa-check-circle"></i> Live Deployment Successful!</strong><br>
-          <span style="font-size:12.5px; color:#cbd5e1;">All changes were merged into 'dev' and 'main'. Your live website (www.mp2tech.co.in) is updating now (~30 seconds).</span>
+        <div style="background:rgba(16, 185, 129, 0.15); border:1.5px solid #10b981; padding:14px 18px; border-radius:8px; color:#34d399; margin-top:12px;">
+          <strong style="font-size:15px;"><i class="fa fa-check-circle"></i> Live Deployment Successful!</strong><br>
+          <span style="font-size:13px; color:#cbd5e1; display:inline-block; margin-top:4px;">
+            All product & blog updates have been published to <strong>main</strong>, <strong>dev</strong>, and <strong>feature</strong> branches. Your live site (<a href="https://www.mp2tech.co.in/blog.html" target="_blank" style="color:#38bdf8; text-decoration:underline;">mp2tech.co.in</a>) is updated!
+          </span>
         </div>
       `;
     }
-    showToast("Successfully deployed to production live site!");
+    showToast("Live deployment successful across all branches!");
   } catch (err) {
     if (statusEl) {
       statusEl.innerHTML = `
-        <div style="background:rgba(239, 68, 68, 0.15); border:1px solid #ef4444; padding:12px 16px; border-radius:8px; color:#f87171; margin-top:10px;">
-          <strong><i class="fa fa-times-circle"></i> Deployment Failed:</strong> ${err.message}
+        <div style="background:rgba(239, 68, 68, 0.15); border:1.5px solid #ef4444; padding:14px 18px; border-radius:8px; color:#f87171; margin-top:12px;">
+          <strong><i class="fa fa-times-circle"></i> Deployment Failed:</strong> ${err.message}<br>
+          <small style="color:#cbd5e1;">Please verify your GitHub token has 'Contents: Read & Write' permission.</small>
         </div>
       `;
     }
-    showToast(`Merge failed: ${err.message}`, "error");
+    showToast(`Deploy failed: ${err.message}`, "error");
+  } finally {
+    deployBtns.forEach((btn) => {
+      btn.innerHTML = btn.dataset.originalText || `<i class="fa fa-rocket"></i> Deploy Live (Merge Feature ➔ Dev ➔ Main)`;
+      btn.disabled = false;
+    });
   }
-}
-
-async function mergeBranchesOnGitHub(token, base, head, commit_message) {
-  const url = `https://api.github.com/repos/${GITHUB_REPO}/merges`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `token ${token}`,
-      "Content-Type": "application/json",
-      Accept: "application/vnd.github.v3+json",
-    },
-    body: JSON.stringify({
-      base,
-      head,
-      commit_message,
-    }),
-  });
-
-  if (res.status === 201 || res.status === 204) {
-    return true;
-  }
-
-  const errData = await res.json();
-  throw new Error(errData.message || `Failed to merge ${head} into ${base}`);
 }
 
 async function commitFileToGitHub(token, branch, path, content, message) {
@@ -920,7 +921,7 @@ async function commitFileToGitHub(token, branch, path, content, message) {
   try {
     const getRes = await fetch(apiUrl, {
       headers: {
-        Authorization: `token ${token}`,
+        Authorization: `Bearer ${token}`,
         Accept: "application/vnd.github.v3+json",
       },
     });
@@ -937,7 +938,7 @@ async function commitFileToGitHub(token, branch, path, content, message) {
   const putRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`, {
     method: "PUT",
     headers: {
-      Authorization: `token ${token}`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
       Accept: "application/vnd.github.v3+json",
     },
@@ -951,7 +952,7 @@ async function commitFileToGitHub(token, branch, path, content, message) {
 
   if (!putRes.ok) {
     const errData = await putRes.json();
-    throw new Error(errData.message || "Failed to commit file to GitHub.");
+    throw new Error(errData.message || `Failed to commit to branch '${branch}'.`);
   }
 }
 
@@ -961,7 +962,7 @@ async function commitFileToGitHub(token, branch, path, content, message) {
 export function initAdminStudio() {
   checkAuth();
 
-  const savedToken = sessionStorage.getItem("mp2tech_github_pat");
+  const savedToken = getStoredToken();
   const tokenInput = document.getElementById("githubTokenInput");
   if (savedToken && tokenInput) {
     tokenInput.value = savedToken;
