@@ -42,6 +42,30 @@ async function sha256(message) {
 }
 
 /**
+ * Robust Unicode UTF-8 to Base64 encoder (handles ₹ Rupee, emojis, and international chars)
+ */
+function utf8ToBase64(str) {
+  const bytes = new TextEncoder().encode(str);
+  let binary = "";
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+/**
+ * Formats authorization header for GitHub REST API
+ */
+function getAuthHeader(token) {
+  const trimmed = (token || "").trim();
+  if (trimmed.startsWith("Bearer ") || trimmed.startsWith("token ")) {
+    return trimmed;
+  }
+  return `Bearer ${trimmed}`;
+}
+
+/**
  * Show notification toast
  */
 export function showToast(message, type = "success") {
@@ -426,6 +450,7 @@ export function editProduct(id) {
 
   document.getElementById("productFormSubmitBtn").textContent = "Save Changes";
   updateProductLivePreview();
+
   document.getElementById("productFormCard").scrollIntoView({ behavior: "smooth" });
 }
 
@@ -465,7 +490,7 @@ export function updateProductLivePreview() {
 
 /* ==========================================================================
    BLOG POSTS CRUD & BULK ACTIONS
-   ========================================================================== */
+   ========================================================================= */
 
 function getFilteredPosts() {
   let list = [...posts];
@@ -746,7 +771,7 @@ function storeToken(t) {
   sessionStorage.setItem("mp2tech_github_pat", t);
   localStorage.setItem("mp2tech_github_pat", t);
   const input = document.getElementById("githubTokenInput");
-  if (input) input.value = t;
+  if (input && input.value !== t) input.value = t;
 }
 
 export async function publishDirectlyToGitHub() {
@@ -756,9 +781,18 @@ export async function publishDirectlyToGitHub() {
   const branch = branchInput ? branchInput.value.trim() : "feature";
 
   if (!token) {
-    token = prompt("Please enter your GitHub Personal Access Token (PAT):") || "";
-    if (!token) return;
-    storeToken(token);
+    const gitTabBtn = document.querySelector('[data-tab=github]');
+    if (gitTabBtn) gitTabBtn.click();
+    const tokenInput = document.getElementById("githubTokenInput");
+    if (tokenInput) {
+      tokenInput.scrollIntoView({ behavior: "smooth", block: "center" });
+      tokenInput.focus();
+    }
+    if (statusEl) {
+      statusEl.innerHTML = `<div style="background:rgba(239, 68, 68, 0.15); border:1.5px solid #ef4444; padding:12px 16px; border-radius:8px; color:#f87171; margin-top:10px;"><i class="fa fa-key"></i> Please enter your GitHub Personal Access Token (PAT) above first.</div>`;
+    }
+    showToast("Please enter your GitHub PAT token above", "error");
+    return;
   }
 
   if (statusEl) {
@@ -808,10 +842,30 @@ export async function publishDirectlyToGitHub() {
  */
 export async function mergeAndDeployToProduction() {
   let token = getStoredToken();
+  const statusEl = document.getElementById("deployLiveStatus") || document.getElementById("githubSyncStatus");
+
   if (!token) {
-    token = prompt("Please enter your GitHub Personal Access Token (PAT) to deploy live:") || "";
-    if (!token) return;
-    storeToken(token);
+    const gitTabBtn = document.querySelector('[data-tab=github]');
+    if (gitTabBtn) gitTabBtn.click();
+
+    const tokenInput = document.getElementById("githubTokenInput");
+    if (tokenInput) {
+      tokenInput.scrollIntoView({ behavior: "smooth", block: "center" });
+      tokenInput.focus();
+      tokenInput.style.borderColor = "#38bdf8";
+      tokenInput.style.boxShadow = "0 0 0 4px rgba(56, 189, 248, 0.4)";
+    }
+
+    if (statusEl) {
+      statusEl.innerHTML = `
+        <div style="background:rgba(239, 68, 68, 0.15); border:1.5px solid #ef4444; padding:12px 16px; border-radius:8px; color:#f87171; margin-top:10px;">
+          <strong><i class="fa fa-key"></i> GitHub Token Required:</strong><br>
+          Please enter your GitHub Personal Access Token (PAT) in the box above to deploy live.
+        </div>
+      `;
+    }
+    showToast("Please enter your GitHub Token above to deploy", "error");
+    return;
   }
 
   const deployBtns = document.querySelectorAll(".btn-deploy-action, [onclick*='mergeAndDeployToProduction']");
@@ -821,12 +875,11 @@ export async function mergeAndDeployToProduction() {
     btn.disabled = true;
   });
 
-  const statusEl = document.getElementById("deployLiveStatus") || document.getElementById("githubSyncStatus");
   if (statusEl) {
     statusEl.innerHTML = `
       <div style="background:#1e293b; border:1px solid #0284c7; padding:14px; border-radius:8px; color:#38bdf8; margin-top:12px;">
         <i class="fa fa-spinner fa-spin"></i> <strong>Deploying to Live Site...</strong><br>
-        <span style="font-size:12.5px; color:#94a3b8;">Syncing data catalog across 'feature', 'dev', and 'main' branches...</span>
+        <span style="font-size:12.5px; color:#cbd5e1;">Syncing data catalog across 'feature', 'dev', and 'main' branches...</span>
       </div>
     `;
   }
@@ -921,7 +974,7 @@ async function commitFileToGitHub(token, branch, path, content, message) {
   try {
     const getRes = await fetch(apiUrl, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: getAuthHeader(token),
         Accept: "application/vnd.github.v3+json",
       },
     });
@@ -933,12 +986,12 @@ async function commitFileToGitHub(token, branch, path, content, message) {
     console.warn("No existing SHA found:", e);
   }
 
-  const base64Content = btoa(unescape(encodeURIComponent(content)));
+  const base64Content = utf8ToBase64(content);
 
   const putRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`, {
     method: "PUT",
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: getAuthHeader(token),
       "Content-Type": "application/json",
       Accept: "application/vnd.github.v3+json",
     },
@@ -951,8 +1004,8 @@ async function commitFileToGitHub(token, branch, path, content, message) {
   });
 
   if (!putRes.ok) {
-    const errData = await putRes.json();
-    throw new Error(errData.message || `Failed to commit to branch '${branch}'.`);
+    const errData = await putRes.json().catch(() => ({}));
+    throw new Error(errData.message || `Failed to commit to branch '${branch}' (${putRes.status} ${putRes.statusText}).`);
   }
 }
 
@@ -966,6 +1019,11 @@ export function initAdminStudio() {
   const tokenInput = document.getElementById("githubTokenInput");
   if (savedToken && tokenInput) {
     tokenInput.value = savedToken;
+  }
+  if (tokenInput) {
+    tokenInput.addEventListener("input", function () {
+      storeToken(this.value.trim());
+    });
   }
 
   // Login form
