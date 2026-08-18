@@ -365,6 +365,50 @@
                 <!-- TAB 3: BLOG ARTICLES STUDIO -->
                 <div id="tab-articles" class="tab-panel">
                     
+                    <!-- AI AUTO-BLOGGER ASSISTANT -->
+                    <div class="ai-blogger-card">
+                        <div class="ai-blogger-header">
+                            <div class="ai-blogger-title">
+                                <i class="fa fa-magic" style="font-size:18px;"></i>
+                                <span>AI Auto-Blogger Assistant</span>
+                            </div>
+                            <span class="ai-status-pill"><span class="pulse-dot"></span> Powered by Google Gemini AI</span>
+                        </div>
+                        <p class="ai-blogger-desc">
+                            Simply enter a repair topic or customer problem. Gemini AI will automatically research the issue, write the technical diagnostic guide with formatted steps, select high-res hardware photography, and link matching Amazon products from your store.
+                        </p>
+                        <div class="ai-input-wrap">
+                            <input type="text" id="aiTopicInput" class="ai-prompt-input" placeholder="Enter topic e.g. 'Laptop battery draining fast after Windows 11 update' or 'How to apply thermal paste correctly'..." />
+                            
+                            <div class="ai-options-grid">
+                                <div>
+                                    <select id="aiToneSelect" class="ai-option-select" title="Article Format">
+                                        <option value="diagnostics">Diagnostic Walkthrough (Problem ➔ Test ➔ Fix)</option>
+                                        <option value="upgrades">Hardware Upgrade & Benchmark Tutorial</option>
+                                        <option value="maintenance">Preventive Maintenance & Thermal Care</option>
+                                        <option value="refurbished">Buyer's Guide & Refurbished Tips</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="ai-checkbox-label">
+                                        <input type="checkbox" id="aiAutoPhotoCheck" checked /> Auto-Attach Tech Photo
+                                    </label>
+                                </div>
+                                <div>
+                                    <label class="ai-checkbox-label">
+                                        <input type="checkbox" id="aiAutoLinkCheck" checked /> Auto-Link Store Products
+                                    </label>
+                                </div>
+                                <div>
+                                    <button type="button" id="generateAiPostBtn" onclick="window.generateArticleWithAI()" class="ai-generate-btn">
+                                        <i class="fa fa-bolt"></i> Generate Complete Article
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="aiFeedbackBox" class="ai-feedback-box"></div>
+                        </div>
+                    </div>
+
                     <div class="admin-panel-card" id="postFormCard">
                         <div class="panel-header">
                             <h2>Write / Edit Blog Article</h2>
@@ -578,6 +622,23 @@
                             <div id="deployLiveStatus" style="margin-top: 14px; font-size: 14px;"></div>
                         </div>
 
+                        <!-- GOOGLE GEMINI AI CONFIGURATION -->
+                        <div class="sync-box" style="background: #0f172a; border: 1.5px solid #334155; margin-top: 24px;">
+                            <h3 style="color:#38bdf8;"><i class="fa fa-key"></i> Google Gemini AI API Configuration</h3>
+                            <p>Your Gemini API Key powers the 1-Click AI Auto-Blogger. Keys are saved securely in your browser's private storage (<code>localStorage</code>) and are never exposed publicly.</p>
+                            
+                            <div class="form-group" style="margin-bottom: 14px;">
+                                <label for="geminiApiKeyInput" style="color:#cbd5e1;">Google Gemini API Key</label>
+                                <input type="password" id="geminiApiKeyInput" placeholder="Enter Gemini API Key..." style="background:#1e293b; color:#fff; border-color:#334155;" />
+                                <span class="form-hint">Default API key configured. You can update or replace this key anytime.</span>
+                            </div>
+
+                            <button type="button" onclick="window.saveGeminiApiKey()" class="btn-primary" style="background:#0284c7; padding: 9px 18px; font-size: 13.5px;">
+                                <i class="fa fa-floppy-o"></i> Save Gemini API Key
+                            </button>
+                            <span id="geminiKeySaveStatus" style="margin-left:12px; font-size:13px; color:#34d399; font-weight:600;"></span>
+                        </div>
+
                         <div class="panel-header" style="margin-top: 30px;">
                             <h2>Manual File Export (Alternative)</h2>
                         </div>
@@ -597,7 +658,7 @@
 
     <!-- Scripts -->
     <script type="module">
-        import { initAdminStudio } from "./js/modules/adminStudio.js?v=20260818d";
+        import { initAdminStudio } from "./js/modules/adminStudio.js?v=20260818ai";
         document.addEventListener("DOMContentLoaded", initAdminStudio);
     </script>
 </body>
