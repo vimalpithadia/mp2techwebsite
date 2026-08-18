@@ -1378,6 +1378,237 @@ Respond ONLY with a single valid JSON object (no markdown formatting, no backtic
 }
 
 /**
+ * 1-Click AI Amazon Product Auto-Capture using Gemini AI
+ */
+export async function extractAmazonProductWithAI() {
+  const input = document.getElementById("aiAmazonLinkInput");
+  const btn = document.getElementById("extractAiProdBtn");
+  const feedback = document.getElementById("aiProdFeedbackBox");
+
+  if (!input) return;
+  const rawInput = input.value.trim();
+
+  if (!rawInput) {
+    if (feedback) {
+      feedback.className = "ai-feedback-box error";
+      feedback.innerHTML = '<i class="fa fa-exclamation-circle"></i> Please paste an Amazon product link or product title first.';
+      feedback.style.display = "flex";
+    }
+    input.focus();
+    return;
+  }
+
+  let apiKey = getGeminiApiKey();
+  if (!apiKey) {
+    const enteredKey = prompt("Please enter your Google Gemini API Key to enable AI Auto-Capture (Saved privately in your browser):");
+    if (enteredKey && enteredKey.trim()) {
+      apiKey = enteredKey.trim();
+      localStorage.setItem(GEMINI_KEY_STORAGE, apiKey);
+      const keyInput = document.getElementById("geminiApiKeyInput");
+      if (keyInput) keyInput.value = apiKey;
+    } else {
+      if (feedback) {
+        feedback.className = "ai-feedback-box error";
+        feedback.innerHTML = '<i class="fa fa-exclamation-circle"></i> Gemini API Key is required. Please set it in Settings.';
+        feedback.style.display = "flex";
+      }
+      return;
+    }
+  }
+
+  // Extract ASIN if available in URL
+  const asinMatch = rawInput.match(/(?:dp|gp\/product|d|asin)\/([A-Z0-9]{10})/i) || rawInput.match(/\b([B0-9][A-Z0-9]{9})\b/i);
+  const detectedAsin = asinMatch ? asinMatch[1].toUpperCase() : null;
+
+  // Build clean Affiliate URL with tag=mp2tech-21
+  let affiliateUrl = rawInput;
+  if (detectedAsin) {
+    affiliateUrl = `https://www.amazon.in/dp/${detectedAsin}/?tag=mp2tech-21`;
+  } else if (rawInput.startsWith("http") && !rawInput.includes("tag=")) {
+    affiliateUrl = rawInput.includes("?") ? `${rawInput}&tag=mp2tech-21` : `${rawInput}?tag=mp2tech-21`;
+  }
+
+  // UI Loading State
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Extracting Specs & Formats...';
+  }
+  if (feedback) {
+    feedback.className = "ai-feedback-box";
+    feedback.style.display = "flex";
+    feedback.style.background = "rgba(245, 158, 11, 0.12)";
+    feedback.style.color = "#fbbf24";
+    feedback.style.border = "1px solid rgba(245, 158, 11, 0.25)";
+    feedback.innerHTML = '<i class="fa fa-cog fa-spin"></i> Gemini AI is parsing hardware specifications, category, rating, and benchmark highlights...';
+  }
+
+  const systemPrompt = `You are a professional PC hardware technician and Amazon product data parser for MP2TECH Store Mumbai.
+Given the following Amazon product link, ASIN, or product title:
+"${rawInput}"
+
+Extract, standardize, and format the product data for an Indian tech store catalog in JSON format.
+Category must be exactly one of: "storage", "ram", "cooling", "tools", "accessories".
+Price must be estimated in Indian Rupees (INR) as a clean formatted string without the rupee symbol (e.g. "2,499", "9,890", "1,249").
+
+Respond ONLY with a single valid JSON object (no markdown backticks, no extra text):
+{
+  "name": "Clean, authoritative, concise product title (50-80 chars, Sentence case)",
+  "brand": "Brand Name (e.g. Samsung, Crucial, Corsair, Noctua, iFixit, Kingston)",
+  "category": "storage",
+  "price": "2,499",
+  "rating": 4.6,
+  "reviews": 18500,
+  "badge": "Technician Verified Upgrade",
+  "highlights": [
+    "Up to 7,450 MB/s Sequential Read Speed",
+    "Custom Nickel-Coated Controller for thermal stability",
+    "DirectStorage & PS5 Compatible"
+  ]
+}`;
+
+  const payload = {
+    contents: [
+      {
+        parts: [{ text: systemPrompt }]
+      }
+    ]
+  };
+
+  const modelsToTry = [
+    "models/gemini-3.5-flash-lite",
+    "models/gemini-flash-lite-latest",
+    "models/gemini-2.5-flash"
+  ];
+
+  let rawResponseText = null;
+  let lastError = null;
+
+  for (const model of modelsToTry) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${apiKey}`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        const json = await response.json();
+        if (json.candidates && json.candidates[0] && json.candidates[0].content && json.candidates[0].content.parts[0]) {
+          rawResponseText = json.candidates[0].content.parts[0].text;
+          break;
+        }
+      } else {
+        const errJson = await response.json().catch(() => ({}));
+        lastError = errJson.error ? errJson.error.message : `HTTP ${response.status}`;
+      }
+    } catch (e) {
+      lastError = e.message;
+    }
+  }
+
+  if (!rawResponseText) {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa fa-magic"></i> Auto-Capture & Fill Product Form';
+    }
+    if (feedback) {
+      feedback.className = "ai-feedback-box error";
+      feedback.innerHTML = `<i class="fa fa-times-circle"></i> AI Product Extraction failed: ${lastError || "Could not reach Gemini API"}`;
+      feedback.style.display = "flex";
+    }
+    showToast("AI Extraction failed. Check your link or API key.", "error");
+    return;
+  }
+
+  try {
+    let cleanJsonStr = rawResponseText.trim();
+    if (cleanJsonStr.startsWith("```json")) {
+      cleanJsonStr = cleanJsonStr.slice(7);
+    } else if (cleanJsonStr.startsWith("```")) {
+      cleanJsonStr = cleanJsonStr.slice(3);
+    }
+    if (cleanJsonStr.endsWith("```")) {
+      cleanJsonStr = cleanJsonStr.slice(0, -3);
+    }
+    cleanJsonStr = cleanJsonStr.trim();
+
+    const data = JSON.parse(cleanJsonStr);
+
+    // Populate Product Form Fields
+    const nameEl = document.getElementById("prodName");
+    const brandEl = document.getElementById("prodBrand");
+    const catEl = document.getElementById("prodCategory");
+    const priceEl = document.getElementById("prodPrice");
+    const ratingEl = document.getElementById("prodRating");
+    const reviewsEl = document.getElementById("prodReviews");
+    const badgeEl = document.getElementById("prodBadge");
+    const urlEl = document.getElementById("prodAmazonUrl");
+    const imageEl = document.getElementById("prodImage");
+    const highlightsEl = document.getElementById("prodHighlights");
+
+    if (nameEl) nameEl.value = data.name || rawInput;
+    if (brandEl) brandEl.value = data.brand || "Verified Brand";
+    if (catEl) catEl.value = data.category || "storage";
+    if (priceEl) priceEl.value = data.price || "2,499";
+    if (ratingEl) ratingEl.value = data.rating || 4.6;
+    if (reviewsEl) reviewsEl.value = data.reviews || 1500;
+    if (badgeEl) badgeEl.value = data.badge || "Technician Verified";
+    if (urlEl) urlEl.value = affiliateUrl;
+
+    // Direct Amazon ASIN Image or fallback curated hardware image
+    let productImgUrl = "";
+    if (detectedAsin) {
+      productImgUrl = `https://images-na.ssl-images-amazon.com/images/P/${detectedAsin}.01.LZZZZZZZ.jpg`;
+    } else {
+      productImgUrl = getCuratedPhotoForTopic(data.category || "storage", data.brand || "", data.name || "");
+    }
+    if (imageEl) imageEl.value = productImgUrl;
+
+    if (highlightsEl && data.highlights) {
+      highlightsEl.value = Array.isArray(data.highlights) ? data.highlights.join("\n") : data.highlights;
+    }
+
+    // Refresh Live Preview
+    updateProductLivePreview();
+
+    // Reset UI State
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa fa-magic"></i> Auto-Capture & Fill Product Form';
+    }
+    if (feedback) {
+      feedback.className = "ai-feedback-box success";
+      feedback.style.background = "rgba(16, 185, 129, 0.15)";
+      feedback.style.color = "#34d399";
+      feedback.style.border = "1px solid rgba(16, 185, 129, 0.35)";
+      feedback.innerHTML = '<i class="fa fa-check-circle"></i> <strong>Product Captured!</strong> Review specs below and click "Add Product to Catalog".';
+      feedback.style.display = "flex";
+    }
+
+    showToast("🛒 Amazon Product details captured!", "success");
+
+    // Smooth scroll to product form
+    const formCard = document.getElementById("productFormCard");
+    if (formCard) {
+      formCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+  } catch (err) {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa fa-magic"></i> Auto-Capture & Fill Product Form';
+    }
+    if (feedback) {
+      feedback.className = "ai-feedback-box error";
+      feedback.innerHTML = `<i class="fa fa-times-circle"></i> Error parsing product response: ${err.message}`;
+      feedback.style.display = "flex";
+    }
+    showToast("Error processing Amazon product data", "error");
+  }
+}
+
+/**
  * Initialize Admin UI Events
  */
 export function initAdminStudio() {
@@ -1528,6 +1759,16 @@ export function initAdminStudio() {
     const input = document.getElementById("aiTopicInput");
     if (input) {
       input.value = topicText;
+      input.focus();
+    }
+  };
+
+  // AI Amazon Product Auto-Capture Window Bindings
+  window.extractAmazonProductWithAI = extractAmazonProductWithAI;
+  window.setAiAmazonLink = function(link) {
+    const input = document.getElementById("aiAmazonLinkInput");
+    if (input) {
+      input.value = link;
       input.focus();
     }
   };

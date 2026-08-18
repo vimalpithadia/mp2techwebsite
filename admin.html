@@ -171,6 +171,55 @@
                 <!-- TAB 2: AMAZON PRODUCTS STUDIO -->
                 <div id="tab-products" class="tab-panel">
                     
+                    <!-- AI AMAZON PRODUCT AUTO-CAPTURE ASSISTANT -->
+                    <div class="ai-blogger-card ai-amazon-card" style="border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 16px 40px -10px rgba(245, 158, 11, 0.2);">
+                        <div class="ai-blogger-header">
+                            <div class="ai-blogger-title-group">
+                                <div class="ai-blogger-icon-badge" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 6px 18px rgba(245, 158, 11, 0.35);">
+                                    <i class="fa fa-amazon"></i>
+                                </div>
+                                <div>
+                                    <h3 class="ai-blogger-title" style="color:#fbbf24;">AI Amazon Product Auto-Capture</h3>
+                                    <span class="ai-blogger-subtitle">Instant Link Extractor, Spec Formatter &amp; Image Loader &bull; Powered by Gemini AI</span>
+                                </div>
+                            </div>
+                            <div class="ai-status-pill" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.35);">
+                                <span class="pulse-dot" style="background:#f59e0b; box-shadow: 0 0 10px #f59e0b;"></span> <span>Instant Link Extraction</span>
+                            </div>
+                        </div>
+
+                        <p class="ai-blogger-desc">
+                            Paste any Amazon product link, ASIN, or product title. Gemini AI will automatically extract the clean product title, detect the brand and category, estimate pricing and ratings, generate technical benchmark highlights, attach high-res imagery, and ensure your affiliate tag (<code>tag=mp2tech-21</code>) is attached!
+                        </p>
+
+                        <!-- Main URL / Keyword Input -->
+                        <div class="ai-prompt-box-wrap">
+                            <i class="fa fa-link ai-prompt-icon" style="color:#fbbf24;"></i>
+                            <input type="text" id="aiAmazonLinkInput" class="ai-prompt-input" placeholder="Paste Amazon product link e.g. https://www.amazon.in/dp/B07G3KRZBX or type product name..." autocomplete="off" />
+                        </div>
+
+                        <!-- Quick Sample Hardware Chips -->
+                        <div class="ai-topic-chips-wrap">
+                            <span class="ai-chips-label"><i class="fa fa-bolt"></i> Popular Hardware:</span>
+                            <button type="button" class="ai-topic-chip" onclick="window.setAiAmazonLink('https://www.amazon.in/Crucial-BX500-Internal-Solid-State/dp/B07G3KRZBX/')">💾 Crucial BX500 SATA SSD</button>
+                            <button type="button" class="ai-topic-chip" onclick="window.setAiAmazonLink('https://www.amazon.in/Samsung-990-PRO-Internal-MZ-V9P1T0BW/dp/B0B9C3Z31R/')">⚡ Samsung 990 PRO NVMe SSD</button>
+                            <button type="button" class="ai-topic-chip" onclick="window.setAiAmazonLink('https://www.amazon.in/Noctua-NT-H1-Pro-Grade-Thermal-Compound/dp/B002CQU14A/')">❄️ Noctua NT-H1 Thermal Paste</button>
+                            <button type="button" class="ai-topic-chip" onclick="window.setAiAmazonLink('https://www.amazon.in/Crucial-16GB-Laptop-Memory-CT16G4SFRA32A/dp/B08C511GQH/')">🧠 Crucial 16GB DDR4 Laptop RAM</button>
+                            <button type="button" class="ai-topic-chip" onclick="window.setAiAmazonLink('https://www.amazon.in/iFixit-Essential-Electronics-Toolkit-Precision/dp/B0964G2Y7S/')">🔧 iFixit Precision Toolkit</button>
+                        </div>
+
+                        <!-- Action Button Row -->
+                        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+                            <span style="font-size:12.5px; color:#94a3b8;"><i class="fa fa-check-circle" style="color:#10b981;"></i> Automatic <code>tag=mp2tech-21</code> affiliate protection</span>
+                            <button type="button" id="extractAiProdBtn" onclick="window.extractAmazonProductWithAI()" class="ai-generate-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color:#111; font-weight:800; width:auto; padding:12px 24px;">
+                                <i class="fa fa-magic"></i> <span>Auto-Capture &amp; Fill Product Form</span>
+                            </button>
+                        </div>
+
+                        <!-- Feedback Banner -->
+                        <div id="aiProdFeedbackBox" class="ai-feedback-box"></div>
+                    </div>
+
                     <!-- Product Form & Live Preview -->
                     <div class="admin-panel-card" id="productFormCard">
                         <div class="panel-header">
