@@ -1524,4 +1524,11 @@ export function initAdminStudio() {
   // AI Blogger Window Bindings
   window.generateArticleWithAI = generateArticleWithAI;
   window.saveGeminiApiKey = saveGeminiApiKey;
+  window.setAiTopic = function(topicText) {
+    const input = document.getElementById("aiTopicInput");
+    if (input) {
+      input.value = topicText;
+      input.focus();
+    }
+  };
 }
