@@ -1446,9 +1446,11 @@ export async function extractAmazonProductWithAI() {
     return;
   }
 
-  // Extract ASIN if available in URL
+  // Extract Slug and ASIN if available in URL
+  const slugMatch = rawInput.match(/(?:amazon\.[a-z.]+\/)?([^/]+)\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i);
+  const urlTitleSlug = slugMatch && !slugMatch[1].startsWith("dp") ? decodeURIComponent(slugMatch[1]).replace(/[-_]/g, " ") : "";
   const asinMatch = rawInput.match(/(?:dp|gp\/product|d|asin)\/([A-Z0-9]{10})/i) || rawInput.match(/\b([B0-9][A-Z0-9]{9})\b/i);
-  const detectedAsin = asinMatch ? asinMatch[1].toUpperCase() : null;
+  const detectedAsin = asinMatch ? asinMatch[1].toUpperCase() : (slugMatch ? slugMatch[2].toUpperCase() : null);
 
   // Build clean Affiliate URL with tag=mp2tech-21
   let affiliateUrl = rawInput;
@@ -1472,27 +1474,36 @@ export async function extractAmazonProductWithAI() {
     feedback.innerHTML = '<i class="fa fa-cog fa-spin"></i> Gemini AI is parsing hardware specifications, category, rating, and benchmark highlights...';
   }
 
-  const systemPrompt = `You are a professional PC hardware technician and Amazon product data parser for MP2TECH Store Mumbai.
-Given the following Amazon product link, ASIN, or product title:
-"${rawInput}"
+  const systemPrompt = `You are a professional PC hardware technician and Amazon India (amazon.in) product catalog specialist for MP2TECH Store Mumbai.
+Given the following Amazon product information:
+- Raw Input / Link: "${rawInput}"
+${urlTitleSlug ? `- Extracted Product Title Slug from URL: "${urlTitleSlug}"` : ""}
+${detectedAsin ? `- Amazon ASIN: "${detectedAsin}"` : ""}
 
-Extract, standardize, and format the product data for an Indian tech store catalog in JSON format.
-Category must be exactly one of: "storage", "ram", "cooling", "tools", "accessories".
-Price must be estimated in Indian Rupees (INR) as a clean formatted string without the rupee symbol (e.g. "2,499", "9,890", "1,249").
+Extract, standardize, and format the product data to accurately match the exact Amazon India listing in JSON format.
+Guidelines:
+1. 'name': Full, standardized product title with model & capacity (50-80 chars, e.g. "Crucial BX500 480GB 3D NAND SATA 2.5-inch Internal SSD" or "Samsung 990 PRO 1TB PCIe 4.0 NVMe M.2 SSD").
+2. 'brand': Exact Brand Name (e.g. Samsung, Crucial, Corsair, Noctua, iFixit, Kingston, Western Digital).
+3. 'category': exactly one of: "storage", "ram", "cooling", "tools", "accessories".
+4. 'price': Most accurate realistic current Amazon.in selling price in Indian Rupees (INR) as a clean string without rupee symbol (e.g. "2,499", "11,299", "899").
+5. 'rating': Accurate customer star rating out of 5 (e.g. 4.5, 4.6, 4.8).
+6. 'reviews': Accurate total customer review count (e.g. 18500, 42000).
+7. 'badge': Best Seller, Amazon's Choice, or Technician Verified Upgrade.
+8. 'highlights': Array of exactly 3 key technical specifications / hardware features.
 
 Respond ONLY with a single valid JSON object (no markdown backticks, no extra text):
 {
-  "name": "Clean, authoritative, concise product title (50-80 chars, Sentence case)",
-  "brand": "Brand Name (e.g. Samsung, Crucial, Corsair, Noctua, iFixit, Kingston)",
+  "name": "Clean product title with model and capacity",
+  "brand": "Brand Name",
   "category": "storage",
   "price": "2,499",
   "rating": 4.6,
   "reviews": 18500,
   "badge": "Technician Verified Upgrade",
   "highlights": [
-    "Up to 7,450 MB/s Sequential Read Speed",
-    "Custom Nickel-Coated Controller for thermal stability",
-    "DirectStorage & PS5 Compatible"
+    "Key technical highlight 1",
+    "Key technical highlight 2",
+    "Key technical highlight 3"
   ]
 }`;
 
