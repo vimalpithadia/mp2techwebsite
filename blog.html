@@ -22,7 +22,7 @@
     <link rel="stylesheet" type="text/css" href="css/style1.css?v=20260109" media="all" />
     <link rel="stylesheet" type="text/css" href="css/dynamic.css">
     <link rel="stylesheet" type="text/css" href="css/responsive.css">
-    <link rel="stylesheet" type="text/css" href="css/blog.css?v=20260818h">
+    <link rel="stylesheet" type="text/css" href="css/blog.css?v=20260818i">
 </head>
 
 <body>
@@ -173,8 +173,31 @@
                 </div>
                 <h1 class="blog-modal-title" id="modalTitle">Article Title</h1>
                 
+                <!-- Social Sharing Bar (Top) -->
+                <div class="blog-modal-share-bar">
+                    <span class="share-label"><i class="fa fa-share-alt"></i> Share this Guide:</span>
+                    <div class="share-btn-group">
+                        <a href="#" id="shareWhatsapp" target="_blank" rel="noopener" class="share-btn share-wa" title="Share on WhatsApp"><i class="fa fa-whatsapp"></i> WhatsApp</a>
+                        <a href="#" id="shareLinkedin" target="_blank" rel="noopener" class="share-btn share-li" title="Share on LinkedIn"><i class="fa fa-linkedin"></i> LinkedIn</a>
+                        <a href="#" id="shareTwitter" target="_blank" rel="noopener" class="share-btn share-tw" title="Share on X / Twitter"><i class="fa fa-twitter"></i> X / Tweet</a>
+                        <a href="#" id="shareFacebook" target="_blank" rel="noopener" class="share-btn share-fb" title="Share on Facebook"><i class="fa fa-facebook"></i> Facebook</a>
+                        <button type="button" id="shareCopyLink" class="share-btn share-cp" title="Copy Direct Link to this Guide"><i class="fa fa-link"></i> <span id="copyLinkText">Copy Link</span></button>
+                    </div>
+                </div>
+
                 <div class="blog-article-body" id="modalBody">
                     <!-- Dynamic Body Content -->
+                </div>
+
+                <!-- Bottom Social Share Box -->
+                <div class="blog-bottom-share-box">
+                    <h4>Found this guide helpful? Share with your friends or colleagues:</h4>
+                    <div class="share-btn-group">
+                        <a href="#" id="shareWhatsappBottom" target="_blank" rel="noopener" class="share-btn share-wa"><i class="fa fa-whatsapp"></i> WhatsApp</a>
+                        <a href="#" id="shareLinkedinBottom" target="_blank" rel="noopener" class="share-btn share-li"><i class="fa fa-linkedin"></i> LinkedIn</a>
+                        <a href="#" id="shareTwitterBottom" target="_blank" rel="noopener" class="share-btn share-tw"><i class="fa fa-twitter"></i> X / Tweet</a>
+                        <button type="button" id="shareCopyLinkBottom" class="share-btn share-cp"><i class="fa fa-link"></i> <span id="copyLinkTextBottom">Copy Link</span></button>
+                    </div>
                 </div>
 
                 <!-- Dynamic In-Article Amazon Affiliate Product Recommendations -->
@@ -242,6 +265,6 @@
 
     <!-- Scripts -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script type="module" src="js/app.js?v=20260818h"></script>
+    <script type="module" src="js/app.js?v=20260818i"></script>
 </body>
 </html>
