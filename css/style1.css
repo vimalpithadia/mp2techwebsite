@@ -217,6 +217,16 @@
     overflow: hidden
 }
 
+/* Mobile menu default state */
+.mobMenuOverlay,
+.mobMenuBox {
+    display: none;
+}
+
+.side-menu {
+    display: none;
+}
+
 /* header */
 #header {
     position: sticky;

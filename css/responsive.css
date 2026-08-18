@@ -8,6 +8,11 @@
 .mobMenuOverlay,
 .mobMenuBox {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: fixed !important;
+    right: -9999px !important;
 }
 
 .side-menu {
@@ -16,6 +21,26 @@
 
 .deskNavigation {
     display: flex !important;
+}
+
+@media (min-width: 991px) {
+    .mobMenuOverlay,
+    .mobMenuBox {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        position: fixed !important;
+        right: -9999px !important;
+    }
+
+    .side-menu {
+        display: none !important;
+    }
+
+    .deskNavigation {
+        display: flex !important;
+    }
 }
 
 /* --------------------------------------------------------------------------
@@ -89,6 +114,8 @@
         z-index: 99998;
         opacity: 0;
         visibility: hidden;
+        pointer-events: auto !important;
+        right: 0 !important;
         transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s ease;
     }
 
@@ -100,9 +127,12 @@
     /* Luxury Off-Canvas Drawer Menu */
     .mobMenuBox {
         display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
         flex-direction: column;
         position: fixed;
-        right: -360px;
+        right: -360px !important;
         top: 0;
         width: 86%;
         max-width: 330px;
@@ -119,7 +149,7 @@
     }
 
     .mobMenuBox.in {
-        right: 0;
+        right: 0 !important;
     }
 
     /* Drawer Header */
