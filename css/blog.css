@@ -1368,6 +1368,9 @@
 /* --------------------------------------------------------------------------
    Responsive Breakpoints
    -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+   Responsive Breakpoints
+   -------------------------------------------------------------------------- */
 @media (max-width: 1200px) {
   .product-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -1377,47 +1380,309 @@
 @media (max-width: 990px) {
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
   }
   .blog-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
   }
 }
 
 @media (max-width: 768px) {
+  .affiliate-disclosure-bar {
+    font-size: 11px;
+    padding: 6px 12px;
+    line-height: 1.35;
+  }
+
+  .storefront-header-bar {
+    padding: 16px 0;
+  }
+
   .storefront-toolbar {
     flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .hero-top-row {
+    flex-direction: column;
     align-items: flex-start;
+    gap: 8px;
   }
-  .store-search-box {
+
+  .hero-trust-row {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .hero-trust-item {
+    font-size: 11px;
+    padding: 2px 7px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+  }
+
+  .storefront-title-box h1 {
+    font-size: 21px;
+    line-height: 1.3;
+  }
+
+  /* Sticky Category & Search Nav */
+  .category-filter-nav {
+    top: 50px;
+    padding: 8px 0;
+  }
+
+  .category-nav-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .category-pills-wrap {
     width: 100%;
-    min-width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding: 2px 0 6px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 6px;
   }
+
+  .category-pill {
+    padding: 6px 13px;
+    font-size: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .category-controls-wrap {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-search-box {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
+    width: auto;
+  }
+
+  .nav-search-box input.nav-search-input {
+    font-size: 12.5px !important;
+    padding: 6px 26px 6px 32px !important;
+    height: 36px !important;
+  }
+
+  .sort-filter-select {
+    font-size: 11.5px;
+    padding: 6px 10px;
+    height: 36px;
+    max-width: 145px;
+    flex-shrink: 0;
+  }
+
+  .nav-deals-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+    height: 36px;
+    flex-shrink: 0;
+  }
+
+  /* Products & Guides Grid */
+  .products-section {
+    padding: 24px 0 48px;
+  }
+
+  .section-title-wrap {
+    margin-bottom: 16px;
+  }
+
+  .section-title-wrap h2 {
+    font-size: 17px;
+  }
+
+  .product-count {
+    font-size: 11.5px;
+  }
+
   .product-grid {
     grid-template-columns: 1fr;
-    max-width: 380px;
+    max-width: 440px;
     margin: 0 auto;
+    gap: 16px;
   }
+
+  .product-card {
+    border-radius: 12px;
+  }
+
   .blog-grid {
     grid-template-columns: 1fr;
     max-width: 480px;
     margin: 0 auto;
+    gap: 18px;
   }
-  .category-pills-wrap {
-    justify-content: flex-start;
-    padding: 0 15px;
+
+  /* Dedicated Single Article View */
+  .single-article-wrapper {
+    padding: 16px 0 40px;
   }
+
+  .back-to-guides-btn {
+    font-size: 12px;
+    padding: 7px 14px;
+    margin-bottom: 16px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .single-article-card {
+    padding: 20px 15px;
+    border-radius: 12px;
+  }
+
+  .single-article-title {
+    font-size: 20px;
+    line-height: 1.35;
+    margin-bottom: 10px;
+  }
+
+  .single-article-meta-row {
+    font-size: 11.5px;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+  }
+
+  .single-article-img {
+    margin: 14px 0 20px;
+    border-radius: 8px;
+    max-height: 240px;
+  }
+
+  .blog-article-body {
+    font-size: 14.5px;
+    line-height: 1.65;
+  }
+
+  .blog-article-body h3 {
+    font-size: 16.5px;
+    margin: 22px 0 10px;
+  }
+
+  .blog-article-body p,
+  .blog-article-body ul,
+  .blog-article-body ol {
+    margin-bottom: 14px;
+  }
+
+  .blog-modal-share-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px 14px;
+    margin: 14px 0 18px;
+  }
+
+  .share-label {
+    font-size: 12px;
+    justify-content: center;
+  }
+
+  .share-btn-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    width: 100%;
+  }
+
+  .share-btn {
+    justify-content: center;
+    font-size: 11.5px;
+    padding: 8px 6px;
+  }
+
+  .in-article-affiliate-box {
+    padding: 14px 12px;
+    border-radius: 10px;
+    margin: 20px 0;
+  }
+
+  .affiliate-box-title {
+    font-size: 13.5px;
+  }
+
+  .in-article-product-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .blog-bottom-share-box {
+    padding: 16px 12px;
+    margin: 22px 0 16px;
+  }
+
+  .blog-bottom-share-box h4 {
+    font-size: 13.5px;
+  }
+
+  .blog-bottom-share-box .share-btn-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
   .blog-modal-footer-cta {
     flex-direction: column;
     text-align: center;
+    padding: 16px 14px;
+  }
+
+  .blog-modal-cta-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 
 @media (max-width: 480px) {
   .storefront-title-box h1 {
-    font-size: 20px;
+    font-size: 18px;
   }
+
   .category-pill {
-    font-size: 12px;
-    padding: 6px 14px;
+    font-size: 11.5px;
+    padding: 5px 11px;
+  }
+
+  .section-title-wrap h2 {
+    font-size: 16px;
+  }
+
+  .product-price-val {
+    font-size: 16px;
+  }
+
+  .buy-amazon-btn {
+    font-size: 13px;
+    padding: 9px 12px;
+  }
+
+  .single-article-title {
+    font-size: 18.5px;
+  }
+
+  .share-btn-group {
+    grid-template-columns: 1fr;
+  }
+
+  .blog-bottom-share-box .share-btn-group {
+    grid-template-columns: 1fr;
   }
 }
