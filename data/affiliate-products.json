@@ -1,5 +1,22 @@
 [
   {
+    "id": "prod-9737",
+    "name": "TP-Link Nano USB Bluetooth 5.0 Adapter UB500 for PC",
+    "category": "accessories",
+    "brand": "TP-Link",
+    "priceEstimate": "₹799",
+    "rating": 4.3,
+    "reviewCount": 45200,
+    "badge": "Amazon's Choice",
+    "image": "https://images-na.ssl-images-amazon.com/images/P/B098K3H92Z.01.LZZZZZZZ.jpg",
+    "amazonUrl": "https://www.amazon.in/dp/B098K3H92Z/?tag=mp2tech-21",
+    "highlights": [
+      "Bluetooth 5.0 technology with backward compatibility",
+      "Nano-sized ultra-small design for convenient portability",
+      "Supports Windows 11/10/8.1/7 operating systems"
+    ]
+  },
+  {
     "id": "prod-2613",
     "name": "Gigabyte H510M V2 Intel Motherboard",
     "category": "accessories",
