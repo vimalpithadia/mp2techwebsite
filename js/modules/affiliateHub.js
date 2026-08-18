@@ -130,7 +130,7 @@ export function renderProducts(category = "all", searchQuery = "", sortOrder = "
         <i class="fa fa-search" style="font-size: 32px; color: #94a3b8; margin-bottom: 12px; display: block;"></i>
         <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">No Hardware Found</h3>
         <p style="font-size: 14px; color: #64748b; margin-bottom: 18px;">No products match your search "${searchQuery}".</p>
-        <button onclick="window.quickSearch('')" class="btn-primary" style="background:#0284c7; padding: 9px 20px; font-size: 13px;">View All Hardware Deals</button>
+        <button onclick="window.quickSearch('')" class="btn-primary" style="background:#0284c7; padding: 9px 20px; font-size: 13px;">View All Products</button>
       </div>
     `;
     return;
@@ -402,7 +402,7 @@ export function showArticle(identifier, updateHistory = true) {
             </div>
             <div style="text-align:center; padding-top: 16px; border-top: 1px dashed #e2e8f0; margin-top: 16px;">
               <a href="deals.html" class="nav-deals-btn">
-                <i class="fa fa-th-large"></i> Explore Full Hardware & Deals Catalog ➔
+                <i class="fa fa-shopping-bag"></i> Explore Full MP2TECH Store ➔
               </a>
             </div>
           </div>
