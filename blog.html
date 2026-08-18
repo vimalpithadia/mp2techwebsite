@@ -21,35 +21,51 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" href="css/style1.css?v=20260109" media="all" />
     <link rel="stylesheet" type="text/css" href="css/dynamic.css">
-    <link rel="stylesheet" type="text/css" href="css/responsive.css">
-    <link rel="stylesheet" type="text/css" href="css/blog.css?v=20260818m">
+    <link rel="stylesheet" type="text/css" href="css/responsive.css?v=20260818n">
+    <link rel="stylesheet" type="text/css" href="css/blog.css?v=20260818n">
 </head>
 
 <body>
 
     <div id="page-overlay"></div>
 
-    <!-- Top Affiliate Disclosure Bar -->
-    <div class="affiliate-disclosure-bar">
-        <div class="container">
-            <i class="fa fa-info-circle"></i>
-            <span><strong>Amazon Associates Disclosure:</strong> As an Amazon Associate, MP2TECH earns from qualifying purchases. Our diagnostic guides feature parts & tools tested in our Mumbai lab.</span>
+    <!-- Slim Ultra-Modern Top Announcement & Disclosure Strip -->
+    <aside class="top-announcement-strip">
+        <div class="container announcement-inner">
+            <span class="announcement-badge"><span class="status-dot"></span> MP2TECH Lab</span>
+            <span class="announcement-text">Hands-on repair walkthroughs &bull; Diagnostic benchmarks &bull; Hardware tutorials</span>
+            <span class="announcement-disclosure-tag" title="As an Amazon Associate, MP2TECH earns from qualifying purchases.">Amazon Associate <i class="fa fa-info-circle"></i></span>
         </div>
-    </div>
+    </aside>
 
-    <!-- Mobile Menu Start -->
+    <!-- Luxury Off-Canvas Mobile Drawer Start -->
     <div class="mobMenuOverlay"></div>
     <div class="mobMenuBox">
-        <div class="menuClose">X</div>
-        <ul class="nav-left mobNavigation">
-            <li><a href="index.html#home">Home</a></li>
-            <li><a href="index.html#about">About</a></li>
-            <li><a href="index.html#service">Services</a></li>
-            <li><a href="deals.html">Store</a></li>
-            <li class="active"><a href="blog.html">Tech Guides</a></li>
-            <li><a href="index.html#contact">Contact us</a></li>
-            <li><a href="https://wa.me/919930568888?text=Hello%20MP2TECH%2C%20I%20want%20to%20create%20a%20ticket." target="_blank" rel="noopener" class="button">Create Ticket</a></li>
-        </ul>
+        <div class="mobMenuHeader">
+            <a href="index.html" class="mob-drawer-logo">
+                <img src="./img/logo.jpg" alt="MP2TECH Logo" />
+            </a>
+            <button type="button" class="menuClose" aria-label="Close Menu">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        <div class="mobMenuContent" style="display:flex; flex-direction:column; flex-grow:1;">
+            <ul class="nav-left mobNavigation">
+                <li><a href="index.html#home"><span class="nav-left-part"><i class="fa fa-home"></i> <span>Home</span></span></a></li>
+                <li><a href="index.html#about"><span class="nav-left-part"><i class="fa fa-info-circle"></i> <span>About</span></span></a></li>
+                <li><a href="index.html#service"><span class="nav-left-part"><i class="fa fa-cogs"></i> <span>Services</span></span></a></li>
+                <li><a href="deals.html"><span class="nav-left-part"><i class="fa fa-shopping-bag"></i> <span>Store</span></span> <span class="mob-nav-badge">Prime</span></a></li>
+                <li class="active"><a href="blog.html"><span class="nav-left-part"><i class="fa fa-book"></i> <span>Tech Guides</span></span> <span class="mob-nav-badge lab">Lab</span></a></li>
+                <li><a href="index.html#contact"><span class="nav-left-part"><i class="fa fa-envelope-o"></i> <span>Contact us</span></span></a></li>
+            </ul>
+            <div class="mob-drawer-footer-card">
+                <div class="mob-drawer-card-title">Need Instant Tech Help?</div>
+                <p class="mob-drawer-card-text">Connect directly with our senior technician in Mumbai.</p>
+                <a href="https://wa.me/919930568888?text=Hello%20MP2TECH%2C%20I%20saw%20your%20Tech%20Guides%20and%20need%20assistance." target="_blank" rel="noopener" class="mob-drawer-cta-btn">
+                    <i class="fa fa-whatsapp"></i> Chat on WhatsApp
+                </a>
+            </div>
+        </div>
     </div>
     <!-- Mobile Menu Ends -->
 
@@ -72,7 +88,7 @@
                         <li><a href="index.html#contact">Contact us</a></li>
                         <li><a href="https://wa.me/919930568888?text=Hello%20MP2TECH%2C%20I%20want%20to%20create%20a%20ticket." target="_blank" rel="noopener" class="button">Create Ticket</a></li>
                     </ul>
-                    <div class="side-menu"><img src="img/menu.svg" alt="menu" /></div>
+                    <div class="side-menu" title="Open Menu"><img src="img/menu.svg" alt="menu" /></div>
                 </div>
             </div>
         </div>
@@ -83,7 +99,7 @@
     <section id="singleArticleSection" class="single-article-wrapper" style="display:none;">
         <div class="container">
             <a href="blog.html" class="back-to-guides-btn" onclick="event.preventDefault(); window.showAllArticlesView();">
-                <i class="fa fa-arrow-left"></i> Back to All Tech Guides & Articles
+                <i class="fa fa-arrow-left"></i> Back to Tech Guides & Articles
             </a>
 
             <article class="single-article-card">
@@ -98,13 +114,13 @@
 
                 <!-- Top Social Share Bar -->
                 <div class="blog-modal-share-bar">
-                    <span class="share-label"><i class="fa fa-share-alt"></i> Share this Guide:</span>
+                    <span class="share-label"><i class="fa fa-share-alt"></i> Share Guide:</span>
                     <div class="share-btn-group">
                         <a href="#" id="singleShareWhatsapp" target="_blank" rel="noopener" class="share-btn share-wa" title="Share on WhatsApp"><i class="fa fa-whatsapp"></i> WhatsApp</a>
                         <a href="#" id="singleShareLinkedin" target="_blank" rel="noopener" class="share-btn share-li" title="Share on LinkedIn"><i class="fa fa-linkedin"></i> LinkedIn</a>
                         <a href="#" id="singleShareTwitter" target="_blank" rel="noopener" class="share-btn share-tw" title="Share on X / Twitter"><i class="fa fa-twitter"></i> X / Tweet</a>
                         <a href="#" id="singleShareFacebook" target="_blank" rel="noopener" class="share-btn share-fb" title="Share on Facebook"><i class="fa fa-facebook"></i> Facebook</a>
-                        <button type="button" id="singleShareCopyLink" class="share-btn share-cp" title="Copy Direct Link to this Guide"><i class="fa fa-link"></i> <span id="singleCopyLinkText">Copy Link</span></button>
+                        <button type="button" id="singleShareCopyLink" class="share-btn share-cp" title="Copy Direct Link"><i class="fa fa-link"></i> <span id="singleCopyLinkText">Copy Link</span></button>
                     </div>
                 </div>
 
@@ -116,7 +132,7 @@
 
                 <!-- Bottom Social Share Box -->
                 <div class="blog-bottom-share-box">
-                    <h4>Found this guide helpful? Share with your friends or colleagues:</h4>
+                    <h4>Found this guide helpful? Share with friends or colleagues:</h4>
                     <div class="share-btn-group">
                         <a href="#" id="singleShareWhatsappBottom" target="_blank" rel="noopener" class="share-btn share-wa"><i class="fa fa-whatsapp"></i> WhatsApp</a>
                         <a href="#" id="singleShareLinkedinBottom" target="_blank" rel="noopener" class="share-btn share-li"><i class="fa fa-linkedin"></i> LinkedIn</a>
@@ -133,24 +149,25 @@
 
     <!-- ALL ARTICLES CATALOG SECTION -->
     <div id="allArticlesSection">
-        <!-- COMPACT EYE-CATCHY BLOG HERO -->
+        <!-- STREAMLINED WORLD-CLASS BLOG HERO -->
         <section class="storefront-header-bar blog-hero-header">
             <div class="container">
                 <div class="storefront-toolbar">
                     <div class="storefront-title-box">
-                        <div class="hero-top-row">
-                            <span class="hero-tech-badge">
-                                <span class="pulse-dot"></span> Tech Knowledge Base & Diagnostic Lab
-                            </span>
-                            <div class="hero-trust-row">
-                                <span class="hero-trust-item"><i class="fa fa-wrench"></i> Real Repair Walkthroughs</span>
-                                <span class="hero-trust-item"><i class="fa fa-flask"></i> Lab Tested Solutions</span>
-                                <span class="hero-trust-item"><i class="fa fa-check-circle"></i> Mumbai Specialists</span>
-                            </div>
+                        <div class="hero-status-pill">
+                            <span class="status-dot"></span> Tech Knowledge Base &bull; Diagnostic Lab
                         </div>
                         <h1>
                             Diagnostic Guides & <span class="gradient-text-gold">Tech Tips</span>
                         </h1>
+                        <p class="hero-subtext">
+                            Step-by-step laptop troubleshooting, hardware upgrade tutorials, and repair insights.
+                        </p>
+                        <div class="hero-trust-bar">
+                            <span><i class="fa fa-wrench"></i> Real Repair Walkthroughs</span>
+                            <span><i class="fa fa-flask"></i> Lab Tested Solutions</span>
+                            <span><i class="fa fa-check-circle"></i> Mumbai Specialists</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -160,12 +177,12 @@
         <nav class="category-filter-nav">
             <div class="container">
                 <div class="category-nav-container">
-                    <!-- Left: Blog Category Pills -->
+                    <!-- Left: Blog Category Pills Carousel -->
                     <div class="category-pills-wrap">
                         <button class="blog-filter-btn category-pill active" data-category="all"><i class="fa fa-th-large"></i> All Guides</button>
-                        <button class="blog-filter-btn category-pill" data-category="repair"><i class="fa fa-wrench"></i> Repair & Maintenance</button>
-                        <button class="blog-filter-btn category-pill" data-category="upgrades"><i class="fa fa-microchip"></i> Hardware Upgrades</button>
-                        <button class="blog-filter-btn category-pill" data-category="diagnostics"><i class="fa fa-stethoscope"></i> Diagnostics & Testing</button>
+                        <button class="blog-filter-btn category-pill" data-category="repair"><i class="fa fa-wrench"></i> Repair & Fixes</button>
+                        <button class="blog-filter-btn category-pill" data-category="upgrades"><i class="fa fa-microchip"></i> Upgrades</button>
+                        <button class="blog-filter-btn category-pill" data-category="diagnostics"><i class="fa fa-stethoscope"></i> Diagnostics</button>
                         <button class="blog-filter-btn category-pill" data-category="refurbished"><i class="fa fa-laptop"></i> Refurbished</button>
                     </div>
 
@@ -185,12 +202,10 @@
         </nav>
 
         <!-- BUYER GUIDES & TECH TIPS SECTION -->
-        <main class="guides-section" id="guides" style="padding: 30px 0 60px; background: var(--slate-50);">
+        <main class="guides-section" id="guides">
             <div class="container">
-                <div class="section-title-wrap" style="margin-bottom: 22px;">
-                    <h2 style="font-size: 19px; font-weight: 800; color: var(--dark); display: flex; align-items: center; gap: 8px;">
-                        <i class="fa fa-book" style="color:var(--primary);"></i> Latest Diagnostic Walkthroughs & Articles
-                    </h2>
+                <div class="section-title-wrap">
+                    <h2><i class="fa fa-book" style="color:var(--primary);"></i> Latest Diagnostic Walkthroughs</h2>
                     <span class="product-count" id="guideCounter">Specialist Guides</span>
                 </div>
 
@@ -215,7 +230,7 @@
     <!-- WhatsApp Floating Action -->
     <a class="whatsapp-float" href="https://wa.me/919930568888?text=Hello%20MP2TECH%2C%20I%20need%20help." target="_blank"
         rel="noopener" aria-label="Chat on WhatsApp" title="Chat on WhatsApp"
-        style="position:fixed;right:25px;bottom:25px;z-index:100000;width:54px;height:54px;border-radius:50%;background:#25d366;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 22px rgba(0,0,0,0.18);text-decoration:none;color:#fff;overflow:hidden;">
+        style="position:fixed;right:25px;bottom:25px;z-index:9990;width:54px;height:54px;border-radius:50%;background:#25d366;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 22px rgba(0,0,0,0.18);text-decoration:none;color:#fff;overflow:hidden;">
         <i class="fa fa-whatsapp" aria-hidden="true" style="font-size:28px;line-height:1;color:#fff;"></i>
         <span class="whatsapp-float__badge" aria-hidden="true"></span>
     </a>
@@ -261,6 +276,6 @@
 
     <!-- Scripts -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script type="module" src="js/app.js?v=20260818m"></script>
+    <script type="module" src="js/app.js?v=20260818n"></script>
 </body>
 </html>
