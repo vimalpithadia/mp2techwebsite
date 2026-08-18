@@ -2,6 +2,25 @@
    MP2TECH World-Class Responsive Stylesheet
    ========================================================================== */
 
+/* --------------------------------------------------------------------------
+   Default Desktop Styles (> 990px)
+   -------------------------------------------------------------------------- */
+.mobMenuOverlay,
+.mobMenuBox {
+    display: none !important;
+}
+
+.side-menu {
+    display: none !important;
+}
+
+.deskNavigation {
+    display: flex !important;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Media Queries
+   -------------------------------------------------------------------------- */
 @media (max-width: 1200px) {
     .mainHeadSec h6,
     .mainHeadSec h2 {
@@ -18,7 +37,7 @@
 }
 
 @media (max-width: 990px) {
-    /* Header & Navigation Toggle */
+    /* Header & Navigation Toggle on Mobile/Tablet */
     .side-menu {
         display: flex !important;
         align-items: center;
@@ -57,6 +76,7 @@
 
     /* Luxury Frosted Backdrop Overlay */
     .mobMenuOverlay {
+        display: block !important;
         cursor: pointer;
         position: fixed;
         left: 0;
