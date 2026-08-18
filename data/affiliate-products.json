@@ -1,37 +1,19 @@
 [
   {
-    "id": "prod-5952",
-    "name": "TP-Link TL-WN725N 150Mbps Wireless N Nano USB Adapter",
-    "category": "accessories",
-    "brand": "TP-Link",
-    "priceEstimate": "₹499",
-    "rating": 4.2,
-    "reviewCount": 115400,
-    "badge": "Best Seller",
-    "image": "https://images-na.ssl-images-amazon.com/images/P/B008IFXQFU.01.LZZZZZZZ.jpg",
-    "amazonUrl": "https://www.amazon.in/dp/B008IFXQFU/?tag=mp2tech-21",
-    "highlights": [
-      "150Mbps Wi-Fi speed for smooth video streaming and internet calls",
-      "Nano miniature design allows you to leave it plugged in",
-      "Advanced Security: Supports 64/128 WEP, WPA/WPA2, WPA-PSK/WPA2-PSK"
-    ]
-  },
-  {
-    "id": "prod-5270",
-    "name": "Gigabyte H310M M.2 2.0 Intel LGA 1151 Motherboard",
+    "id": "prod-2613",
+    "name": "Gigabyte H510M V2 Intel Motherboard",
     "category": "accessories",
     "brand": "Gigabyte",
-    "priceEstimate": "₹7,999",
-    "rating": 4.3,
-    "reviewCount": 37,
+    "priceEstimate": "₹8599",
+    "rating": 3.4,
+    "reviewCount": 69,
     "badge": "Technician Verified Upgrade",
-    "image": "https://images-na.ssl-images-amazon.com/images/P/B0896B2DYV.01.LZZZZZZZ.jpg",
-    "amazonUrl": "https://www.amazon.in/dp/B0896B2DYV/?tag=mp2tech-21",
+    "image": "https://images-na.ssl-images-amazon.com/images/P/B0C4ZQXM6X.01.LZZZZZZZ.jpg",
+    "amazonUrl": "https://link.amazon/B09ujZXvN",
     "highlights": [
-      "Supports 8th and 9th Gen Intel Core Processors",
-      "Dual Channel Non-ECC Unbuffered DDR4",
-      "Ultra-Fast M.2 with PCIe Gen2 x2 & SATA interface",
-      "GIGABYTE 8118 Gaming LAN with Bandwidth Management"
+      "Supports 10th and 11th Gen Intel Core Processors",
+      "Dual Channel Non-ECC Unbuffered DDR4 Memory",
+      "High Quality Audio Capacitors and Audio Noise Guard"
     ]
   },
   {
