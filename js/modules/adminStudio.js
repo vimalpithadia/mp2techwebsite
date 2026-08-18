@@ -1060,6 +1060,323 @@ async function commitFileToGitHub(token, branch, path, content, message) {
   }
 }
 
+// --------------------------------------------------------------------------
+// AI Auto-Blogger Engine (Powered by Google Gemini AI)
+// --------------------------------------------------------------------------
+const GEMINI_KEY_STORAGE = "mp2tech_gemini_api_key";
+
+export function getGeminiApiKey() {
+  return localStorage.getItem(GEMINI_KEY_STORAGE) || "";
+}
+
+export function saveGeminiApiKey() {
+  const input = document.getElementById("geminiApiKeyInput");
+  const status = document.getElementById("geminiKeySaveStatus");
+  if (!input) return;
+  const key = input.value.trim();
+  if (key) {
+    localStorage.setItem(GEMINI_KEY_STORAGE, key);
+    if (status) {
+      status.textContent = "✓ Key saved securely in browser!";
+      setTimeout(() => { status.textContent = ""; }, 4000);
+    }
+    showToast("Gemini API Key saved successfully!", "success");
+  }
+}
+
+/**
+ * Resolves curated high-resolution photography from Unsplash based on category and keywords
+ */
+function getCuratedPhotoForTopic(category, keyword = "", topic = "") {
+  const normalized = (keyword + " " + topic).toLowerCase();
+  
+  if (normalized.includes("ssd") || normalized.includes("nvme") || normalized.includes("storage") || normalized.includes("hard drive")) {
+    return "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=1200&q=80";
+  }
+  if (normalized.includes("ram") || normalized.includes("memory") || normalized.includes("ddr4") || normalized.includes("ddr5")) {
+    return "https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&w=1200&q=80";
+  }
+  if (normalized.includes("thermal") || normalized.includes("paste") || normalized.includes("cooling") || normalized.includes("fan") || normalized.includes("overheating")) {
+    return "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1200&q=80";
+  }
+  if (normalized.includes("screen") || normalized.includes("display") || normalized.includes("flicker") || normalized.includes("monitor")) {
+    return "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1200&q=80";
+  }
+  if (normalized.includes("motherboard") || normalized.includes("chip") || normalized.includes("circuit") || normalized.includes("soldering")) {
+    return "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80";
+  }
+  if (normalized.includes("refurbished") || normalized.includes("buy") || normalized.includes("used") || normalized.includes("laptop")) {
+    return "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1200&q=80";
+  }
+  if (normalized.includes("tool") || normalized.includes("screwdriver") || normalized.includes("repair") || normalized.includes("teardown")) {
+    return "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80";
+  }
+
+  switch (category) {
+    case "upgrades":
+      return "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=1200&q=80";
+    case "repair":
+      return "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80";
+    case "refurbished":
+      return "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1200&q=80";
+    case "diagnostics":
+    default:
+      return "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=1200&q=80";
+  }
+}
+
+/**
+ * Auto-matches existing product IDs from products catalog based on topic and AI product keywords
+ */
+function autoMatchProductIds(topic = "", productKeywords = []) {
+  const searchCorpus = (topic + " " + (productKeywords || []).join(" ")).toLowerCase();
+  const matchedIds = [];
+
+  products.forEach((prod) => {
+    const prodText = (prod.name + " " + prod.category + " " + (prod.highlights || []).join(" ")).toLowerCase();
+    
+    if (
+      (searchCorpus.includes("ssd") || searchCorpus.includes("nvme") || searchCorpus.includes("storage")) &&
+      prod.category === "storage"
+    ) {
+      matchedIds.push(prod.id);
+    } else if (
+      (searchCorpus.includes("ram") || searchCorpus.includes("memory") || searchCorpus.includes("ddr4") || searchCorpus.includes("ddr5")) &&
+      prod.category === "ram"
+    ) {
+      matchedIds.push(prod.id);
+    } else if (
+      (searchCorpus.includes("thermal") || searchCorpus.includes("paste") || searchCorpus.includes("cooling") || searchCorpus.includes("fan") || searchCorpus.includes("heat")) &&
+      prod.category === "cooling"
+    ) {
+      matchedIds.push(prod.id);
+    } else if (
+      (searchCorpus.includes("tool") || searchCorpus.includes("screw") || searchCorpus.includes("tester") || searchCorpus.includes("clean")) &&
+      prod.category === "tools"
+    ) {
+      matchedIds.push(prod.id);
+    }
+  });
+
+  return [...new Set(matchedIds)].slice(0, 3);
+}
+
+/**
+ * 1-Click AI Diagnostic Article Generator using Gemini AI
+ */
+export async function generateArticleWithAI() {
+  const topicInput = document.getElementById("aiTopicInput");
+  const toneSelect = document.getElementById("aiToneSelect");
+  const autoPhotoCheck = document.getElementById("aiAutoPhotoCheck");
+  const autoLinkCheck = document.getElementById("aiAutoLinkCheck");
+  const btn = document.getElementById("generateAiPostBtn");
+  const feedback = document.getElementById("aiFeedbackBox");
+
+  if (!topicInput) return;
+  const topic = topicInput.value.trim();
+
+  if (!topic) {
+    if (feedback) {
+      feedback.className = "ai-feedback-box error";
+      feedback.innerHTML = '<i class="fa fa-exclamation-circle"></i> Please enter a topic or customer problem description first.';
+      feedback.style.display = "flex";
+    }
+    topicInput.focus();
+    return;
+  }
+
+  let apiKey = getGeminiApiKey();
+  if (!apiKey) {
+    const enteredKey = prompt("Please enter your Google Gemini API Key to enable AI Auto-Blogging (It will be saved privately in your browser):");
+    if (enteredKey && enteredKey.trim()) {
+      apiKey = enteredKey.trim();
+      localStorage.setItem(GEMINI_KEY_STORAGE, apiKey);
+      const keyInput = document.getElementById("geminiApiKeyInput");
+      if (keyInput) keyInput.value = apiKey;
+    } else {
+      if (feedback) {
+        feedback.className = "ai-feedback-box error";
+        feedback.innerHTML = '<i class="fa fa-exclamation-circle"></i> Gemini API Key is required. Please set it in the Settings tab.';
+        feedback.style.display = "flex";
+      }
+      return;
+    }
+  }
+
+  const tone = toneSelect ? toneSelect.value : "diagnostics";
+  const autoPhoto = autoPhotoCheck ? autoPhotoCheck.checked : true;
+  const autoLink = autoLinkCheck ? autoLinkCheck.checked : true;
+
+  // UI Loading State
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Researching & Writing Article...';
+  }
+  if (feedback) {
+    feedback.className = "ai-feedback-box";
+    feedback.style.display = "flex";
+    feedback.style.background = "rgba(56, 189, 248, 0.12)";
+    feedback.style.color = "#38bdf8";
+    feedback.style.border = "1px solid rgba(56, 189, 248, 0.25)";
+    feedback.innerHTML = '<i class="fa fa-cog fa-spin"></i> Gemini AI is generating formatted diagnostic walkthrough, slug & tips...';
+  }
+
+  const systemPrompt = `You are the Chief Diagnostic Specialist and Hardware Engineer at MP2TECH Mumbai (Specialized Laptop & PC Diagnostic and Repair Lab in Kandivali West, Mumbai).
+Generate an authoritative, practical, step-by-step diagnostic guide for the following user topic:
+"${topic}"
+
+Article Style/Category: ${tone}
+
+Respond ONLY with a single valid JSON object (no markdown formatting, no backticks, no text before or after the JSON):
+{
+  "title": "Authoritative, catchy headline in Sentence case (50-70 characters)",
+  "slug": "clean-hyphenated-url-slug",
+  "category": "${tone}",
+  "categoryName": "Readable Category Name (e.g. Diagnostics & Repairs, Hardware Upgrades, Maintenance & Care, Refurbished Systems)",
+  "excerpt": "Engaging 2-sentence summary (130-160 characters) explaining what the user will diagnose and fix.",
+  "readTime": "4 min read",
+  "keywordForImage": "2-3 English search keywords for finding high-res hardware photo (e.g. laptop motherboard repair, nvme ssd, cooling fan)",
+  "recommendedProductKeywords": ["ssd", "thermal paste", "screws"],
+  "body": "<p>Opening paragraph introducing the real-world symptom and diagnostic context...</p><h3>1. First Inspection & Symptom Isolation</h3><p>Step-by-step technical explanation...</p><h3>2. Deep Hardware / Software Testing</h3><p>Diagnostic methodology...</p><div class=\\"blog-tip-box\\"><strong>Specialist Diagnostic Tip:</strong> Key technician bench advice or warning tip.</div><h3>3. Permanent Fix & Component Recommendations</h3><p>Resolution details...</p><p>Need hands-on hardware diagnosis in Mumbai? Contact MP2TECH for rapid on-site testing and motherboard repair.</p>"
+}`;
+
+  const payload = {
+    contents: [
+      {
+        parts: [{ text: systemPrompt }]
+      }
+    ]
+  };
+
+  const modelsToTry = [
+    "models/gemini-3.5-flash-lite",
+    "models/gemini-flash-lite-latest",
+    "models/gemini-2.5-flash"
+  ];
+
+  let rawResponseText = null;
+  let lastError = null;
+
+  for (const model of modelsToTry) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${apiKey}`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        const json = await response.json();
+        if (json.candidates && json.candidates[0] && json.candidates[0].content && json.candidates[0].content.parts[0]) {
+          rawResponseText = json.candidates[0].content.parts[0].text;
+          break;
+        }
+      } else {
+        const errJson = await response.json().catch(() => ({}));
+        lastError = errJson.error ? errJson.error.message : `HTTP ${response.status}`;
+      }
+    } catch (e) {
+      lastError = e.message;
+    }
+  }
+
+  if (!rawResponseText) {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa fa-bolt"></i> Generate Complete Article';
+    }
+    if (feedback) {
+      feedback.className = "ai-feedback-box error";
+      feedback.innerHTML = `<i class="fa fa-times-circle"></i> AI Generation failed: ${lastError || "Could not reach Gemini API"}`;
+      feedback.style.display = "flex";
+    }
+    showToast("AI Generation failed. Check your API key.", "error");
+    return;
+  }
+
+  try {
+    let cleanJsonStr = rawResponseText.trim();
+    if (cleanJsonStr.startsWith("```json")) {
+      cleanJsonStr = cleanJsonStr.slice(7);
+    } else if (cleanJsonStr.startsWith("```")) {
+      cleanJsonStr = cleanJsonStr.slice(3);
+    }
+    if (cleanJsonStr.endsWith("```")) {
+      cleanJsonStr = cleanJsonStr.slice(0, -3);
+    }
+    cleanJsonStr = cleanJsonStr.trim();
+
+    const data = JSON.parse(cleanJsonStr);
+
+    const titleEl = document.getElementById("postTitle");
+    const slugEl = document.getElementById("postSlug");
+    const catEl = document.getElementById("postCategory");
+    const readTimeEl = document.getElementById("postReadTime");
+    const dateEl = document.getElementById("postDate");
+    const imageEl = document.getElementById("postImage");
+    const excerptEl = document.getElementById("postExcerpt");
+    const bodyEl = document.getElementById("postBody");
+    const relatedProdsEl = document.getElementById("postRelatedProds");
+
+    if (titleEl) titleEl.value = data.title || topic;
+    if (slugEl) slugEl.value = data.slug || slugify(data.title || topic);
+    if (catEl) catEl.value = data.category || tone;
+    if (readTimeEl) readTimeEl.value = data.readTime || "4 min read";
+    if (dateEl) {
+      const today = new Date();
+      const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      dateEl.value = `${months[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
+    }
+    
+    if (autoPhoto && imageEl) {
+      const photo = getCuratedPhotoForTopic(data.category || tone, data.keywordForImage, topic);
+      imageEl.value = photo;
+    }
+
+    if (excerptEl) excerptEl.value = data.excerpt || "";
+    if (bodyEl) bodyEl.value = data.body || "";
+
+    if (autoLink && relatedProdsEl) {
+      const matchedIds = autoMatchProductIds(topic, data.recommendedProductKeywords || []);
+      Array.from(relatedProdsEl.options).forEach((opt) => {
+        opt.selected = matchedIds.includes(opt.value);
+      });
+    }
+
+    updatePostLivePreview();
+
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa fa-bolt"></i> Generate Complete Article';
+    }
+    if (feedback) {
+      feedback.className = "ai-feedback-box success";
+      feedback.innerHTML = '<i class="fa fa-check-circle"></i> <strong>Article Generated!</strong> Review the formatted walkthrough below and click "Publish Article".';
+      feedback.style.display = "flex";
+    }
+
+    showToast("✨ AI Article generated successfully!", "success");
+
+    const formCard = document.getElementById("postFormCard");
+    if (formCard) {
+      formCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+  } catch (err) {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa fa-bolt"></i> Generate Complete Article';
+    }
+    if (feedback) {
+      feedback.className = "ai-feedback-box error";
+      feedback.innerHTML = `<i class="fa fa-times-circle"></i> Error parsing AI response: ${err.message}`;
+      feedback.style.display = "flex";
+    }
+    showToast("Error processing AI response", "error");
+  }
+}
+
 /**
  * Initialize Admin UI Events
  */
@@ -1075,6 +1392,12 @@ export function initAdminStudio() {
     tokenInput.addEventListener("input", function () {
       storeToken(this.value.trim());
     });
+  }
+
+  // Load Gemini API Key into Settings input
+  const geminiInput = document.getElementById("geminiApiKeyInput");
+  if (geminiInput) {
+    geminiInput.value = getGeminiApiKey();
   }
 
   // Login form
@@ -1197,4 +1520,8 @@ export function initAdminStudio() {
   window.exportDataFiles = exportDataFiles;
   window.publishDirectlyToGitHub = publishDirectlyToGitHub;
   window.mergeAndDeployToProduction = mergeAndDeployToProduction;
+
+  // AI Blogger Window Bindings
+  window.generateArticleWithAI = generateArticleWithAI;
+  window.saveGeminiApiKey = saveGeminiApiKey;
 }
