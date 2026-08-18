@@ -25,9 +25,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
     <link rel="stylesheet" type="text/css" href="css/style1.css?v=20260109" media="all" />
     <link rel="stylesheet" type="text/css" href="css/dynamic.css">
-    <link rel="stylesheet" type="text/css" href="css/responsive.css">
-    <link rel="stylesheet" type="text/css" href="css/blog.css?v=20260817">
-
+    <link rel="stylesheet" type="text/css" href="css/responsive.css?v=20260818n">
+    <link rel="stylesheet" type="text/css" href="css/blog.css?v=20260818n">
 
 </head>
 
@@ -35,22 +34,36 @@
 
     <div id="page-overlay"></div>
 
-    <!-- Menu start -->
+    <!-- Luxury Off-Canvas Mobile Drawer Start -->
     <div class="mobMenuOverlay"></div>
     <div class="mobMenuBox">
-        <div class="menuClose">X</div>
-        <ul class="nav-left mobNavigation">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#service">Services</a></li>
-            <li><a href="deals.html">Store</a></li>
-            <li><a href="blog.html">Tech Guides</a></li>
-            <li><a href="#contact">Contact us</a></li>
-            <li><a href="https://wa.me/919930568888?text=Hello%20MP2TECH%2C%20I%20want%20to%20create%20a%20ticket." target="_blank" rel="noopener" class="button">Create Ticket</a>
-            </li>
-        </ul>
+        <div class="mobMenuHeader">
+            <a href="index.html" class="mob-drawer-logo">
+                <img src="./img/logo.jpg" alt="MP2TECH Logo" />
+            </a>
+            <button type="button" class="menuClose" aria-label="Close Menu">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        <div class="mobMenuContent" style="display:flex; flex-direction:column; flex-grow:1;">
+            <ul class="nav-left mobNavigation">
+                <li class="active"><a href="#home"><span class="nav-left-part"><i class="fa fa-home"></i> <span>Home</span></span></a></li>
+                <li><a href="#about"><span class="nav-left-part"><i class="fa fa-info-circle"></i> <span>About</span></span></a></li>
+                <li><a href="#service"><span class="nav-left-part"><i class="fa fa-cogs"></i> <span>Services</span></span></a></li>
+                <li><a href="deals.html"><span class="nav-left-part"><i class="fa fa-shopping-bag"></i> <span>Store</span></span> <span class="mob-nav-badge">Prime</span></a></li>
+                <li><a href="blog.html"><span class="nav-left-part"><i class="fa fa-book"></i> <span>Tech Guides</span></span> <span class="mob-nav-badge lab">Lab</span></a></li>
+                <li><a href="#contact"><span class="nav-left-part"><i class="fa fa-envelope-o"></i> <span>Contact us</span></span></a></li>
+            </ul>
+            <div class="mob-drawer-footer-card">
+                <div class="mob-drawer-card-title">Need Instant Tech Help?</div>
+                <p class="mob-drawer-card-text">Connect directly with our senior technician in Mumbai.</p>
+                <a href="https://wa.me/919930568888?text=Hello%20MP2TECH%2C%20I%20want%20to%20create%20a%20ticket." target="_blank" rel="noopener" class="mob-drawer-cta-btn">
+                    <i class="fa fa-whatsapp"></i> Chat on WhatsApp
+                </a>
+            </div>
+        </div>
     </div>
-    <!-- Menu Ends -->
+    <!-- Mobile Menu Ends -->
 
     <!-- Content -->
     <div id="content">
@@ -439,7 +452,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
-    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/app.js?v=20260818n"></script>
 
 </body>
 
