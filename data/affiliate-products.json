@@ -1,5 +1,22 @@
 [
   {
+    "id": "prod-2613",
+    "name": "Gigabyte H510M V2 Intel Motherboard",
+    "category": "accessories",
+    "brand": "Gigabyte",
+    "priceEstimate": "₹8599",
+    "rating": 3.4,
+    "reviewCount": 69,
+    "badge": "Technician Verified Upgrade",
+    "image": "https://images-na.ssl-images-amazon.com/images/P/B0C4ZQXM6X.01.LZZZZZZZ.jpg",
+    "amazonUrl": "https://link.amazon/B09ujZXvN",
+    "highlights": [
+      "Supports 10th and 11th Gen Intel Core Processors",
+      "Dual Channel Non-ECC Unbuffered DDR4 Memory",
+      "High Quality Audio Capacitors and Audio Noise Guard"
+    ]
+  },
+  {
     "id": "prod-8010",
     "name": "Dell KM3322W Wireless USB Keyboard and Mouse Combo",
     "category": "storage",
