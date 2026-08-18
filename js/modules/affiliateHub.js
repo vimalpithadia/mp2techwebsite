@@ -15,8 +15,11 @@ export const AMAZON_CONFIG = {
 let allProducts = [...DEFAULT_PRODUCTS];
 let allPosts = [...DEFAULT_POSTS];
 let currentProdCategory = "all";
-let currentSearch = "";
+let currentProdSearch = "";
 let currentSort = "default";
+
+let currentBlogCategory = "all";
+let currentBlogSearch = "";
 
 /**
  * Appends the Amazon affiliate tag and tracking parameters to any Amazon URL
@@ -175,51 +178,75 @@ export function renderProducts(category = "all", searchQuery = "", sortOrder = "
 /**
  * Render Diagnostic Guides & Tech Articles
  */
-export function renderBlogPosts(category = "all") {
+export function renderBlogPosts(category = "all", searchQuery = "") {
   const container = document.getElementById("blogCardsContainer");
   if (!container) return;
 
-  let filtered = allPosts;
+  let filtered = [...allPosts];
+
+  // Filter by category
   if (category && category !== "all") {
     filtered = filtered.filter((p) => p.category === category);
   }
 
+  // Filter by search query
+  if (searchQuery && searchQuery.trim() !== "") {
+    const q = searchQuery.toLowerCase().trim();
+    filtered = filtered.filter(
+      (p) =>
+        p.title.toLowerCase().includes(q) ||
+        (p.excerpt && p.excerpt.toLowerCase().includes(q)) ||
+        (p.categoryName && p.categoryName.toLowerCase().includes(q)) ||
+        p.category.toLowerCase().includes(q)
+    );
+  }
+
+  // Update guide counter
+  const counter = document.getElementById("guideCounter");
+  if (counter) {
+    counter.textContent = `${filtered.length} ${filtered.length === 1 ? "Guide" : "Guides"} Available`;
+  }
+
   if (filtered.length === 0) {
     container.innerHTML = `
-      <div class="affiliate-empty-state" style="grid-column: 1 / -1; text-align: center; padding: 48px 20px;">
+      <div class="affiliate-empty-state" style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: #ffffff; border-radius: 16px; border: 1.5px dashed #cbd5e1;">
         <i class="fa fa-file-text-o" style="font-size: 32px; color: #94a3b8; margin-bottom: 12px; display: block;"></i>
-        <h3 style="font-size: 18px; font-weight: 800; color: #0f172a;">No Articles Found</h3>
-        <p style="font-size: 14px; color: #64748b;">No guides published in this category yet.</p>
+        <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">No Guides Found</h3>
+        <p style="font-size: 14px; color: #64748b;">No articles match your search "${searchQuery}".</p>
       </div>
     `;
     return;
   }
 
   container.innerHTML = filtered
-    .map(
-      (post) => `
-      <article class="blog-card" data-post-id="${post.id}">
-        <div class="blog-card-image-wrap">
-          <img src="${post.image}" alt="${post.title}" loading="lazy" onerror="this.src='img/service.jpg'" />
-          <span class="blog-card-category">${post.categoryName || post.category}</span>
-        </div>
-        <div class="blog-card-body">
-          <div class="blog-card-meta">
-            <span><i class="fa fa-calendar-o"></i> ${post.date}</span>
-            <span><i class="fa fa-clock-o"></i> ${post.readTime}</span>
+    .map((post) => {
+      const hasProducts = post.relatedProductIds && post.relatedProductIds.length > 0;
+      const partsCount = hasProducts ? post.relatedProductIds.length : 0;
+
+      return `
+        <article class="blog-card" data-post-id="${post.id}">
+          <div class="blog-card-image-wrap">
+            <img src="${post.image}" alt="${post.title}" loading="lazy" onerror="this.src='img/service.jpg'" />
+            <span class="blog-card-category">${post.categoryName || post.category}</span>
           </div>
-          <h3 class="blog-card-title">${post.title}</h3>
-          <p class="blog-card-excerpt">${post.excerpt}</p>
-          <div class="blog-card-footer">
-            <button class="blog-read-btn" onclick="openArticleModal(${post.id})">
-              Read Guide <i class="fa fa-arrow-right"></i>
-            </button>
-            <span class="blog-author-tag"><i class="fa fa-user"></i> MP2TECH Specialist</span>
+          <div class="blog-card-body">
+            <div class="blog-card-meta">
+              <span><i class="fa fa-calendar-o"></i> ${post.date}</span>
+              <span><i class="fa fa-clock-o"></i> ${post.readTime}</span>
+            </div>
+            <h3 class="blog-card-title">${post.title}</h3>
+            <p class="blog-card-excerpt">${post.excerpt}</p>
+            ${hasProducts ? `<div class="blog-parts-badge"><i class="fa fa-amazon" style="color:#ff9900"></i> Includes ${partsCount} Verified ${partsCount === 1 ? 'Part' : 'Parts'}</div>` : ''}
+            <div class="blog-card-footer" style="margin-top: 14px;">
+              <button class="blog-read-btn" onclick="openArticleModal(${post.id})">
+                Read Guide <i class="fa fa-arrow-right"></i>
+              </button>
+              <span class="blog-author-tag"><i class="fa fa-user"></i> MP2TECH Specialist</span>
+            </div>
           </div>
-        </div>
-      </article>
-    `
-    )
+        </article>
+      `;
+    })
     .join("");
 }
 
@@ -250,7 +277,7 @@ export function openArticleModal(postId) {
         relContainer.innerHTML = `
           <div class="in-article-affiliate-box">
             <div class="affiliate-box-header">
-              <span class="affiliate-box-title"><i class="fa fa-amazon"></i> Recommended Hardware for this Guide</span>
+              <span class="affiliate-box-title"><i class="fa fa-amazon" style="color:#ff9900"></i> Recommended Hardware & Tools for this Guide</span>
               <span class="affiliate-tag-badge">Genuine Amazon Links</span>
             </div>
             <div class="in-article-product-grid">
@@ -273,6 +300,11 @@ export function openArticleModal(postId) {
                   `;
                 })
                 .join("")}
+            </div>
+            <div style="text-align:center; padding-top: 14px; border-top: 1px dashed #e2e8f0; margin-top: 14px;">
+              <a href="deals.html" class="nav-deals-btn">
+                <i class="fa fa-th-large"></i> Explore Full Hardware & Deals Catalog ➔
+              </a>
             </div>
           </div>
         `;
@@ -300,7 +332,7 @@ export function closeArticleModal() {
 }
 
 /**
- * Quick Search Helper (triggered from trending chips or script)
+ * Quick Search Helper for Products
  */
 export function quickSearch(term = "") {
   const searchInput = document.getElementById("heroSearchInput") || document.getElementById("productSearchInput");
@@ -311,9 +343,8 @@ export function quickSearch(term = "") {
     if (clearBtn) clearBtn.style.display = term ? "flex" : "none";
   }
   
-  currentSearch = term;
+  currentProdSearch = term;
   
-  // Reset category pill to "All" if searching
   if (term) {
     currentProdCategory = "all";
     document.querySelectorAll(".category-pill").forEach((btn) => {
@@ -322,7 +353,7 @@ export function quickSearch(term = "") {
     });
   }
 
-  renderProducts(currentProdCategory, currentSearch, currentSort);
+  renderProducts(currentProdCategory, currentProdSearch, currentSort);
 
   const productsSection = document.getElementById("products");
   if (productsSection && term) {
@@ -336,28 +367,28 @@ export function quickSearch(term = "") {
 export async function initAffiliateHub() {
   // Render default embedded data immediately without delay
   renderProducts("all", "", "default");
-  renderBlogPosts("all");
+  renderBlogPosts("all", "");
 
-  // Product Category Filters (Pills)
-  const prodFilterBtns = document.querySelectorAll(".category-pill");
+  // Product Category Filters (Pills on deals.html)
+  const prodFilterBtns = document.querySelectorAll(".category-pill:not(.blog-filter-btn)");
   prodFilterBtns.forEach((btn) => {
     btn.addEventListener("click", function () {
       prodFilterBtns.forEach((b) => b.classList.remove("active"));
       this.classList.add("active");
       currentProdCategory = this.getAttribute("data-category") || "all";
-      renderProducts(currentProdCategory, currentSearch, currentSort);
+      renderProducts(currentProdCategory, currentProdSearch, currentSort);
     });
   });
 
-  // Product Search Input & Clear Button
+  // Product Search Input & Clear Button (deals.html)
   const searchInput = document.getElementById("heroSearchInput") || document.getElementById("productSearchInput");
   const clearBtn = document.getElementById("clearSearchBtn");
 
   if (searchInput) {
     searchInput.addEventListener("input", function () {
-      currentSearch = this.value;
+      currentProdSearch = this.value;
       if (clearBtn) clearBtn.style.display = this.value ? "flex" : "none";
-      renderProducts(currentProdCategory, currentSearch, currentSort);
+      renderProducts(currentProdCategory, currentProdSearch, currentSort);
     });
   }
 
@@ -367,18 +398,53 @@ export async function initAffiliateHub() {
         searchInput.value = "";
         searchInput.focus();
       }
-      currentSearch = "";
+      currentProdSearch = "";
       clearBtn.style.display = "none";
       renderProducts(currentProdCategory, "", currentSort);
     });
   }
 
-  // Product Sort Select
+  // Product Sort Select (deals.html)
   const sortSelect = document.getElementById("productSortSelect");
   if (sortSelect) {
     sortSelect.addEventListener("change", function () {
       currentSort = this.value;
-      renderProducts(currentProdCategory, currentSearch, currentSort);
+      renderProducts(currentProdCategory, currentProdSearch, currentSort);
+    });
+  }
+
+  // Blog Category Filters (blog.html)
+  const blogFilterBtns = document.querySelectorAll(".blog-filter-btn");
+  blogFilterBtns.forEach((btn) => {
+    btn.addEventListener("click", function () {
+      blogFilterBtns.forEach((b) => b.classList.remove("active"));
+      this.classList.add("active");
+      currentBlogCategory = this.getAttribute("data-category") || "all";
+      renderBlogPosts(currentBlogCategory, currentBlogSearch);
+    });
+  });
+
+  // Blog Search Input & Clear Button (blog.html)
+  const blogSearchInput = document.getElementById("blogSearchInput");
+  const clearBlogSearchBtn = document.getElementById("clearBlogSearchBtn");
+
+  if (blogSearchInput) {
+    blogSearchInput.addEventListener("input", function () {
+      currentBlogSearch = this.value;
+      if (clearBlogSearchBtn) clearBlogSearchBtn.style.display = this.value ? "flex" : "none";
+      renderBlogPosts(currentBlogCategory, currentBlogSearch);
+    });
+  }
+
+  if (clearBlogSearchBtn) {
+    clearBlogSearchBtn.addEventListener("click", function () {
+      if (blogSearchInput) {
+        blogSearchInput.value = "";
+        blogSearchInput.focus();
+      }
+      currentBlogSearch = "";
+      clearBlogSearchBtn.style.display = "none";
+      renderBlogPosts(currentBlogCategory, "");
     });
   }
 
@@ -394,30 +460,19 @@ export async function initAffiliateHub() {
       const p = await prodRes.json();
       if (Array.isArray(p) && p.length > 0) {
         allProducts = p;
-        renderProducts(currentProdCategory, currentSearch, currentSort);
+        renderProducts(currentProdCategory, currentProdSearch, currentSort);
       }
     }
     if (postRes.ok) {
       const b = await postRes.json();
       if (Array.isArray(b) && b.length > 0) {
         allPosts = b;
-        renderBlogPosts("all");
+        renderBlogPosts(currentBlogCategory, currentBlogSearch);
       }
     }
   } catch (err) {
     console.info("Using embedded product catalog fallback");
   }
-
-  // Blog Category Filters if present
-  const blogFilterBtns = document.querySelectorAll(".blog-filter-btn");
-  blogFilterBtns.forEach((btn) => {
-    btn.addEventListener("click", function () {
-      blogFilterBtns.forEach((b) => b.classList.remove("active"));
-      this.classList.add("active");
-      const cat = this.getAttribute("data-category") || "all";
-      renderBlogPosts(cat);
-    });
-  });
 
   // Modal helpers on window
   window.openArticleModal = openArticleModal;
