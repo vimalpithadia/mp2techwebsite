@@ -2,7 +2,8 @@
  * MP2TECH Elite Amazon Affiliate & Blog Dynamic Hub
  * Handles real-time search, category filtering,
  * in-article product recommendation embeds,
- * dynamic sorting, and appends Amazon Affiliate tracking tags.
+ * dynamic sorting, unique deep-link routing for articles,
+ * and comprehensive social media sharing (WhatsApp, LinkedIn, X, FB, Copy).
  */
 
 import { DEFAULT_PRODUCTS, DEFAULT_POSTS } from "../../data/defaultData.js";
@@ -20,6 +21,7 @@ let currentSort = "default";
 
 let currentBlogCategory = "all";
 let currentBlogSearch = "";
+let activeOpenPostId = null;
 
 /**
  * Appends the Amazon affiliate tag and tracking parameters to any Amazon URL
@@ -70,7 +72,16 @@ function renderStars(rating = 4.5) {
 }
 
 /**
- * Render Amazon Affiliate Product Cards
+ * Generate direct canonical share URL for a post
+ */
+export function getPostShareUrl(post) {
+  const origin = window.location.origin || "https://www.mp2tech.co.in";
+  const slugOrId = encodeURIComponent(post.slug || post.id);
+  return `${origin}/blog.html?post=${slugOrId}`;
+}
+
+/**
+ * Render Amazon Affiliate Product Cards (deals.html)
  */
 export function renderProducts(category = "all", searchQuery = "", sortOrder = "default") {
   const container = document.getElementById("affiliateProductGrid");
@@ -176,7 +187,7 @@ export function renderProducts(category = "all", searchQuery = "", sortOrder = "
 }
 
 /**
- * Render Diagnostic Guides & Tech Articles
+ * Render Diagnostic Guides & Tech Articles (blog.html)
  */
 export function renderBlogPosts(category = "all", searchQuery = "") {
   const container = document.getElementById("blogCardsContainer");
@@ -225,7 +236,7 @@ export function renderBlogPosts(category = "all", searchQuery = "") {
 
       return `
         <article class="blog-card" data-post-id="${post.id}">
-          <div class="blog-card-image-wrap">
+          <div class="blog-card-image-wrap" onclick="openArticleModal('${post.slug || post.id}')" style="cursor:pointer;">
             <img src="${post.image}" alt="${post.title}" loading="lazy" onerror="this.src='img/service.jpg'" />
             <span class="blog-card-category">${post.categoryName || post.category}</span>
           </div>
@@ -234,14 +245,16 @@ export function renderBlogPosts(category = "all", searchQuery = "") {
               <span><i class="fa fa-calendar-o"></i> ${post.date}</span>
               <span><i class="fa fa-clock-o"></i> ${post.readTime}</span>
             </div>
-            <h3 class="blog-card-title">${post.title}</h3>
+            <h3 class="blog-card-title" onclick="openArticleModal('${post.slug || post.id}')" style="cursor:pointer;">${post.title}</h3>
             <p class="blog-card-excerpt">${post.excerpt}</p>
             ${hasProducts ? `<div class="blog-parts-badge"><i class="fa fa-amazon" style="color:#ff9900"></i> Includes ${partsCount} Verified ${partsCount === 1 ? 'Part' : 'Parts'}</div>` : ''}
             <div class="blog-card-footer" style="margin-top: 14px;">
-              <button class="blog-read-btn" onclick="openArticleModal(${post.id})">
+              <button class="blog-read-btn" onclick="openArticleModal('${post.slug || post.id}')">
                 Read Guide <i class="fa fa-arrow-right"></i>
               </button>
-              <span class="blog-author-tag"><i class="fa fa-user"></i> MP2TECH Specialist</span>
+              <button class="blog-card-share-btn" onclick="sharePostDirect(event, '${post.slug || post.id}')" title="Share this Guide">
+                <i class="fa fa-share-alt"></i> Share
+              </button>
             </div>
           </div>
         </article>
@@ -251,11 +264,75 @@ export function renderBlogPosts(category = "all", searchQuery = "") {
 }
 
 /**
- * Open Article Reader Modal
+ * Configure social share links inside reader modal
  */
-export function openArticleModal(postId) {
-  const post = allPosts.find((p) => p.id === Number(postId));
+function updateModalShareLinks(post) {
+  const shareUrl = getPostShareUrl(post);
+  const shareTitle = post.title;
+  const shareText = `${shareTitle} - Check out this laptop diagnostic and repair guide from MP2TECH Mumbai:`;
+
+  // WhatsApp
+  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + "\n\n" + shareUrl)}`;
+  const waTop = document.getElementById("shareWhatsapp");
+  const waBottom = document.getElementById("shareWhatsappBottom");
+  if (waTop) waTop.href = waUrl;
+  if (waBottom) waBottom.href = waUrl;
+
+  // LinkedIn
+  const liUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+  const liTop = document.getElementById("shareLinkedin");
+  const liBottom = document.getElementById("shareLinkedinBottom");
+  if (liTop) liTop.href = liUrl;
+  if (liBottom) liBottom.href = liUrl;
+
+  // Twitter / X
+  const twUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`;
+  const twTop = document.getElementById("shareTwitter");
+  const twBottom = document.getElementById("shareTwitterBottom");
+  if (twTop) twTop.href = twUrl;
+  if (twBottom) twBottom.href = twUrl;
+
+  // Facebook
+  const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+  const fbTop = document.getElementById("shareFacebook");
+  if (fbTop) fbTop.href = fbUrl;
+
+  // Copy Link Buttons
+  const cpTop = document.getElementById("shareCopyLink");
+  const cpBottom = document.getElementById("shareCopyLinkBottom");
+
+  const copyHandler = async function (btn, textSpanId) {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      const textSpan = document.getElementById(textSpanId);
+      if (textSpan) textSpan.textContent = "✓ Copied!";
+      btn.classList.add("copied");
+      setTimeout(() => {
+        if (textSpan) textSpan.textContent = "Copy Link";
+        btn.classList.remove("copied");
+      }, 2500);
+    } catch (e) {
+      // Fallback prompt
+      window.prompt("Copy this direct link to share:", shareUrl);
+    }
+  };
+
+  if (cpTop) {
+    cpTop.onclick = () => copyHandler(cpTop, "copyLinkText");
+  }
+  if (cpBottom) {
+    cpBottom.onclick = () => copyHandler(cpBottom, "copyLinkTextBottom");
+  }
+}
+
+/**
+ * Open Article Reader Modal with deep-linking support
+ */
+export function openArticleModal(identifier, updateHistory = true) {
+  const post = allPosts.find((p) => p.id === Number(identifier) || p.slug === String(identifier) || String(p.id) === String(identifier));
   if (!post) return;
+
+  activeOpenPostId = post.id;
 
   const modal = document.getElementById("blogModal");
   if (!modal) return;
@@ -267,6 +344,9 @@ export function openArticleModal(postId) {
   document.getElementById("modalReadTime").innerHTML = `<i class="fa fa-clock-o"></i> ${post.readTime}`;
   document.getElementById("modalTitle").textContent = post.title;
   document.getElementById("modalBody").innerHTML = post.body;
+
+  // Update social sharing buttons
+  updateModalShareLinks(post);
 
   // Render related Amazon products inside the guide
   const relContainer = document.getElementById("modalRelatedProducts");
@@ -317,22 +397,60 @@ export function openArticleModal(postId) {
     }
   }
 
+  // Update browser URL query param for deep linking
+  if (updateHistory && window.history && window.history.pushState) {
+    const slugOrId = post.slug || post.id;
+    const newUrl = `${window.location.pathname}?post=${encodeURIComponent(slugOrId)}`;
+    window.history.pushState({ postId: post.id }, post.title, newUrl);
+    document.title = `${post.title} | MP2TECH Diagnostic Guides`;
+  }
+
   modal.classList.add("is-open");
   document.body.style.overflow = "hidden";
 }
 
 /**
- * Close Article Reader Modal
+ * Close Article Reader Modal and reset URL
  */
-export function closeArticleModal() {
+export function closeArticleModal(updateHistory = true) {
   const modal = document.getElementById("blogModal");
   if (!modal) return;
   modal.classList.remove("is-open");
   document.body.style.overflow = "";
+  activeOpenPostId = null;
+
+  if (updateHistory && window.history && window.history.pushState) {
+    window.history.pushState({}, "Diagnostic Guides & Tech Tips | MP2TECH Mumbai", window.location.pathname);
+    document.title = "Diagnostic Guides & Tech Tips | MP2TECH Mumbai";
+  }
 }
 
 /**
- * Quick Search Helper for Products
+ * Quick Direct Share from card (Native share sheet or copy link)
+ */
+export function sharePostDirect(event, identifier) {
+  if (event) event.stopPropagation();
+  const post = allPosts.find((p) => p.id === Number(identifier) || p.slug === String(identifier) || String(p.id) === String(identifier));
+  if (!post) return;
+
+  const shareUrl = getPostShareUrl(post);
+
+  if (navigator.share) {
+    navigator
+      .share({
+        title: post.title,
+        text: `Read this guide by MP2TECH: ${post.title}`,
+        url: shareUrl,
+      })
+      .catch(() => {});
+  } else {
+    // Open the article modal directly so user can share across all buttons
+    openArticleModal(identifier);
+  }
+}
+
+/**
+ * Quick Search Helper for Products (deals.html)
  */
 export function quickSearch(term = "") {
   const searchInput = document.getElementById("heroSearchInput") || document.getElementById("productSearchInput");
@@ -347,7 +465,7 @@ export function quickSearch(term = "") {
   
   if (term) {
     currentProdCategory = "all";
-    document.querySelectorAll(".category-pill").forEach((btn) => {
+    document.querySelectorAll(".category-pill:not(.blog-filter-btn)").forEach((btn) => {
       if (btn.getAttribute("data-category") === "all") btn.classList.add("active");
       else btn.classList.remove("active");
     });
@@ -362,12 +480,41 @@ export function quickSearch(term = "") {
 }
 
 /**
+ * Check URL query parameters on load to auto-open shared blog post
+ */
+function handleDeepLinking() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const postQuery = urlParams.get("post") || urlParams.get("article") || urlParams.get("id");
+
+  if (postQuery) {
+    // Attempt to match post
+    setTimeout(() => {
+      openArticleModal(postQuery, false);
+    }, 100);
+  }
+}
+
+/**
  * Initialize dynamic hub
  */
 export async function initAffiliateHub() {
   // Render default embedded data immediately without delay
   renderProducts("all", "", "default");
   renderBlogPosts("all", "");
+
+  // Check URL parameters for direct link on initial load
+  handleDeepLinking();
+
+  // Handle browser back/forward buttons
+  window.addEventListener("popstate", (event) => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const postQuery = urlParams.get("post");
+    if (postQuery) {
+      openArticleModal(postQuery, false);
+    } else {
+      closeArticleModal(false);
+    }
+  });
 
   // Product Category Filters (Pills on deals.html)
   const prodFilterBtns = document.querySelectorAll(".category-pill:not(.blog-filter-btn)");
@@ -468,6 +615,7 @@ export async function initAffiliateHub() {
       if (Array.isArray(b) && b.length > 0) {
         allPosts = b;
         renderBlogPosts(currentBlogCategory, currentBlogSearch);
+        handleDeepLinking();
       }
     }
   } catch (err) {
@@ -477,6 +625,7 @@ export async function initAffiliateHub() {
   // Modal helpers on window
   window.openArticleModal = openArticleModal;
   window.closeArticleModal = closeArticleModal;
+  window.sharePostDirect = sharePostDirect;
   window.quickSearch = quickSearch;
   window.handleModalBackdropClick = function (e) {
     if (e.target.id === "blogModal") {
