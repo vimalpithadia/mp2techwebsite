@@ -994,7 +994,7 @@ export async function mergeAndDeployToProduction() {
         <div style="background:rgba(16, 185, 129, 0.15); border:1.5px solid #10b981; padding:14px 18px; border-radius:8px; color:#34d399; margin-top:12px;">
           <strong style="font-size:15px;"><i class="fa fa-check-circle"></i> Live Deployment Successful!</strong><br>
           <span style="font-size:13px; color:#cbd5e1; display:inline-block; margin-top:4px;">
-            All product & blog updates have been published to <strong>main</strong>, <strong>dev</strong>, and <strong>feature</strong> branches. Your live site (<a href="https://www.mp2tech.co.in/deals.html" target="_blank" style="color:#38bdf8; text-decoration:underline;">Hardware Deals</a> &bull; <a href="https://www.mp2tech.co.in/blog.html" target="_blank" style="color:#38bdf8; text-decoration:underline;">Tech Blog</a>) is updated!
+            All product & blog updates have been published to <strong>main</strong>, <strong>dev</strong>, and <strong>feature</strong> branches. Your live site (<a href="https://www.mp2tech.co.in/deals.html" target="_blank" style="color:#38bdf8; text-decoration:underline;">Store</a> &bull; <a href="https://www.mp2tech.co.in/blog.html" target="_blank" style="color:#38bdf8; text-decoration:underline;">Tech Blog</a>) is updated!
           </span>
         </div>
       `;
