@@ -492,6 +492,32 @@ export function updateProductLivePreview() {
    BLOG POSTS CRUD & BULK ACTIONS
    ========================================================================= */
 
+export function slugify(text) {
+  if (!text) return "";
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/&/g, "-and-")
+    .replace(/[^\w\-]+/g, "")
+    .replace(/\-\-+/g, "-")
+    .replace(/^-+/, "")
+    .replace(/-+$/, "");
+}
+
+export function copyPostDirectUrl(slugOrId) {
+  const url = `https://www.mp2tech.co.in/blog.html?post=${encodeURIComponent(slugOrId)}`;
+  navigator.clipboard
+    .writeText(url)
+    .then(() => {
+      showToast(`Copied direct share link to clipboard!`);
+    })
+    .catch(() => {
+      window.prompt("Direct Article URL:", url);
+    });
+}
+
 function getFilteredPosts() {
   let list = [...posts];
 
@@ -537,6 +563,10 @@ export function renderPostsTable() {
   tbody.innerHTML = filtered
     .map((p) => {
       const isChecked = selectedPostIds.has(p.id);
+      const postSlug = p.slug || slugify(p.title) || p.id;
+      const shareUrl = `https://www.mp2tech.co.in/blog.html?post=${encodeURIComponent(postSlug)}`;
+      const waShareText = encodeURIComponent(`${p.title}\n\nRead this diagnostic guide from MP2TECH Mumbai:\n${shareUrl}`);
+
       return `
         <tr class="${isChecked ? "selected" : ""}">
           <td style="width: 40px; text-align: center;">
@@ -546,6 +576,19 @@ export function renderPostsTable() {
           <td><strong>${p.title}</strong><br><small style="color:#64748b;"><span class="table-badge badge-blue">${p.categoryName || p.category}</span> &bull; ${p.readTime}</small></td>
           <td>${p.date}</td>
           <td><span class="table-badge badge-green">${p.relatedProductIds?.length || 0} Products Linked</span></td>
+          <td>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button class="action-btn" onclick="window.copyPostDirectUrl('${postSlug}')" title="Copy Unique Share Link" style="background:#0f172a; color:#38bdf8; border:1px solid #334155; padding:5px 8px; font-size:11.5px; border-radius:4px; cursor:pointer;">
+                <i class="fa fa-link"></i> Copy Link
+              </button>
+              <a href="https://api.whatsapp.com/send?text=${waShareText}" target="_blank" rel="noopener" class="action-btn" title="Share on WhatsApp" style="background:#25d366; color:#fff; border:none; padding:5px 8px; font-size:12px; border-radius:4px; text-decoration:none; display:inline-flex; align-items:center;">
+                <i class="fa fa-whatsapp"></i>
+              </a>
+              <a href="blog.html?post=${encodeURIComponent(postSlug)}" target="_blank" rel="noopener" class="action-btn" title="Preview Article" style="background:#0284c7; color:#fff; border:none; padding:5px 8px; font-size:12px; border-radius:4px; text-decoration:none; display:inline-flex; align-items:center;">
+                <i class="fa fa-external-link"></i>
+              </a>
+            </div>
+          </td>
           <td>
             <div class="action-btns">
               <button class="action-btn" onclick="window.editPost(${p.id})" title="Edit Article"><i class="fa fa-pencil"></i></button>
@@ -621,6 +664,8 @@ export function populateRelatedProductsSelect() {
 
 export function savePostFromForm() {
   const title = document.getElementById("postTitle").value.trim();
+  const slugInput = document.getElementById("postSlug") ? document.getElementById("postSlug").value.trim() : "";
+  const slug = slugInput ? slugify(slugInput) : slugify(title);
   const category = document.getElementById("postCategory").value;
   const categoryName = document.getElementById("postCategory").options[document.getElementById("postCategory").selectedIndex].text;
   const date = document.getElementById("postDate").value.trim() || new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
@@ -642,7 +687,7 @@ export function savePostFromForm() {
     if (idx !== -1) {
       posts[idx] = {
         id: Number(editingPostId),
-        slug: title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+        slug,
         category,
         categoryName,
         date,
@@ -661,7 +706,7 @@ export function savePostFromForm() {
     const newId = posts.length > 0 ? Math.max(...posts.map((p) => p.id)) + 1 : 1;
     posts.unshift({
       id: newId,
-      slug: title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+      slug,
       category,
       categoryName,
       date,
@@ -686,6 +731,9 @@ export function editPost(id) {
 
   editingPostId = id;
   document.getElementById("postTitle").value = post.title;
+  if (document.getElementById("postSlug")) {
+    document.getElementById("postSlug").value = post.slug || slugify(post.title);
+  }
   document.getElementById("postCategory").value = post.category;
   document.getElementById("postDate").value = post.date;
   document.getElementById("postReadTime").value = post.readTime;
@@ -716,6 +764,9 @@ export function deletePost(id) {
 export function resetPostForm() {
   editingPostId = null;
   document.getElementById("postForm").reset();
+  if (document.getElementById("postSlug")) {
+    document.getElementById("postSlug").value = "";
+  }
   document.getElementById("postFormSubmitBtn").textContent = "Publish Article";
   updatePostLivePreview();
 }
@@ -1112,6 +1163,17 @@ export function initAdminStudio() {
     if (el) el.addEventListener("input", updatePostLivePreview);
   });
 
+  // Auto-slugify post title into postSlug input
+  const postTitleEl = document.getElementById("postTitle");
+  const postSlugEl = document.getElementById("postSlug");
+  if (postTitleEl && postSlugEl) {
+    postTitleEl.addEventListener("input", function () {
+      if (!editingPostId) {
+        postSlugEl.value = slugify(this.value);
+      }
+    });
+  }
+
   // Global window bindings for inline HTML handlers
   window.editProduct = editProduct;
   window.deleteProduct = deleteProduct;
@@ -1130,6 +1192,7 @@ export function initAdminStudio() {
   window.togglePostCheck = togglePostCheck;
   window.deselectAllPosts = deselectAllPosts;
   window.bulkDeletePosts = bulkDeletePosts;
+  window.copyPostDirectUrl = copyPostDirectUrl;
 
   window.exportDataFiles = exportDataFiles;
   window.publishDirectlyToGitHub = publishDirectlyToGitHub;

@@ -2,7 +2,8 @@
  * MP2TECH Elite Amazon Affiliate & Blog Dynamic Hub
  * Handles real-time search, category filtering,
  * in-article product recommendation embeds,
- * dynamic sorting, unique deep-link routing for articles,
+ * dynamic sorting, dedicated standalone article page views,
+ * unique deep-link routing for articles,
  * and comprehensive social media sharing (WhatsApp, LinkedIn, X, FB, Copy).
  */
 
@@ -187,7 +188,7 @@ export function renderProducts(category = "all", searchQuery = "", sortOrder = "
 }
 
 /**
- * Render Diagnostic Guides & Tech Articles (blog.html)
+ * Render Diagnostic Guides & Tech Articles (blog.html grid)
  */
 export function renderBlogPosts(category = "all", searchQuery = "") {
   const container = document.getElementById("blogCardsContainer");
@@ -233,10 +234,11 @@ export function renderBlogPosts(category = "all", searchQuery = "") {
     .map((post) => {
       const hasProducts = post.relatedProductIds && post.relatedProductIds.length > 0;
       const partsCount = hasProducts ? post.relatedProductIds.length : 0;
+      const identifier = post.slug || post.id;
 
       return `
         <article class="blog-card" data-post-id="${post.id}">
-          <div class="blog-card-image-wrap" onclick="openArticleModal('${post.slug || post.id}')" style="cursor:pointer;">
+          <div class="blog-card-image-wrap" onclick="showArticle('${identifier}')" style="cursor:pointer;">
             <img src="${post.image}" alt="${post.title}" loading="lazy" onerror="this.src='img/service.jpg'" />
             <span class="blog-card-category">${post.categoryName || post.category}</span>
           </div>
@@ -245,14 +247,14 @@ export function renderBlogPosts(category = "all", searchQuery = "") {
               <span><i class="fa fa-calendar-o"></i> ${post.date}</span>
               <span><i class="fa fa-clock-o"></i> ${post.readTime}</span>
             </div>
-            <h3 class="blog-card-title" onclick="openArticleModal('${post.slug || post.id}')" style="cursor:pointer;">${post.title}</h3>
+            <h3 class="blog-card-title" onclick="showArticle('${identifier}')" style="cursor:pointer;">${post.title}</h3>
             <p class="blog-card-excerpt">${post.excerpt}</p>
             ${hasProducts ? `<div class="blog-parts-badge"><i class="fa fa-amazon" style="color:#ff9900"></i> Includes ${partsCount} Verified ${partsCount === 1 ? 'Part' : 'Parts'}</div>` : ''}
             <div class="blog-card-footer" style="margin-top: 14px;">
-              <button class="blog-read-btn" onclick="openArticleModal('${post.slug || post.id}')">
+              <button class="blog-read-btn" onclick="showArticle('${identifier}')">
                 Read Guide <i class="fa fa-arrow-right"></i>
               </button>
-              <button class="blog-card-share-btn" onclick="sharePostDirect(event, '${post.slug || post.id}')" title="Share this Guide">
+              <button class="blog-card-share-btn" onclick="sharePostDirect(event, '${identifier}')" title="Share this Guide">
                 <i class="fa fa-share-alt"></i> Share
               </button>
             </div>
@@ -264,92 +266,109 @@ export function renderBlogPosts(category = "all", searchQuery = "") {
 }
 
 /**
- * Configure social share links inside reader modal
+ * Configure social share links on elements
  */
-function updateModalShareLinks(post) {
+function setupSocialShareButtons(post, prefix = "single") {
   const shareUrl = getPostShareUrl(post);
   const shareTitle = post.title;
-  const shareText = `${shareTitle} - Check out this laptop diagnostic and repair guide from MP2TECH Mumbai:`;
+  const shareText = `${shareTitle} - Read this technical diagnostic guide by MP2TECH Mumbai:`;
 
   // WhatsApp
   const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + "\n\n" + shareUrl)}`;
-  const waTop = document.getElementById("shareWhatsapp");
-  const waBottom = document.getElementById("shareWhatsappBottom");
+  const waTop = document.getElementById(`${prefix}ShareWhatsapp`);
+  const waBottom = document.getElementById(`${prefix}ShareWhatsappBottom`);
   if (waTop) waTop.href = waUrl;
   if (waBottom) waBottom.href = waUrl;
 
   // LinkedIn
   const liUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
-  const liTop = document.getElementById("shareLinkedin");
-  const liBottom = document.getElementById("shareLinkedinBottom");
+  const liTop = document.getElementById(`${prefix}ShareLinkedin`);
+  const liBottom = document.getElementById(`${prefix}ShareLinkedinBottom`);
   if (liTop) liTop.href = liUrl;
   if (liBottom) liBottom.href = liUrl;
 
   // Twitter / X
   const twUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`;
-  const twTop = document.getElementById("shareTwitter");
-  const twBottom = document.getElementById("shareTwitterBottom");
+  const twTop = document.getElementById(`${prefix}ShareTwitter`);
+  const twBottom = document.getElementById(`${prefix}ShareTwitterBottom`);
   if (twTop) twTop.href = twUrl;
   if (twBottom) twBottom.href = twUrl;
 
   // Facebook
   const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
-  const fbTop = document.getElementById("shareFacebook");
+  const fbTop = document.getElementById(`${prefix}ShareFacebook`);
   if (fbTop) fbTop.href = fbUrl;
 
   // Copy Link Buttons
-  const cpTop = document.getElementById("shareCopyLink");
-  const cpBottom = document.getElementById("shareCopyLinkBottom");
+  const cpTop = document.getElementById(`${prefix}ShareCopyLink`);
+  const cpBottom = document.getElementById(`${prefix}ShareCopyLinkBottom`);
 
   const copyHandler = async function (btn, textSpanId) {
     try {
       await navigator.clipboard.writeText(shareUrl);
       const textSpan = document.getElementById(textSpanId);
-      if (textSpan) textSpan.textContent = "✓ Copied!";
+      if (textSpan) textSpan.textContent = "✓ Link Copied!";
       btn.classList.add("copied");
       setTimeout(() => {
         if (textSpan) textSpan.textContent = "Copy Link";
         btn.classList.remove("copied");
       }, 2500);
     } catch (e) {
-      // Fallback prompt
       window.prompt("Copy this direct link to share:", shareUrl);
     }
   };
 
   if (cpTop) {
-    cpTop.onclick = () => copyHandler(cpTop, "copyLinkText");
+    cpTop.onclick = () => copyHandler(cpTop, `${prefix}CopyLinkText`);
   }
   if (cpBottom) {
-    cpBottom.onclick = () => copyHandler(cpBottom, "copyLinkTextBottom");
+    cpBottom.onclick = () => copyHandler(cpBottom, `${prefix}CopyLinkTextBottom`);
   }
 }
 
 /**
- * Open Article Reader Modal with deep-linking support
+ * Show Dedicated Full-Page Article View
  */
-export function openArticleModal(identifier, updateHistory = true) {
-  const post = allPosts.find((p) => p.id === Number(identifier) || p.slug === String(identifier) || String(p.id) === String(identifier));
-  if (!post) return;
+export function showArticle(identifier, updateHistory = true) {
+  const post = allPosts.find(
+    (p) =>
+      p.slug === String(identifier) ||
+      p.id === Number(identifier) ||
+      String(p.id) === String(identifier)
+  );
+
+  if (!post) {
+    // If not found, show catalog
+    showAllArticlesView(false);
+    return;
+  }
 
   activeOpenPostId = post.id;
 
-  const modal = document.getElementById("blogModal");
-  if (!modal) return;
+  const singleSection = document.getElementById("singleArticleSection");
+  const allSection = document.getElementById("allArticlesSection");
 
-  document.getElementById("modalCategory").textContent = post.categoryName || post.category;
-  document.getElementById("modalImage").src = post.image;
-  document.getElementById("modalImage").alt = post.title;
-  document.getElementById("modalDate").innerHTML = `<i class="fa fa-calendar-o"></i> ${post.date}`;
-  document.getElementById("modalReadTime").innerHTML = `<i class="fa fa-clock-o"></i> ${post.readTime}`;
-  document.getElementById("modalTitle").textContent = post.title;
-  document.getElementById("modalBody").innerHTML = post.body;
+  if (!singleSection || !allSection) return;
 
-  // Update social sharing buttons
-  updateModalShareLinks(post);
+  // Populate Single Article View
+  document.getElementById("singleCategory").textContent = post.categoryName || post.category;
+  document.getElementById("singleTitle").textContent = post.title;
+  document.getElementById("singleDate").innerHTML = `<i class="fa fa-calendar-o"></i> ${post.date}`;
+  document.getElementById("singleReadTime").innerHTML = `<i class="fa fa-clock-o"></i> ${post.readTime}`;
+  
+  const imgEl = document.getElementById("singleImage");
+  if (imgEl) {
+    imgEl.src = post.image;
+    imgEl.alt = post.title;
+  }
 
-  // Render related Amazon products inside the guide
-  const relContainer = document.getElementById("modalRelatedProducts");
+  document.getElementById("singleBody").innerHTML = post.body;
+
+  // Setup social share links
+  setupSocialShareButtons(post, "single");
+
+  // Render related Amazon hardware products
+  const relContainer = document.getElementById("singleRelatedProducts");
   if (relContainer) {
     if (post.relatedProductIds && post.relatedProductIds.length > 0) {
       const relProducts = allProducts.filter((p) => post.relatedProductIds.includes(p.id));
@@ -381,7 +400,7 @@ export function openArticleModal(identifier, updateHistory = true) {
                 })
                 .join("")}
             </div>
-            <div style="text-align:center; padding-top: 14px; border-top: 1px dashed #e2e8f0; margin-top: 14px;">
+            <div style="text-align:center; padding-top: 16px; border-top: 1px dashed #e2e8f0; margin-top: 16px;">
               <a href="deals.html" class="nav-deals-btn">
                 <i class="fa fa-th-large"></i> Explore Full Hardware & Deals Catalog ➔
               </a>
@@ -397,40 +416,53 @@ export function openArticleModal(identifier, updateHistory = true) {
     }
   }
 
-  // Update browser URL query param for deep linking
+  // Switch views
+  allSection.style.display = "none";
+  singleSection.style.display = "block";
+
+  // Update browser URL query parameter
   if (updateHistory && window.history && window.history.pushState) {
     const slugOrId = post.slug || post.id;
     const newUrl = `${window.location.pathname}?post=${encodeURIComponent(slugOrId)}`;
-    window.history.pushState({ postId: post.id }, post.title, newUrl);
+    window.history.pushState({ postId: post.id, slug: post.slug }, post.title, newUrl);
     document.title = `${post.title} | MP2TECH Diagnostic Guides`;
   }
 
-  modal.classList.add("is-open");
-  document.body.style.overflow = "hidden";
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 /**
- * Close Article Reader Modal and reset URL
+ * Show All Articles Catalog View
  */
-export function closeArticleModal(updateHistory = true) {
-  const modal = document.getElementById("blogModal");
-  if (!modal) return;
-  modal.classList.remove("is-open");
-  document.body.style.overflow = "";
+export function showAllArticlesView(updateHistory = true) {
   activeOpenPostId = null;
+
+  const singleSection = document.getElementById("singleArticleSection");
+  const allSection = document.getElementById("allArticlesSection");
+
+  if (singleSection) singleSection.style.display = "none";
+  if (allSection) allSection.style.display = "block";
 
   if (updateHistory && window.history && window.history.pushState) {
     window.history.pushState({}, "Diagnostic Guides & Tech Tips | MP2TECH Mumbai", window.location.pathname);
     document.title = "Diagnostic Guides & Tech Tips | MP2TECH Mumbai";
   }
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 /**
- * Quick Direct Share from card (Native share sheet or copy link)
+ * Quick Direct Share from card
  */
 export function sharePostDirect(event, identifier) {
   if (event) event.stopPropagation();
-  const post = allPosts.find((p) => p.id === Number(identifier) || p.slug === String(identifier) || String(p.id) === String(identifier));
+  const post = allPosts.find(
+    (p) =>
+      p.slug === String(identifier) ||
+      p.id === Number(identifier) ||
+      String(p.id) === String(identifier)
+  );
   if (!post) return;
 
   const shareUrl = getPostShareUrl(post);
@@ -444,8 +476,15 @@ export function sharePostDirect(event, identifier) {
       })
       .catch(() => {});
   } else {
-    // Open the article modal directly so user can share across all buttons
-    openArticleModal(identifier);
+    // Copy to clipboard with prompt
+    navigator.clipboard
+      .writeText(shareUrl)
+      .then(() => {
+        alert(`Direct Link Copied to Clipboard!\n\n${shareUrl}`);
+      })
+      .catch(() => {
+        window.prompt("Share this direct guide URL:", shareUrl);
+      });
   }
 }
 
@@ -480,17 +519,16 @@ export function quickSearch(term = "") {
 }
 
 /**
- * Check URL query parameters on load to auto-open shared blog post
+ * Check URL query parameters on load to auto-display shared blog post
  */
 function handleDeepLinking() {
   const urlParams = new URLSearchParams(window.location.search);
   const postQuery = urlParams.get("post") || urlParams.get("article") || urlParams.get("id");
 
   if (postQuery) {
-    // Attempt to match post
-    setTimeout(() => {
-      openArticleModal(postQuery, false);
-    }, 100);
+    showArticle(postQuery, false);
+  } else {
+    showAllArticlesView(false);
   }
 }
 
@@ -498,25 +536,25 @@ function handleDeepLinking() {
  * Initialize dynamic hub
  */
 export async function initAffiliateHub() {
-  // Render default embedded data immediately without delay
+  // Initial render
   renderProducts("all", "", "default");
   renderBlogPosts("all", "");
 
-  // Check URL parameters for direct link on initial load
+  // Deep linking initial check
   handleDeepLinking();
 
   // Handle browser back/forward buttons
-  window.addEventListener("popstate", (event) => {
+  window.addEventListener("popstate", () => {
     const urlParams = new URLSearchParams(window.location.search);
     const postQuery = urlParams.get("post");
     if (postQuery) {
-      openArticleModal(postQuery, false);
+      showArticle(postQuery, false);
     } else {
-      closeArticleModal(false);
+      showAllArticlesView(false);
     }
   });
 
-  // Product Category Filters (Pills on deals.html)
+  // Product Category Filters (deals.html)
   const prodFilterBtns = document.querySelectorAll(".category-pill:not(.blog-filter-btn)");
   prodFilterBtns.forEach((btn) => {
     btn.addEventListener("click", function () {
@@ -595,7 +633,7 @@ export async function initAffiliateHub() {
     });
   }
 
-  // Fetch updated JSON datasets in background with cache buster
+  // Fetch updated JSON datasets in background
   try {
     const timestamp = Date.now();
     const [prodRes, postRes] = await Promise.all([
@@ -622,20 +660,9 @@ export async function initAffiliateHub() {
     console.info("Using embedded product catalog fallback");
   }
 
-  // Modal helpers on window
-  window.openArticleModal = openArticleModal;
-  window.closeArticleModal = closeArticleModal;
+  // Global helpers
+  window.showArticle = showArticle;
+  window.showAllArticlesView = showAllArticlesView;
   window.sharePostDirect = sharePostDirect;
   window.quickSearch = quickSearch;
-  window.handleModalBackdropClick = function (e) {
-    if (e.target.id === "blogModal") {
-      closeArticleModal();
-    }
-  };
-
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") {
-      closeArticleModal();
-    }
-  });
 }
