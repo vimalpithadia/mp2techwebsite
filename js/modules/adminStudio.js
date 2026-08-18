@@ -1639,6 +1639,7 @@ Respond ONLY with a single valid JSON object (no markdown backticks, no extra te
       feedback.style.display = "flex";
     }
     showToast("Error processing Amazon product data", "error");
+  }
 }
 
 /**
