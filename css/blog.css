@@ -815,6 +815,149 @@
   font-weight: 600;
 }
 
+/* Card Quick Share Button */
+.blog-card-share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 5px 11px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.blog-card-share-btn:hover {
+  background: #e0f2fe;
+  color: #0284c7;
+  border-color: #bae6fd;
+}
+
+/* --------------------------------------------------------------------------
+   Article Sharing Bar & Buttons
+   -------------------------------------------------------------------------- */
+.blog-modal-share-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin: 16px 0 20px;
+  flex-wrap: wrap;
+}
+
+.share-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.share-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.share-wa {
+  background: #25d366;
+  color: #ffffff !important;
+}
+.share-wa:hover {
+  background: #20ba59;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+}
+
+.share-li {
+  background: #0a66c2;
+  color: #ffffff !important;
+}
+.share-li:hover {
+  background: #08519c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(10, 102, 194, 0.3);
+}
+
+.share-tw {
+  background: #0f172a;
+  color: #ffffff !important;
+}
+.share-tw:hover {
+  background: #000000;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.3);
+}
+
+.share-fb {
+  background: #1877f2;
+  color: #ffffff !important;
+}
+.share-fb:hover {
+  background: #1464cc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(24, 119, 242, 0.3);
+}
+
+.share-cp {
+  background: #e2e8f0;
+  color: #1e293b !important;
+}
+.share-cp:hover {
+  background: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.share-cp.copied {
+  background: #10b981;
+  color: #ffffff !important;
+}
+
+/* Bottom Article Share Box */
+.blog-bottom-share-box {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin: 28px 0 20px;
+  text-align: center;
+}
+
+.blog-bottom-share-box h4 {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 12px;
+}
+
+.blog-bottom-share-box .share-btn-group {
+  justify-content: center;
+}
+
 /* --------------------------------------------------------------------------
    Article Reader Modal
    -------------------------------------------------------------------------- */
