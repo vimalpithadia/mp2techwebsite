@@ -7,8 +7,8 @@
     <link rel="icon" href="img/favicon.png" type="image/png" />
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-    <link rel="stylesheet" type="text/css" href="css/admin.css?v=20260818d">
-    <link rel="stylesheet" type="text/css" href="css/blog.css?v=20260818d">
+    <link rel="stylesheet" type="text/css" href="css/admin.css?v=20260818v">
+    <link rel="stylesheet" type="text/css" href="css/blog.css?v=20260818v">
 </head>
 <body>
 
@@ -365,48 +365,77 @@
                 <!-- TAB 3: BLOG ARTICLES STUDIO -->
                 <div id="tab-articles" class="tab-panel">
                     
-                    <!-- AI AUTO-BLOGGER ASSISTANT -->
+                    <!-- WORLD-CLASS AI AUTO-BLOGGER ASSISTANT -->
                     <div class="ai-blogger-card">
                         <div class="ai-blogger-header">
-                            <div class="ai-blogger-title">
-                                <i class="fa fa-magic" style="font-size:18px;"></i>
-                                <span>AI Auto-Blogger Assistant</span>
+                            <div class="ai-blogger-title-group">
+                                <div class="ai-blogger-icon-badge">
+                                    <i class="fa fa-magic"></i>
+                                </div>
+                                <div>
+                                    <h3 class="ai-blogger-title">AI Diagnostic Article Architect</h3>
+                                    <span class="ai-blogger-subtitle">Autonomous Research &amp; Content Engine &bull; Powered by Google Gemini</span>
+                                </div>
                             </div>
-                            <span class="ai-status-pill"><span class="pulse-dot"></span> Powered by Google Gemini AI</span>
+                            <div class="ai-status-pill">
+                                <span class="pulse-dot"></span> <span>Gemini AI Connected</span>
+                            </div>
                         </div>
+
                         <p class="ai-blogger-desc">
-                            Simply enter a repair topic or customer problem. Gemini AI will automatically research the issue, write the technical diagnostic guide with formatted steps, select high-res hardware photography, and link matching Amazon products from your store.
+                            Type any hardware issue, repair symptom, or upgrade question. Gemini AI will research the issue, write a structured diagnostic guide with step-by-step checklists, attach high-res hardware photos, and auto-link matching Amazon parts from your store.
                         </p>
-                        <div class="ai-input-wrap">
-                            <input type="text" id="aiTopicInput" class="ai-prompt-input" placeholder="Enter topic e.g. 'Laptop battery draining fast after Windows 11 update' or 'How to apply thermal paste correctly'..." />
-                            
-                            <div class="ai-options-grid">
-                                <div>
-                                    <select id="aiToneSelect" class="ai-option-select" title="Article Format">
-                                        <option value="diagnostics">Diagnostic Walkthrough (Problem ➔ Test ➔ Fix)</option>
-                                        <option value="upgrades">Hardware Upgrade & Benchmark Tutorial</option>
-                                        <option value="maintenance">Preventive Maintenance & Thermal Care</option>
-                                        <option value="refurbished">Buyer's Guide & Refurbished Tips</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="ai-checkbox-label">
-                                        <input type="checkbox" id="aiAutoPhotoCheck" checked /> Auto-Attach Tech Photo
-                                    </label>
-                                </div>
-                                <div>
-                                    <label class="ai-checkbox-label">
-                                        <input type="checkbox" id="aiAutoLinkCheck" checked /> Auto-Link Store Products
-                                    </label>
-                                </div>
-                                <div>
-                                    <button type="button" id="generateAiPostBtn" onclick="window.generateArticleWithAI()" class="ai-generate-btn">
-                                        <i class="fa fa-bolt"></i> Generate Complete Article
-                                    </button>
-                                </div>
-                            </div>
-                            <div id="aiFeedbackBox" class="ai-feedback-box"></div>
+
+                        <!-- Main Prompt Input with Icon -->
+                        <div class="ai-prompt-box-wrap">
+                            <i class="fa fa-terminal ai-prompt-icon"></i>
+                            <input type="text" id="aiTopicInput" class="ai-prompt-input" placeholder="e.g. Laptop screen flickers when unplugged on battery, or NVMe SSD overheating fix..." autocomplete="off" />
                         </div>
+
+                        <!-- 1-Click Trending Topic Suggestions -->
+                        <div class="ai-topic-chips-wrap">
+                            <span class="ai-chips-label"><i class="fa fa-lightbulb-o"></i> Quick Ideas:</span>
+                            <button type="button" class="ai-topic-chip" onclick="window.setAiTopic('Laptop fan making loud grinding noise and overheating')">🔥 Fan Noise &amp; Overheating</button>
+                            <button type="button" class="ai-topic-chip" onclick="window.setAiTopic('Why NVMe SSD gets hot and how to install heatsink')">⚡ NVMe SSD Thermal Heatsink</button>
+                            <button type="button" class="ai-topic-chip" onclick="window.setAiTopic('Symptoms of dying laptop battery and calibration steps')">🔋 Battery Health &amp; Calibration</button>
+                            <button type="button" class="ai-topic-chip" onclick="window.setAiTopic('How to choose between DDR4 vs DDR5 RAM for video editing')">💻 DDR4 vs DDR5 RAM Guide</button>
+                            <button type="button" class="ai-topic-chip" onclick="window.setAiTopic('Top signs of motherboard liquid damage and ultrasonic cleaning')">🔬 Liquid Damage Diagnostics</button>
+                        </div>
+
+                        <!-- Controls Bar -->
+                        <div class="ai-controls-bar">
+                            <div class="ai-control-col format-col">
+                                <label for="aiToneSelect" class="ai-control-label"><i class="fa fa-sliders"></i> Article Format</label>
+                                <select id="aiToneSelect" class="ai-option-select">
+                                    <option value="diagnostics">Diagnostic Walkthrough (Problem ➔ Test ➔ Fix)</option>
+                                    <option value="upgrades">Hardware Upgrade &amp; Benchmark Tutorial</option>
+                                    <option value="maintenance">Preventive Maintenance &amp; Thermal Care</option>
+                                    <option value="refurbished">Buyer's Guide &amp; Refurbished Tips</option>
+                                </select>
+                            </div>
+
+                            <div class="ai-control-col options-col">
+                                <label class="ai-toggle-label">
+                                    <input type="checkbox" id="aiAutoPhotoCheck" checked />
+                                    <span class="ai-toggle-switch"></span>
+                                    <span class="ai-toggle-text"><i class="fa fa-picture-o"></i> Auto-Attach Tech Photo</span>
+                                </label>
+                                <label class="ai-toggle-label">
+                                    <input type="checkbox" id="aiAutoLinkCheck" checked />
+                                    <span class="ai-toggle-switch"></span>
+                                    <span class="ai-toggle-text"><i class="fa fa-shopping-cart"></i> Auto-Link Store Products</span>
+                                </label>
+                            </div>
+
+                            <div class="ai-control-col action-col">
+                                <button type="button" id="generateAiPostBtn" onclick="window.generateArticleWithAI()" class="ai-generate-btn">
+                                    <i class="fa fa-bolt"></i> <span>Generate Complete Article</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Feedback Banner -->
+                        <div id="aiFeedbackBox" class="ai-feedback-box"></div>
                     </div>
 
                     <div class="admin-panel-card" id="postFormCard">
@@ -658,7 +687,7 @@
 
     <!-- Scripts -->
     <script type="module">
-        import { initAdminStudio } from "./js/modules/adminStudio.js?v=20260818ai";
+        import { initAdminStudio } from "./js/modules/adminStudio.js?v=20260818v";
         document.addEventListener("DOMContentLoaded", initAdminStudio);
     </script>
 </body>
