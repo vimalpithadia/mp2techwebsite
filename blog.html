@@ -22,7 +22,7 @@
     <link rel="stylesheet" type="text/css" href="css/style1.css?v=20260109" media="all" />
     <link rel="stylesheet" type="text/css" href="css/dynamic.css">
     <link rel="stylesheet" type="text/css" href="css/responsive.css">
-    <link rel="stylesheet" type="text/css" href="css/blog.css?v=20260818i">
+    <link rel="stylesheet" type="text/css" href="css/blog.css?v=20260818j">
 </head>
 
 <body>
@@ -79,73 +79,128 @@
     </header>
     <!-- Header Ends -->
 
-    <!-- COMPACT EYE-CATCHY BLOG HERO -->
-    <section class="storefront-header-bar blog-hero-header">
+    <!-- DEDICATED SINGLE ARTICLE FULL-PAGE VIEW (Shown when URL has ?post=...) -->
+    <section id="singleArticleSection" class="single-article-wrapper" style="display:none;">
         <div class="container">
-            <div class="storefront-toolbar">
-                <div class="storefront-title-box">
-                    <div class="hero-top-row">
-                        <span class="hero-tech-badge">
-                            <span class="pulse-dot"></span> Tech Knowledge Base & Diagnostic Lab
-                        </span>
-                        <div class="hero-trust-row">
-                            <span class="hero-trust-item"><i class="fa fa-wrench"></i> Real Repair Walkthroughs</span>
-                            <span class="hero-trust-item"><i class="fa fa-flask"></i> Lab Tested Solutions</span>
-                            <span class="hero-trust-item"><i class="fa fa-check-circle"></i> Mumbai Specialists</span>
-                        </div>
-                    </div>
-                    <h1>
-                        Diagnostic Guides & <span class="gradient-text-gold">Tech Tips</span>
-                    </h1>
+            <a href="blog.html" class="back-to-guides-btn" onclick="event.preventDefault(); window.showAllArticlesView();">
+                <i class="fa fa-arrow-left"></i> Back to All Tech Guides & Articles
+            </a>
+
+            <article class="single-article-card">
+                <span class="single-article-category-badge" id="singleCategory">Diagnostics</span>
+                <h1 class="single-article-title" id="singleTitle">Article Title</h1>
+                
+                <div class="single-article-meta-row">
+                    <span><i class="fa fa-user"></i> MP2TECH Specialist</span>
+                    <span id="singleDate"><i class="fa fa-calendar-o"></i> Date</span>
+                    <span id="singleReadTime"><i class="fa fa-clock-o"></i> 5 min read</span>
                 </div>
-            </div>
+
+                <!-- Top Social Share Bar -->
+                <div class="blog-modal-share-bar">
+                    <span class="share-label"><i class="fa fa-share-alt"></i> Share this Guide:</span>
+                    <div class="share-btn-group">
+                        <a href="#" id="singleShareWhatsapp" target="_blank" rel="noopener" class="share-btn share-wa" title="Share on WhatsApp"><i class="fa fa-whatsapp"></i> WhatsApp</a>
+                        <a href="#" id="singleShareLinkedin" target="_blank" rel="noopener" class="share-btn share-li" title="Share on LinkedIn"><i class="fa fa-linkedin"></i> LinkedIn</a>
+                        <a href="#" id="singleShareTwitter" target="_blank" rel="noopener" class="share-btn share-tw" title="Share on X / Twitter"><i class="fa fa-twitter"></i> X / Tweet</a>
+                        <a href="#" id="singleShareFacebook" target="_blank" rel="noopener" class="share-btn share-fb" title="Share on Facebook"><i class="fa fa-facebook"></i> Facebook</a>
+                        <button type="button" id="singleShareCopyLink" class="share-btn share-cp" title="Copy Direct Link to this Guide"><i class="fa fa-link"></i> <span id="singleCopyLinkText">Copy Link</span></button>
+                    </div>
+                </div>
+
+                <img src="" alt="" class="single-article-img" id="singleImage" />
+
+                <div class="blog-article-body" id="singleBody">
+                    <!-- Dynamic Body Content -->
+                </div>
+
+                <!-- Bottom Social Share Box -->
+                <div class="blog-bottom-share-box">
+                    <h4>Found this guide helpful? Share with your friends or colleagues:</h4>
+                    <div class="share-btn-group">
+                        <a href="#" id="singleShareWhatsappBottom" target="_blank" rel="noopener" class="share-btn share-wa"><i class="fa fa-whatsapp"></i> WhatsApp</a>
+                        <a href="#" id="singleShareLinkedinBottom" target="_blank" rel="noopener" class="share-btn share-li"><i class="fa fa-linkedin"></i> LinkedIn</a>
+                        <a href="#" id="singleShareTwitterBottom" target="_blank" rel="noopener" class="share-btn share-tw"><i class="fa fa-twitter"></i> X / Tweet</a>
+                        <button type="button" id="singleShareCopyLinkBottom" class="share-btn share-cp"><i class="fa fa-link"></i> <span id="singleCopyLinkTextBottom">Copy Link</span></button>
+                    </div>
+                </div>
+
+                <!-- Dynamic In-Article Amazon Affiliate Product Recommendations -->
+                <div id="singleRelatedProducts" style="display:none;"></div>
+            </article>
         </div>
     </section>
 
-    <!-- STICKY UNIFIED BLOG CATEGORY & SEARCH TOOLBAR -->
-    <nav class="category-filter-nav">
-        <div class="container">
-            <div class="category-nav-container">
-                <!-- Left: Blog Category Pills -->
-                <div class="category-pills-wrap">
-                    <button class="blog-filter-btn category-pill active" data-category="all"><i class="fa fa-th-large"></i> All Guides</button>
-                    <button class="blog-filter-btn category-pill" data-category="repair"><i class="fa fa-wrench"></i> Repair & Maintenance</button>
-                    <button class="blog-filter-btn category-pill" data-category="hardware"><i class="fa fa-microchip"></i> Hardware Upgrades</button>
-                    <button class="blog-filter-btn category-pill" data-category="diagnostics"><i class="fa fa-stethoscope"></i> Diagnostics & Testing</button>
-                    <button class="blog-filter-btn category-pill" data-category="tips"><i class="fa fa-lightbulb-o"></i> Tech Tips</button>
-                </div>
-
-                <!-- Right: Compact Search & Hardware Hub Link -->
-                <div class="category-controls-wrap">
-                    <div class="nav-search-box">
-                        <i class="fa fa-search nav-search-icon"></i>
-                        <input type="text" id="blogSearchInput" class="nav-search-input" placeholder="Search guides, errors, fixes..." autocomplete="off" />
-                        <button type="button" id="clearBlogSearchBtn" class="nav-search-clear" title="Clear search">&times;</button>
+    <!-- ALL ARTICLES CATALOG SECTION -->
+    <div id="allArticlesSection">
+        <!-- COMPACT EYE-CATCHY BLOG HERO -->
+        <section class="storefront-header-bar blog-hero-header">
+            <div class="container">
+                <div class="storefront-toolbar">
+                    <div class="storefront-title-box">
+                        <div class="hero-top-row">
+                            <span class="hero-tech-badge">
+                                <span class="pulse-dot"></span> Tech Knowledge Base & Diagnostic Lab
+                            </span>
+                            <div class="hero-trust-row">
+                                <span class="hero-trust-item"><i class="fa fa-wrench"></i> Real Repair Walkthroughs</span>
+                                <span class="hero-trust-item"><i class="fa fa-flask"></i> Lab Tested Solutions</span>
+                                <span class="hero-trust-item"><i class="fa fa-check-circle"></i> Mumbai Specialists</span>
+                            </div>
+                        </div>
+                        <h1>
+                            Diagnostic Guides & <span class="gradient-text-gold">Tech Tips</span>
+                        </h1>
                     </div>
-                    <a href="deals.html" class="nav-deals-btn" title="View Hardware Deals">
-                        <i class="fa fa-shopping-cart"></i> Hardware Deals
-                    </a>
                 </div>
             </div>
-        </div>
-    </nav>
+        </section>
 
-    <!-- BUYER GUIDES & TECH TIPS SECTION -->
-    <main class="guides-section" id="guides" style="padding: 30px 0 60px; background: var(--slate-50);">
-        <div class="container">
-            <div class="section-title-wrap" style="margin-bottom: 22px;">
-                <h2 style="font-size: 19px; font-weight: 800; color: var(--dark); display: flex; align-items: center; gap: 8px;">
-                    <i class="fa fa-book" style="color:var(--primary);"></i> Latest Diagnostic Walkthroughs & Articles
-                </h2>
-                <span class="product-count" id="guideCounter">Specialist Guides</span>
-            </div>
+        <!-- STICKY UNIFIED BLOG CATEGORY & SEARCH TOOLBAR -->
+        <nav class="category-filter-nav">
+            <div class="container">
+                <div class="category-nav-container">
+                    <!-- Left: Blog Category Pills -->
+                    <div class="category-pills-wrap">
+                        <button class="blog-filter-btn category-pill active" data-category="all"><i class="fa fa-th-large"></i> All Guides</button>
+                        <button class="blog-filter-btn category-pill" data-category="repair"><i class="fa fa-wrench"></i> Repair & Maintenance</button>
+                        <button class="blog-filter-btn category-pill" data-category="upgrades"><i class="fa fa-microchip"></i> Hardware Upgrades</button>
+                        <button class="blog-filter-btn category-pill" data-category="diagnostics"><i class="fa fa-stethoscope"></i> Diagnostics & Testing</button>
+                        <button class="blog-filter-btn category-pill" data-category="refurbished"><i class="fa fa-laptop"></i> Refurbished</button>
+                    </div>
 
-            <!-- Dynamic Guides Grid -->
-            <div class="blog-grid" id="blogCardsContainer">
-                <!-- Dynamically rendered by affiliateHub.js -->
+                    <!-- Right: Compact Search & Hardware Hub Link -->
+                    <div class="category-controls-wrap">
+                        <div class="nav-search-box">
+                            <i class="fa fa-search nav-search-icon"></i>
+                            <input type="text" id="blogSearchInput" class="nav-search-input" placeholder="Search guides, errors, fixes..." autocomplete="off" />
+                            <button type="button" id="clearBlogSearchBtn" class="nav-search-clear" title="Clear search">&times;</button>
+                        </div>
+                        <a href="deals.html" class="nav-deals-btn" title="View Hardware Deals">
+                            <i class="fa fa-shopping-cart"></i> Hardware Deals
+                        </a>
+                    </div>
+                </div>
             </div>
-        </div>
-    </main>
+        </nav>
+
+        <!-- BUYER GUIDES & TECH TIPS SECTION -->
+        <main class="guides-section" id="guides" style="padding: 30px 0 60px; background: var(--slate-50);">
+            <div class="container">
+                <div class="section-title-wrap" style="margin-bottom: 22px;">
+                    <h2 style="font-size: 19px; font-weight: 800; color: var(--dark); display: flex; align-items: center; gap: 8px;">
+                        <i class="fa fa-book" style="color:var(--primary);"></i> Latest Diagnostic Walkthroughs & Articles
+                    </h2>
+                    <span class="product-count" id="guideCounter">Specialist Guides</span>
+                </div>
+
+                <!-- Dynamic Guides Grid -->
+                <div class="blog-grid" id="blogCardsContainer">
+                    <!-- Dynamically rendered by affiliateHub.js -->
+                </div>
+            </div>
+        </main>
+    </div>
 
     <!-- Support Callout Section -->
     <section class="w-section m-padding" style="background-color:#5aa3ce">
@@ -156,65 +211,6 @@
             </div>
         </div>
     </section>
-
-    <!-- Article Reader Modal (with embedded related Amazon products) -->
-    <div class="blog-modal-backdrop" id="blogModal" onclick="handleModalBackdropClick(event)">
-        <div class="blog-modal-container">
-            <div class="blog-modal-header">
-                <span class="blog-modal-category" id="modalCategory">Diagnostics</span>
-                <button class="blog-modal-close" onclick="closeArticleModal()" aria-label="Close modal">&times;</button>
-            </div>
-            <div class="blog-modal-content">
-                <img src="" alt="" class="blog-modal-image" id="modalImage" />
-                <div class="blog-modal-meta">
-                    <span id="modalDate"><i class="fa fa-calendar-o"></i> Aug 12, 2026</span>
-                    <span id="modalReadTime"><i class="fa fa-clock-o"></i> 5 min read</span>
-                    <span><i class="fa fa-user"></i> MP2TECH Specialist</span>
-                </div>
-                <h1 class="blog-modal-title" id="modalTitle">Article Title</h1>
-                
-                <!-- Social Sharing Bar (Top) -->
-                <div class="blog-modal-share-bar">
-                    <span class="share-label"><i class="fa fa-share-alt"></i> Share this Guide:</span>
-                    <div class="share-btn-group">
-                        <a href="#" id="shareWhatsapp" target="_blank" rel="noopener" class="share-btn share-wa" title="Share on WhatsApp"><i class="fa fa-whatsapp"></i> WhatsApp</a>
-                        <a href="#" id="shareLinkedin" target="_blank" rel="noopener" class="share-btn share-li" title="Share on LinkedIn"><i class="fa fa-linkedin"></i> LinkedIn</a>
-                        <a href="#" id="shareTwitter" target="_blank" rel="noopener" class="share-btn share-tw" title="Share on X / Twitter"><i class="fa fa-twitter"></i> X / Tweet</a>
-                        <a href="#" id="shareFacebook" target="_blank" rel="noopener" class="share-btn share-fb" title="Share on Facebook"><i class="fa fa-facebook"></i> Facebook</a>
-                        <button type="button" id="shareCopyLink" class="share-btn share-cp" title="Copy Direct Link to this Guide"><i class="fa fa-link"></i> <span id="copyLinkText">Copy Link</span></button>
-                    </div>
-                </div>
-
-                <div class="blog-article-body" id="modalBody">
-                    <!-- Dynamic Body Content -->
-                </div>
-
-                <!-- Bottom Social Share Box -->
-                <div class="blog-bottom-share-box">
-                    <h4>Found this guide helpful? Share with your friends or colleagues:</h4>
-                    <div class="share-btn-group">
-                        <a href="#" id="shareWhatsappBottom" target="_blank" rel="noopener" class="share-btn share-wa"><i class="fa fa-whatsapp"></i> WhatsApp</a>
-                        <a href="#" id="shareLinkedinBottom" target="_blank" rel="noopener" class="share-btn share-li"><i class="fa fa-linkedin"></i> LinkedIn</a>
-                        <a href="#" id="shareTwitterBottom" target="_blank" rel="noopener" class="share-btn share-tw"><i class="fa fa-twitter"></i> X / Tweet</a>
-                        <button type="button" id="shareCopyLinkBottom" class="share-btn share-cp"><i class="fa fa-link"></i> <span id="copyLinkTextBottom">Copy Link</span></button>
-                    </div>
-                </div>
-
-                <!-- Dynamic In-Article Amazon Affiliate Product Recommendations -->
-                <div id="modalRelatedProducts" style="display:none;"></div>
-
-                <div class="blog-modal-footer-cta">
-                    <div>
-                        <h4>Need hands-on repair or upgrade service?</h4>
-                        <p>Visit our Kandivali West workshop or request remote/on-site assistance.</p>
-                    </div>
-                    <a href="https://wa.me/919930568888?text=Hello%20MP2TECH%2C%20I%20have%20an%20issue%20with%20my%20computer." target="_blank" rel="noopener" class="blog-modal-cta-btn">
-                        <i class="fa fa-whatsapp"></i> Chat on WhatsApp
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- WhatsApp Floating Action -->
     <a class="whatsapp-float" href="https://wa.me/919930568888?text=Hello%20MP2TECH%2C%20I%20need%20help." target="_blank"
@@ -265,6 +261,6 @@
 
     <!-- Scripts -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script type="module" src="js/app.js?v=20260818i"></script>
+    <script type="module" src="js/app.js?v=20260818j"></script>
 </body>
 </html>
