@@ -10,7 +10,7 @@
 import { DEFAULT_PRODUCTS, DEFAULT_POSTS } from "../../data/defaultData.js";
 
 export const AMAZON_CONFIG = {
-  defaultAffiliateTag: "mp2tech-21",
+  defaultAffiliateTag: "mp2tech20-21",
   siteCountry: "in",
 };
 
