@@ -1,5 +1,22 @@
 [
   {
+    "id": "prod-5729",
+    "name": "EVM 8GB DDR3 1600MHz Long DIMM Desktop RAM (EVMT8G1600U86P)",
+    "category": "ram",
+    "brand": "EVM",
+    "priceEstimate": "₹2333",
+    "rating": 4.2,
+    "reviewCount": 524,
+    "badge": "Technician Verified Upgrade",
+    "image": "https://m.media-amazon.com/images/I/515m2W95tPL._SL1100_.jpg",
+    "amazonUrl": "https://www.amazon.in/dp/B09XXTMSD9/?tag=mp2tech-21",
+    "highlights": [
+      "8GB DDR3 Desktop Memory (Long DIMM)",
+      "Fast 1600MHz Clock Speed",
+      "Reliable performance for legacy desktop upgrades"
+    ]
+  },
+  {
     "id": "prod-4953",
     "name": "EVM 16GB 2133MHz DDR4 Long DIMM Desktop RAM (EVMT16G2133U88P)",
     "category": "ram",
