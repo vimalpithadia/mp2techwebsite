@@ -1452,12 +1452,12 @@ export async function extractAmazonProductWithAI() {
   const asinMatch = rawInput.match(/(?:dp|gp\/product|d|asin)\/([A-Z0-9]{10})/i) || rawInput.match(/\b([B0-9][A-Z0-9]{9})\b/i);
   const detectedAsin = asinMatch ? asinMatch[1].toUpperCase() : (slugMatch ? slugMatch[2].toUpperCase() : null);
 
-  // Build clean Affiliate URL with tag=mp2tech-21
+  // Build clean Affiliate URL with tag=mp2tech20-21
   let affiliateUrl = rawInput;
   if (detectedAsin) {
-    affiliateUrl = `https://www.amazon.in/dp/${detectedAsin}/?tag=mp2tech-21`;
+    affiliateUrl = `https://www.amazon.in/dp/${detectedAsin}/?tag=mp2tech20-21`;
   } else if (rawInput.startsWith("http") && !rawInput.includes("tag=")) {
-    affiliateUrl = rawInput.includes("?") ? `${rawInput}&tag=mp2tech-21` : `${rawInput}?tag=mp2tech-21`;
+    affiliateUrl = rawInput.includes("?") ? `${rawInput}&tag=mp2tech20-21` : `${rawInput}?tag=mp2tech20-21`;
   }
 
   // UI Loading State
@@ -1653,6 +1653,538 @@ Respond ONLY with a single valid JSON object (no markdown backticks, no extra te
   }
 }
 
+// Bulk Importer Candidate State
+let bulkCandidates = [];
+
+export function switchAmazonAiMode(mode) {
+  const singleTab = document.getElementById("aiModeTabSingle");
+  const batchTab = document.getElementById("aiModeTabBatch");
+  const discoveryTab = document.getElementById("aiModeTabDiscovery");
+
+  const singleSec = document.getElementById("aiAmazonSingleSection");
+  const batchSec = document.getElementById("aiAmazonBatchSection");
+  const discoverySec = document.getElementById("aiAmazonDiscoverySection");
+
+  [singleTab, batchTab, discoveryTab].forEach((t) => t && t.classList.remove("active"));
+  [singleSec, batchSec, discoverySec].forEach((s) => s && (s.style.display = "none"));
+
+  if (mode === "batch") {
+    if (batchTab) batchTab.classList.add("active");
+    if (batchSec) batchSec.style.display = "block";
+  } else if (mode === "discovery") {
+    if (discoveryTab) discoveryTab.classList.add("active");
+    if (discoverySec) discoverySec.style.display = "block";
+  } else {
+    if (singleTab) singleTab.classList.add("active");
+    if (singleSec) singleSec.style.display = "block";
+  }
+}
+
+export function populateBulkDemo(type) {
+  const input = document.getElementById("aiBulkLinksInput");
+  if (!input) return;
+
+  if (type === "ssds") {
+    input.value = [
+      "https://www.amazon.in/dp/B07G3KRZBX/ (Crucial BX500 480GB SATA 2.5 SSD)",
+      "https://www.amazon.in/dp/B08GLX7TNT/ (Samsung 980 PRO 1TB PCIe 4.0 NVMe M.2 SSD)",
+      "https://www.amazon.in/dp/B0C8XHN1J3/ (Western Digital WD Blue SN580 1TB NVMe SSD)",
+      "https://www.amazon.in/dp/B0BBWH1R8H/ (Kingston NV2 500GB PCIe 4.0 M.2 SSD)",
+      "https://www.amazon.in/dp/B08QBN5C92/ (Samsung 870 EVO 500GB SATA 2.5 SSD)"
+    ].join("\n");
+  } else if (type === "ram") {
+    input.value = [
+      "Crucial 16GB DDR4 3200MHz SODIMM Laptop RAM (CT16G4SFRA32A)",
+      "Crucial 8GB DDR4 3200MHz SODIMM Laptop RAM (CT8G4SFRA32A)",
+      "Crucial 16GB DDR5 4800MHz SODIMM Laptop RAM (CT16G48C40S5)",
+      "Corsair Vengeance LPX 16GB DDR4 3200MHz Desktop RAM"
+    ].join("\n");
+  } else if (type === "cooling") {
+    input.value = [
+      "Noctua NT-H1 3.5g Pro-Grade Thermal Compound Paste",
+      "Arctic MX-4 4g High-Performance Thermal Paste with Spatula",
+      "Thermal Grizzly Kryonaut 1g Extreme Performance Thermal Paste",
+      "Klim Wind Laptop Cooling Pad with 4 High-Speed Quiet Fans"
+    ].join("\n");
+  } else if (type === "tools") {
+    input.value = [
+      "iFixit Essential Electronics Toolkit Precision Screwdrivers",
+      "STREBITO 142-Piece Electronics Precision Screwdriver Repair Set",
+      "Digital Multimeter with Auto-Ranging for Component Testing",
+      "Anti-Static Wrist Strap ESD Band for Motherboard Safety"
+    ].join("\n");
+  }
+  input.focus();
+}
+
+export async function analyzeBulkAmazonLinksWithAI() {
+  const input = document.getElementById("aiBulkLinksInput");
+  const btn = document.getElementById("analyzeBulkLinksBtn");
+  const feedback = document.getElementById("aiProdFeedbackBox");
+
+  if (!input) return;
+  const rawText = input.value.trim();
+
+  if (!rawText) {
+    if (feedback) {
+      feedback.className = "ai-feedback-box error";
+      feedback.innerHTML = '<i class="fa fa-exclamation-circle"></i> Please paste at least 1 Amazon link or product name.';
+      feedback.style.display = "flex";
+    }
+    input.focus();
+    return;
+  }
+
+  const lines = rawText.split("\n").map((l) => l.trim()).filter((l) => l.length > 0).slice(0, 25);
+  if (lines.length === 0) return;
+
+  const apiKey = getGeminiApiKey();
+  if (!apiKey) {
+    if (feedback) {
+      feedback.className = "ai-feedback-box error";
+      feedback.innerHTML = '<i class="fa fa-exclamation-circle"></i> Gemini API Key is missing. Please set it in Settings.';
+      feedback.style.display = "flex";
+    }
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Analyzing & Extracting ${lines.length} Items...`;
+  }
+  if (feedback) {
+    feedback.className = "ai-feedback-box";
+    feedback.style.display = "flex";
+    feedback.style.background = "rgba(245, 158, 11, 0.12)";
+    feedback.style.color = "#fbbf24";
+    feedback.style.border = "1px solid rgba(245, 158, 11, 0.25)";
+    feedback.innerHTML = `<i class="fa fa-cog fa-spin"></i> Gemini AI is parsing ${lines.length} Amazon hardware products in parallel...`;
+  }
+
+  const systemPrompt = `You are a professional PC hardware technician and Amazon India (amazon.in) catalog specialist for MP2TECH Store Mumbai.
+Given the following list of ${lines.length} Amazon product links or product queries:
+${lines.map((l, i) => `${i + 1}. ${l}`).join("\n")}
+
+Extract, standardize, and format each product accurately for the Amazon India catalog.
+Category must be exactly one of: "storage", "ram", "cooling", "tools", "accessories".
+Price must be estimated in Indian Rupees (INR) as a clean string without currency symbol (e.g. "2,499", "11,299", "899").
+Affiliate URLs must include tag=mp2tech20-21.
+If an ASIN is detectable, format image as "https://images-na.ssl-images-amazon.com/images/P/{ASIN}.01.LZZZZZZZ.jpg" and amazonUrl as "https://www.amazon.in/dp/{ASIN}/?tag=mp2tech20-21".
+
+Respond ONLY with a valid JSON array of ${lines.length} objects (no markdown backticks, no extra text):
+[
+  {
+    "name": "Full standardized product title with model & capacity (50-80 chars)",
+    "brand": "Brand Name",
+    "category": "storage",
+    "priceEstimate": "2,499",
+    "rating": 4.6,
+    "reviewCount": 18500,
+    "badge": "Best Seller",
+    "asin": "B07G3KRZBX",
+    "amazonUrl": "https://www.amazon.in/dp/B07G3KRZBX/?tag=mp2tech20-21",
+    "image": "https://images-na.ssl-images-amazon.com/images/P/B07G3KRZBX.01.LZZZZZZZ.jpg",
+    "highlights": [
+      "Key technical highlight 1",
+      "Key technical highlight 2",
+      "Key technical highlight 3"
+    ]
+  }
+]`;
+
+  await executeGeminiBatchRequest(systemPrompt, apiKey, btn, feedback, `Batch of ${lines.length} Products`, "Batch Imported Items");
+}
+
+export async function generateCategoryDiscoveryWithAI(categoryKey) {
+  const btn = document.getElementById("analyzeBulkLinksBtn");
+  const feedback = document.getElementById("aiProdFeedbackBox");
+
+  const apiKey = getGeminiApiKey();
+  if (!apiKey) {
+    if (feedback) {
+      feedback.className = "ai-feedback-box error";
+      feedback.innerHTML = '<i class="fa fa-exclamation-circle"></i> Gemini API Key is missing. Please set it in Settings.';
+      feedback.style.display = "flex";
+    }
+    return;
+  }
+
+  const categoryDescriptions = {
+    storage: "top 10 best-selling internal SSDs on Amazon India (Crucial BX500, Samsung 980/990 PRO, WD Blue SN580, Kingston NV2, Samsung 870 EVO, EVM)",
+    ram: "top 10 best-selling laptop and desktop RAM modules on Amazon India (Crucial 8GB/16GB DDR4 & DDR5 SODIMM, Corsair Vengeance DDR4/DDR5)",
+    cooling: "top 8 high-performance thermal pastes, cooling pads, and thermal compounds on Amazon India (Noctua NT-H1, Arctic MX-4, Thermal Grizzly, Klim cooling pad)",
+    tools: "top 8 PC & laptop repair diagnostic toolkits and precision screwdriver sets on Amazon India (iFixit toolkit, STREBITO, Digital Multimeters, Anti-static mats)",
+    accessories: "top 8 USB-C hubs, multi-port display docks, and diagnostic adapters on Amazon India (TP-Link, UGREEN, Anker)"
+  };
+
+  const desc = categoryDescriptions[categoryKey] || `top 8 products for ${categoryKey}`;
+
+  if (feedback) {
+    feedback.className = "ai-feedback-box";
+    feedback.style.display = "flex";
+    feedback.style.background = "rgba(245, 158, 11, 0.12)";
+    feedback.style.color = "#fbbf24";
+    feedback.style.border = "1px solid rgba(245, 158, 11, 0.25)";
+    feedback.innerHTML = `<i class="fa fa-magic fa-spin"></i> Gemini AI is discovering curated ${desc}...`;
+  }
+
+  const systemPrompt = `You are a professional PC hardware technician and Amazon India catalog curator for MP2TECH Store Mumbai.
+Discover and generate the ${desc}.
+Every product must be a real, genuine product sold on Amazon India (amazon.in) with realistic ASINs, live market INR pricing, star ratings, review counts, direct Amazon image links, and tag=mp2tech20-21 attached.
+
+Respond ONLY with a valid JSON array of objects (no markdown backticks, no extra text):
+[
+  {
+    "name": "Full standardized product title with model & capacity (50-80 chars)",
+    "brand": "Brand Name",
+    "category": "${categoryKey}",
+    "priceEstimate": "2,499",
+    "rating": 4.6,
+    "reviewCount": 18500,
+    "badge": "Amazon's Choice",
+    "asin": "B07G3KRZBX",
+    "amazonUrl": "https://www.amazon.in/dp/B07G3KRZBX/?tag=mp2tech20-21",
+    "image": "https://images-na.ssl-images-amazon.com/images/P/B07G3KRZBX.01.LZZZZZZZ.jpg",
+    "highlights": [
+      "Key technical highlight 1",
+      "Key technical highlight 2",
+      "Key technical highlight 3"
+    ]
+  }
+]`;
+
+  await executeGeminiBatchRequest(systemPrompt, apiKey, btn, feedback, `Curated ${categoryKey.toUpperCase()} Pack`, `Discovered ${categoryKey.toUpperCase()} Products`);
+}
+
+export async function generateCustomDiscoveryWithAI() {
+  const input = document.getElementById("aiCustomDiscoveryInput");
+  const feedback = document.getElementById("aiProdFeedbackBox");
+  if (!input) return;
+  const query = input.value.trim();
+  if (!query) {
+    input.focus();
+    return;
+  }
+
+  const apiKey = getGeminiApiKey();
+  if (!apiKey) {
+    if (feedback) {
+      feedback.className = "ai-feedback-box error";
+      feedback.innerHTML = '<i class="fa fa-exclamation-circle"></i> Gemini API Key is missing. Please set it in Settings.';
+      feedback.style.display = "flex";
+    }
+    return;
+  }
+
+  if (feedback) {
+    feedback.className = "ai-feedback-box";
+    feedback.style.display = "flex";
+    feedback.style.background = "rgba(245, 158, 11, 0.12)";
+    feedback.style.color = "#fbbf24";
+    feedback.style.border = "1px solid rgba(245, 158, 11, 0.25)";
+    feedback.innerHTML = `<i class="fa fa-search fa-spin"></i> Gemini AI is searching for "${query}" on Amazon India...`;
+  }
+
+  const systemPrompt = `You are a professional PC hardware technician for MP2TECH Store Mumbai.
+Search Amazon India for: "${query}".
+Generate 6 to 8 top-rated products on Amazon.in with real ASINs, live INR prices, ratings, reviews, and tag=mp2tech20-21 attached.
+
+Respond ONLY with a valid JSON array of objects (no markdown backticks, no extra text):
+[
+  {
+    "name": "Full standardized product title (50-80 chars)",
+    "brand": "Brand Name",
+    "category": "accessories",
+    "priceEstimate": "1,499",
+    "rating": 4.5,
+    "reviewCount": 8500,
+    "badge": "Top Rated",
+    "asin": "B07XYZ1234",
+    "amazonUrl": "https://www.amazon.in/dp/B07XYZ1234/?tag=mp2tech20-21",
+    "image": "https://images-na.ssl-images-amazon.com/images/P/B07XYZ1234.01.LZZZZZZZ.jpg",
+    "highlights": ["Highlight 1", "Highlight 2", "Highlight 3"]
+  }
+]`;
+
+  await executeGeminiBatchRequest(systemPrompt, apiKey, null, feedback, `Custom Discovery: "${query}"`, "Custom Search Results");
+}
+
+async function executeGeminiBatchRequest(systemPrompt, apiKey, btn, feedback, title, subtitle) {
+  const payload = {
+    contents: [
+      {
+        parts: [{ text: systemPrompt }]
+      }
+    ]
+  };
+
+  const modelsToTry = [
+    "models/gemini-3.5-flash-lite",
+    "models/gemini-flash-lite-latest"
+  ];
+
+  let rawResponseText = null;
+  let lastError = null;
+
+  for (const model of modelsToTry) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${apiKey}`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        const json = await response.json();
+        if (json.candidates && json.candidates[0] && json.candidates[0].content && json.candidates[0].content.parts[0]) {
+          rawResponseText = json.candidates[0].content.parts[0].text;
+          break;
+        }
+      } else {
+        const errJson = await response.json().catch(() => ({}));
+        lastError = errJson.error ? errJson.error.message : `HTTP ${response.status}`;
+      }
+    } catch (e) {
+      lastError = e.message;
+    }
+  }
+
+  if (btn) {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa fa-list-alt"></i> <span>Analyze & Format Bulk Products</span>';
+  }
+
+  if (!rawResponseText) {
+    if (feedback) {
+      feedback.className = "ai-feedback-box error";
+      feedback.innerHTML = `<i class="fa fa-times-circle"></i> Batch AI Extraction failed: ${lastError || "Could not reach Gemini API"}`;
+      feedback.style.display = "flex";
+    }
+    showToast("Batch AI extraction failed", "error");
+    return;
+  }
+
+  try {
+    let cleanJsonStr = rawResponseText.trim();
+    if (cleanJsonStr.startsWith("```json")) {
+      cleanJsonStr = cleanJsonStr.slice(7);
+    } else if (cleanJsonStr.startsWith("```")) {
+      cleanJsonStr = cleanJsonStr.slice(3);
+    }
+    if (cleanJsonStr.endsWith("```")) {
+      cleanJsonStr = cleanJsonStr.slice(0, -3);
+    }
+    cleanJsonStr = cleanJsonStr.trim();
+
+    const candidates = JSON.parse(cleanJsonStr);
+    if (!Array.isArray(candidates) || candidates.length === 0) {
+      throw new Error("No valid product array found in AI response");
+    }
+
+    renderBulkReviewGrid(candidates, title, subtitle);
+
+    if (feedback) {
+      feedback.className = "ai-feedback-box success";
+      feedback.style.background = "rgba(16, 185, 129, 0.15)";
+      feedback.style.color = "#34d399";
+      feedback.style.border = "1px solid rgba(16, 185, 129, 0.35)";
+      feedback.innerHTML = `<i class="fa fa-check-circle"></i> <strong>${candidates.length} Products Found!</strong> Review the items in the grid below and click "Import Selected Products".`;
+      feedback.style.display = "flex";
+    }
+
+    showToast(`Found ${candidates.length} products ready for import!`, "success");
+
+  } catch (err) {
+    if (feedback) {
+      feedback.className = "ai-feedback-box error";
+      feedback.innerHTML = `<i class="fa fa-times-circle"></i> Error parsing batch response: ${err.message}`;
+      feedback.style.display = "flex";
+    }
+    showToast("Error processing batch product data", "error");
+  }
+}
+
+export function renderBulkReviewGrid(candidates, title = "Bulk Products Review", subtitle = "Select the hardware components you want to add to your store catalog.") {
+  bulkCandidates = candidates;
+  const drawer = document.getElementById("bulkReviewDrawer");
+  const tbody = document.getElementById("bulkCandidatesTableBody");
+  const titleEl = document.getElementById("bulkFoundTitle");
+  const subEl = document.getElementById("bulkFoundSubtitle");
+
+  if (!drawer || !tbody) return;
+
+  if (titleEl) titleEl.textContent = `${title} (${candidates.length} items)`;
+  if (subEl) subEl.textContent = subtitle;
+
+  const existingAsins = new Set(
+    products
+      .map((p) => {
+        const m = (p.amazonUrl || "").match(/(?:dp|gp\/product|d|asin)\/([A-Z0-9]{10})/i);
+        return m ? m[1].toUpperCase() : null;
+      })
+      .filter(Boolean)
+  );
+
+  const existingNames = new Set(products.map((p) => p.name.toLowerCase().trim()));
+
+  tbody.innerHTML = candidates
+    .map((item, index) => {
+      const asin = item.asin ? item.asin.toUpperCase() : null;
+      const isDuplicate = (asin && existingAsins.has(asin)) || existingNames.has((item.name || "").toLowerCase().trim());
+      const checkedAttr = isDuplicate ? "" : "checked";
+      const normalizedCat = normalizeProductCategory(item.category || "storage");
+      const normalizedPrice = normalizePrice(item.priceEstimate || "2,499");
+      const imgSrc = item.image || (asin ? `https://images-na.ssl-images-amazon.com/images/P/${asin}.01.LZZZZZZZ.jpg` : getCuratedPhotoForTopic(normalizedCat, item.brand, item.name));
+      const highlightsText = Array.isArray(item.highlights) ? item.highlights.join(" • ") : (item.highlights || "");
+
+      return `
+        <tr class="bulk-candidate-row ${isDuplicate ? "duplicate" : ""}" data-index="${index}">
+          <td style="text-align:center;">
+            <input type="checkbox" class="bulk-candidate-check" data-index="${index}" ${checkedAttr} onchange="window.updateBulkSelectionCount()" />
+          </td>
+          <td>
+            <img src="${imgSrc}" alt="thumb" style="width:46px; height:46px; object-fit:contain; border-radius:6px; background:#1e293b; padding:2px;" onerror="this.src='img/service.jpg'" />
+          </td>
+          <td style="min-width:240px;">
+            <input type="text" class="candidate-editable-input candidate-name-input" value="${item.name || ""}" style="font-weight:700; margin-bottom:4px;" />
+            <div style="font-size:11px; color:#94a3b8; line-height:1.4;">${highlightsText}</div>
+          </td>
+          <td style="width:110px;">
+            <input type="text" class="candidate-editable-input candidate-brand-input" value="${item.brand || "Verified"}" />
+          </td>
+          <td style="width:130px;">
+            <select class="candidate-editable-input candidate-cat-select" style="padding:4px 6px;">
+              <option value="storage" ${normalizedCat === "storage" ? "selected" : ""}>SSDs & Storage</option>
+              <option value="ram" ${normalizedCat === "ram" ? "selected" : ""}>RAM Modules</option>
+              <option value="cooling" ${normalizedCat === "cooling" ? "selected" : ""}>Cooling & Thermal</option>
+              <option value="tools" ${normalizedCat === "tools" ? "selected" : ""}>Diagnostic Tools</option>
+              <option value="accessories" ${normalizedCat === "accessories" ? "selected" : ""}>Accessories & Docks</option>
+            </select>
+          </td>
+          <td style="width:90px;">
+            <input type="text" class="candidate-editable-input candidate-price-input" value="${normalizedPrice}" style="font-weight:700; color:#fbbf24;" />
+          </td>
+          <td style="width:85px; font-size:12px; color:#cbd5e1;">
+            <span style="color:#ff9900;"><i class="fa fa-star"></i> ${item.rating || "4.5"}</span>
+            <div style="font-size:10.5px; color:#64748b;">(${item.reviewCount ? item.reviewCount.toLocaleString() : "1.2k"})</div>
+          </td>
+          <td style="width:95px;">
+            ${isDuplicate ? '<span class="duplicate-pill">In Store</span>' : '<span class="ready-pill">Ready</span>'}
+          </td>
+        </tr>
+      `;
+    })
+    .join("");
+
+  drawer.style.display = "block";
+  updateBulkSelectionCount();
+  drawer.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+export function toggleAllBulkCandidates(checked) {
+  const checkboxes = document.querySelectorAll(".bulk-candidate-check");
+  checkboxes.forEach((cb) => {
+    cb.checked = checked;
+  });
+  const master = document.getElementById("bulkSelectAllCheckbox");
+  if (master) master.checked = checked;
+  updateBulkSelectionCount();
+}
+
+export function updateBulkSelectionCount() {
+  const checked = document.querySelectorAll(".bulk-candidate-check:checked");
+  const count = checked ? checked.length : 0;
+  const countText = document.getElementById("bulkSelectedCountText");
+  const importBtn = document.getElementById("importBulkBtn");
+
+  if (countText) {
+    countText.textContent = `${count} products selected for import`;
+  }
+  if (importBtn) {
+    importBtn.disabled = count === 0;
+    importBtn.innerHTML = `<i class="fa fa-download"></i> <span>Import ${count} Selected Products to Catalog</span>`;
+  }
+}
+
+export function importSelectedBulkProducts() {
+  const checkboxes = document.querySelectorAll(".bulk-candidate-check:checked");
+  if (!checkboxes || checkboxes.length === 0) {
+    showToast("Please select at least 1 product to import.", "error");
+    return;
+  }
+
+  let importedCount = 0;
+  let maxId = products.reduce((max, p) => Math.max(max, p.id || 0), 0);
+
+  checkboxes.forEach((cb) => {
+    const idx = parseInt(cb.getAttribute("data-index"), 10);
+    const candidate = bulkCandidates[idx];
+    if (!candidate) return;
+
+    const row = cb.closest("tr");
+    const nameInput = row ? row.querySelector(".candidate-name-input") : null;
+    const brandInput = row ? row.querySelector(".candidate-brand-input") : null;
+    const catSelect = row ? row.querySelector(".candidate-cat-select") : null;
+    const priceInput = row ? row.querySelector(".candidate-price-input") : null;
+
+    const finalName = nameInput ? nameInput.value.trim() : candidate.name;
+    const finalBrand = brandInput ? brandInput.value.trim() : candidate.brand;
+    const finalCat = catSelect ? catSelect.value : candidate.category;
+    const finalPrice = priceInput ? priceInput.value.trim() : candidate.priceEstimate;
+
+    // Ensure Amazon Affiliate tag mp2tech20-21 is attached
+    let finalUrl = candidate.amazonUrl;
+    if (candidate.asin) {
+      finalUrl = `https://www.amazon.in/dp/${candidate.asin}/?tag=mp2tech20-21`;
+    } else if (finalUrl && !finalUrl.includes("tag=")) {
+      finalUrl = finalUrl.includes("?") ? `${finalUrl}&tag=mp2tech20-21` : `${finalUrl}?tag=mp2tech20-21`;
+    }
+
+    maxId += 1;
+    const newProduct = {
+      id: maxId,
+      name: finalName,
+      brand: finalBrand,
+      category: normalizeProductCategory(finalCat),
+      priceEstimate: normalizePrice(finalPrice),
+      rating: normalizeRating(candidate.rating),
+      reviewCount: normalizeReviews(candidate.reviewCount),
+      badge: candidate.badge || "Verified Hardware",
+      amazonUrl: finalUrl,
+      image: candidate.image || (candidate.asin ? `https://images-na.ssl-images-amazon.com/images/P/${candidate.asin}.01.LZZZZZZZ.jpg` : getCuratedPhotoForTopic(finalCat, finalBrand, finalName)),
+      highlights: Array.isArray(candidate.highlights) ? candidate.highlights : ["Genuine Hardware", "Technician Tested"]
+    };
+
+    products.unshift(newProduct);
+    importedCount++;
+  });
+
+  if (importedCount > 0) {
+    sessionStorage.setItem("mp2tech_draft_products", JSON.stringify(products));
+    hasUnpublishedChanges = true;
+
+    updateMetrics();
+    renderProductsTable();
+    populateRelatedProductsSelect();
+    updateDraftBanner();
+
+    const drawer = document.getElementById("bulkReviewDrawer");
+    if (drawer) drawer.style.display = "none";
+    bulkCandidates = [];
+
+    const bulkInput = document.getElementById("aiBulkLinksInput");
+    if (bulkInput) bulkInput.value = "";
+
+    showToast(`🎉 Successfully imported ${importedCount} products into your store!`, "success");
+
+    const tableCard = document.getElementById("productFormCard");
+    if (tableCard) {
+      tableCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+}
+
 /**
  * Initialize Admin UI Events
  */
@@ -1838,8 +2370,16 @@ export function initAdminStudio() {
     }
   };
 
-  // AI Amazon Product Auto-Capture Window Bindings
+  // AI Amazon Product Auto-Capture & Bulk Importer Window Bindings
   window.extractAmazonProductWithAI = extractAmazonProductWithAI;
+  window.switchAmazonAiMode = switchAmazonAiMode;
+  window.populateBulkDemo = populateBulkDemo;
+  window.analyzeBulkAmazonLinksWithAI = analyzeBulkAmazonLinksWithAI;
+  window.generateCategoryDiscoveryWithAI = generateCategoryDiscoveryWithAI;
+  window.generateCustomDiscoveryWithAI = generateCustomDiscoveryWithAI;
+  window.toggleAllBulkCandidates = toggleAllBulkCandidates;
+  window.updateBulkSelectionCount = updateBulkSelectionCount;
+  window.importSelectedBulkProducts = importSelectedBulkProducts;
   window.setAiAmazonLink = function(link) {
     const input = document.getElementById("aiAmazonLinkInput");
     if (input) {
@@ -1855,6 +2395,14 @@ if (typeof window !== "undefined") {
   window.generateArticleWithAI = generateArticleWithAI;
   window.saveGeminiApiKey = saveGeminiApiKey;
   window.getGeminiApiKey = getGeminiApiKey;
+  window.switchAmazonAiMode = switchAmazonAiMode;
+  window.populateBulkDemo = populateBulkDemo;
+  window.analyzeBulkAmazonLinksWithAI = analyzeBulkAmazonLinksWithAI;
+  window.generateCategoryDiscoveryWithAI = generateCategoryDiscoveryWithAI;
+  window.generateCustomDiscoveryWithAI = generateCustomDiscoveryWithAI;
+  window.toggleAllBulkCandidates = toggleAllBulkCandidates;
+  window.updateBulkSelectionCount = updateBulkSelectionCount;
+  window.importSelectedBulkProducts = importSelectedBulkProducts;
   window.setAiAmazonLink = function(link) {
     const input = document.getElementById("aiAmazonLinkInput");
     if (input) {

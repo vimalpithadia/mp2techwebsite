@@ -171,7 +171,7 @@
                 <!-- TAB 2: AMAZON PRODUCTS STUDIO -->
                 <div id="tab-products" class="tab-panel">
                     
-                    <!-- AI AMAZON PRODUCT AUTO-CAPTURE ASSISTANT -->
+                    <!-- AI AMAZON PRODUCT AUTO-CAPTURE & BULK DISCOVERY HUB -->
                     <div class="ai-blogger-card ai-amazon-card" style="border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 16px 40px -10px rgba(245, 158, 11, 0.2);">
                         <div class="ai-blogger-header">
                             <div class="ai-blogger-title-group">
@@ -179,45 +179,195 @@
                                     <i class="fa fa-amazon"></i>
                                 </div>
                                 <div>
-                                    <h3 class="ai-blogger-title" style="color:#fbbf24;">AI Amazon Product Auto-Capture</h3>
-                                    <span class="ai-blogger-subtitle">Instant Link Extractor, Spec Formatter &amp; Image Loader &bull; Powered by Gemini AI</span>
+                                    <h3 class="ai-blogger-title" style="color:#fbbf24;">AI Amazon Hardware Store Hub</h3>
+                                    <span class="ai-blogger-subtitle">1-Click Auto-Capture, Multi-Link Batch Importer &amp; Catalog Discovery &bull; Powered by Gemini AI</span>
                                 </div>
                             </div>
                             <div class="ai-status-pill" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.35);">
-                                <span class="pulse-dot" style="background:#f59e0b; box-shadow: 0 0 10px #f59e0b;"></span> <span>Instant Link Extraction</span>
+                                <span class="pulse-dot" style="background:#f59e0b; box-shadow: 0 0 10px #f59e0b;"></span> <span>Store ID: mp2tech20-21</span>
                             </div>
                         </div>
 
-                        <p class="ai-blogger-desc">
-                            Paste any Amazon product link, ASIN, or product title. Gemini AI will automatically extract the clean product title, detect the brand and category, estimate pricing and ratings, generate technical benchmark highlights, attach high-res imagery, and ensure your affiliate tag (<code>tag=mp2tech-21</code>) is attached!
-                        </p>
-
-                        <!-- Main URL / Keyword Input -->
-                        <div class="ai-prompt-box-wrap">
-                            <i class="fa fa-link ai-prompt-icon" style="color:#fbbf24;"></i>
-                            <input type="text" id="aiAmazonLinkInput" class="ai-prompt-input" placeholder="Paste Amazon product link e.g. https://www.amazon.in/dp/B07G3KRZBX or type product name..." autocomplete="off" />
-                        </div>
-
-                        <!-- Quick Sample Hardware Chips -->
-                        <div class="ai-topic-chips-wrap">
-                            <span class="ai-chips-label"><i class="fa fa-bolt"></i> Popular Hardware:</span>
-                            <button type="button" class="ai-topic-chip" onclick="window.setAiAmazonLink('https://www.amazon.in/Crucial-BX500-Internal-Solid-State/dp/B07G3KRZBX/')">💾 Crucial BX500 SATA SSD</button>
-                            <button type="button" class="ai-topic-chip" onclick="window.setAiAmazonLink('https://www.amazon.in/Samsung-990-PRO-Internal-MZ-V9P1T0BW/dp/B0B9C3Z31R/')">⚡ Samsung 990 PRO NVMe SSD</button>
-                            <button type="button" class="ai-topic-chip" onclick="window.setAiAmazonLink('https://www.amazon.in/Noctua-NT-H1-Pro-Grade-Thermal-Compound/dp/B002CQU14A/')">❄️ Noctua NT-H1 Thermal Paste</button>
-                            <button type="button" class="ai-topic-chip" onclick="window.setAiAmazonLink('https://www.amazon.in/Crucial-16GB-Laptop-Memory-CT16G4SFRA32A/dp/B08C511GQH/')">🧠 Crucial 16GB DDR4 Laptop RAM</button>
-                            <button type="button" class="ai-topic-chip" onclick="window.setAiAmazonLink('https://www.amazon.in/iFixit-Essential-Electronics-Toolkit-Precision/dp/B0964G2Y7S/')">🔧 iFixit Precision Toolkit</button>
-                        </div>
-
-                        <!-- Action Button Row -->
-                        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
-                            <span style="font-size:12.5px; color:#94a3b8;"><i class="fa fa-check-circle" style="color:#10b981;"></i> Automatic <code>tag=mp2tech-21</code> affiliate protection</span>
-                            <button type="button" id="extractAiProdBtn" onclick="if(window.extractAmazonProductWithAI){window.extractAmazonProductWithAI();}else if(window.AdminStudio&&window.AdminStudio.extractAmazonProductWithAI){window.AdminStudio.extractAmazonProductWithAI();}" class="ai-generate-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color:#111; font-weight:800; width:auto; padding:12px 24px;">
-                                <i class="fa fa-magic"></i> <span>Auto-Capture &amp; Fill Product Form</span>
+                        <!-- Mode Switcher Tabs -->
+                        <div class="ai-mode-tabs" style="display:flex; gap:8px; margin: 16px 0 18px 0; border-bottom: 1px solid #1e293b; padding-bottom: 12px; flex-wrap:wrap;">
+                            <button type="button" class="ai-mode-tab active" onclick="window.switchAmazonAiMode('single')" id="aiModeTabSingle">
+                                <i class="fa fa-link"></i> 1-Click Single Link
                             </button>
+                            <button type="button" class="ai-mode-tab" onclick="window.switchAmazonAiMode('batch')" id="aiModeTabBatch">
+                                <i class="fa fa-list-alt"></i> 📋 Multi-Link Batch Paste
+                            </button>
+                            <button type="button" class="ai-mode-tab" onclick="window.switchAmazonAiMode('discovery')" id="aiModeTabDiscovery">
+                                <i class="fa fa-magic"></i> 🔍 1-Click Catalog Discovery
+                            </button>
+                        </div>
+
+                        <!-- MODE 1: SINGLE LINK CAPTURE -->
+                        <div id="aiAmazonSingleSection">
+                            <p class="ai-blogger-desc">
+                                Paste any Amazon product link, ASIN, or product title. Gemini AI will automatically extract the clean product title, detect the brand and category, estimate pricing and ratings, attach high-res imagery, and secure your affiliate tag (<code>tag=mp2tech20-21</code>)!
+                            </p>
+
+                            <!-- Main URL / Keyword Input -->
+                            <div class="ai-prompt-box-wrap">
+                                <i class="fa fa-link ai-prompt-icon" style="color:#fbbf24;"></i>
+                                <input type="text" id="aiAmazonLinkInput" class="ai-prompt-input" placeholder="Paste Amazon product link e.g. https://www.amazon.in/dp/B07G3KRZBX or type product name..." autocomplete="off" />
+                            </div>
+
+                            <!-- Quick Sample Hardware Chips -->
+                            <div class="ai-topic-chips-wrap">
+                                <span class="ai-chips-label"><i class="fa fa-bolt"></i> Quick Links:</span>
+                                <button type="button" class="ai-topic-chip" onclick="window.setAiAmazonLink('https://www.amazon.in/Crucial-BX500-Internal-Solid-State/dp/B07G3KRZBX/')">💾 Crucial BX500 SATA SSD</button>
+                                <button type="button" class="ai-topic-chip" onclick="window.setAiAmazonLink('https://www.amazon.in/Samsung-990-PRO-Internal-MZ-V9P1T0BW/dp/B0B9C3Z31R/')">⚡ Samsung 990 PRO NVMe SSD</button>
+                                <button type="button" class="ai-topic-chip" onclick="window.setAiAmazonLink('https://www.amazon.in/Noctua-NT-H1-Pro-Grade-Thermal-Compound/dp/B002CQU14A/')">❄️ Noctua NT-H1 Thermal Paste</button>
+                                <button type="button" class="ai-topic-chip" onclick="window.setAiAmazonLink('https://www.amazon.in/Crucial-16GB-Laptop-Memory-CT16G4SFRA32A/dp/B08C511GQH/')">🧠 Crucial 16GB DDR4 Laptop RAM</button>
+                                <button type="button" class="ai-topic-chip" onclick="window.setAiAmazonLink('https://www.amazon.in/iFixit-Essential-Electronics-Toolkit-Precision/dp/B0964G2Y7S/')">🔧 iFixit Precision Toolkit</button>
+                            </div>
+
+                            <!-- Action Button Row -->
+                            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+                                <span style="font-size:12.5px; color:#94a3b8;"><i class="fa fa-check-circle" style="color:#10b981;"></i> Automatic <code>tag=mp2tech20-21</code> affiliate protection</span>
+                                <button type="button" id="extractAiProdBtn" onclick="if(window.extractAmazonProductWithAI){window.extractAmazonProductWithAI();}else if(window.AdminStudio&&window.AdminStudio.extractAmazonProductWithAI){window.AdminStudio.extractAmazonProductWithAI();}" class="ai-generate-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color:#111; font-weight:800; width:auto; padding:12px 24px;">
+                                    <i class="fa fa-magic"></i> <span>Auto-Capture &amp; Fill Product Form</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- MODE 2: MULTI-LINK BATCH PASTE -->
+                        <div id="aiAmazonBatchSection" style="display:none;">
+                            <p class="ai-blogger-desc">
+                                Paste multiple Amazon India links, ASINs, or hardware model names (one per line, up to 25 items). Gemini AI will process and format all products simultaneously into an interactive checklist!
+                            </p>
+
+                            <div style="margin-bottom: 12px;">
+                                <textarea id="aiBulkLinksInput" rows="5" class="ai-prompt-input" style="font-family: monospace; font-size: 13.5px; resize: vertical;" placeholder="Paste multiple Amazon URLs or product names (1 per line)...&#10;e.g.&#10;https://www.amazon.in/dp/B07G3KRZBX&#10;https://www.amazon.in/dp/B08GLX7TNT&#10;Crucial 16GB DDR4 3200MHz SODIMM Laptop RAM&#10;Noctua NT-H1 Thermal Compound 3.5g"></textarea>
+                            </div>
+
+                            <!-- Quick Batch Demos -->
+                            <div class="ai-topic-chips-wrap">
+                                <span class="ai-chips-label"><i class="fa fa-bolt"></i> Sample Batches:</span>
+                                <button type="button" class="ai-topic-chip" onclick="window.populateBulkDemo('ssds')">💾 Top 5 Crucial &amp; Samsung SSDs</button>
+                                <button type="button" class="ai-topic-chip" onclick="window.populateBulkDemo('ram')">🧠 Top 4 DDR4/DDR5 Laptop RAM</button>
+                                <button type="button" class="ai-topic-chip" onclick="window.populateBulkDemo('cooling')">❄️ Top 4 Thermal Pastes &amp; Coolers</button>
+                                <button type="button" class="ai-topic-chip" onclick="window.populateBulkDemo('tools')">🔧 Top 4 Repair Toolkits</button>
+                            </div>
+
+                            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+                                <span style="font-size:12.5px; color:#94a3b8;"><i class="fa fa-shield" style="color:#10b981;"></i> Parallel AI extraction with duplicate protection</span>
+                                <button type="button" id="analyzeBulkLinksBtn" onclick="window.analyzeBulkAmazonLinksWithAI()" class="ai-generate-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color:#111; font-weight:800; width:auto; padding:12px 24px;">
+                                    <i class="fa fa-list-alt"></i> <span>Analyze &amp; Format Bulk Products</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- MODE 3: 1-CLICK CATALOG DISCOVERY -->
+                        <div id="aiAmazonDiscoverySection" style="display:none;">
+                            <p class="ai-blogger-desc">
+                                Choose any hardware category pack below. Gemini AI will instantly discover, curate, and retrieve the top-selling Amazon India products with real ASINs, live INR prices, official images, and ratings!
+                            </p>
+
+                            <!-- Discovery Presets Grid -->
+                            <div class="discovery-preset-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px;">
+                                <button type="button" class="discovery-preset-btn" onclick="window.generateCategoryDiscoveryWithAI('storage')">
+                                    <div class="preset-icon" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8;"><i class="fa fa-hdd-o"></i></div>
+                                    <div class="preset-info">
+                                        <strong>Top 10 SSDs &amp; NVMe</strong>
+                                        <span>Crucial, Samsung, WD, Kingston</span>
+                                    </div>
+                                </button>
+
+                                <button type="button" class="discovery-preset-btn" onclick="window.generateCategoryDiscoveryWithAI('ram')">
+                                    <div class="preset-icon" style="background:rgba(168, 85, 247, 0.15); color:#c084fc;"><i class="fa fa-microchip"></i></div>
+                                    <div class="preset-info">
+                                        <strong>Top 10 RAM Modules</strong>
+                                        <span>DDR4, DDR5 Laptop &amp; Desktop</span>
+                                    </div>
+                                </button>
+
+                                <button type="button" class="discovery-preset-btn" onclick="window.generateCategoryDiscoveryWithAI('cooling')">
+                                    <div class="preset-icon" style="background:rgba(52, 211, 153, 0.15); color:#34d399;"><i class="fa fa-snowflake-o"></i></div>
+                                    <div class="preset-info">
+                                        <strong>Top 8 Thermal &amp; Cooling</strong>
+                                        <span>Noctua, Arctic, Thermal Pads</span>
+                                    </div>
+                                </button>
+
+                                <button type="button" class="discovery-preset-btn" onclick="window.generateCategoryDiscoveryWithAI('tools')">
+                                    <div class="preset-icon" style="background:rgba(251, 191, 36, 0.15); color:#fbbf24;"><i class="fa fa-wrench"></i></div>
+                                    <div class="preset-info">
+                                        <strong>Top 8 Repair Toolkits</strong>
+                                        <span>iFixit, Screwdrivers, Testers</span>
+                                    </div>
+                                </button>
+
+                                <button type="button" class="discovery-preset-btn" onclick="window.generateCategoryDiscoveryWithAI('accessories')">
+                                    <div class="preset-icon" style="background:rgba(244, 114, 182, 0.15); color:#f472b6;"><i class="fa fa-plug"></i></div>
+                                    <div class="preset-info">
+                                        <strong>Top 8 USB-C &amp; Docks</strong>
+                                        <span>Hubs, Adapters, Cables</span>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <!-- Custom Category Search -->
+                            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                <input type="text" id="aiCustomDiscoveryInput" class="ai-prompt-input" style="flex:1; min-width:260px;" placeholder="Or type custom search e.g. 'Best Wi-Fi 6 cards and Bluetooth dongles for PC'..." />
+                                <button type="button" onclick="window.generateCustomDiscoveryWithAI()" class="ai-generate-btn" style="background: #1e293b; color:#fff; border:1px solid #334155; width:auto; padding:12px 20px;">
+                                    <i class="fa fa-search"></i> Discover
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Feedback Banner -->
                         <div id="aiProdFeedbackBox" class="ai-feedback-box"></div>
+
+                        <!-- INTERACTIVE BULK REVIEW & IMPORT DRAWER -->
+                        <div id="bulkReviewDrawer" style="display:none; margin-top:24px; padding-top:20px; border-top:1.5px dashed rgba(245, 158, 11, 0.3);">
+                            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+                                <div>
+                                    <h4 style="font-size:16px; font-weight:800; color:#fbbf24; margin:0 0 3px 0;">
+                                        <i class="fa fa-check-square-o"></i> <span id="bulkFoundTitle">Bulk Products Review</span>
+                                    </h4>
+                                    <span style="font-size:12.5px; color:#94a3b8;" id="bulkFoundSubtitle">Select the hardware components you want to add to your store catalog.</span>
+                                </div>
+                                <div style="display:flex; gap:8px;">
+                                    <button type="button" class="btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="window.toggleAllBulkCandidates(true)">Select All</button>
+                                    <button type="button" class="btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="window.toggleAllBulkCandidates(false)">Deselect All</button>
+                                </div>
+                            </div>
+
+                            <!-- Table of Candidates -->
+                            <div class="table-responsive" style="max-height: 480px; overflow-y: auto; border:1px solid #334155; border-radius:10px; background:#090e17;">
+                                <table class="admin-table" style="font-size:13px;">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:40px; text-align:center;"><input type="checkbox" id="bulkSelectAllCheckbox" checked onchange="window.toggleAllBulkCandidates(this.checked)" /></th>
+                                            <th style="width:60px;">Image</th>
+                                            <th>Product Title &amp; Highlights</th>
+                                            <th>Brand</th>
+                                            <th>Category</th>
+                                            <th>Price (₹)</th>
+                                            <th>Rating</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="bulkCandidatesTableBody">
+                                        <!-- Rendered dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Import Action Bar -->
+                            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:16px; padding:14px 18px; background:rgba(15, 23, 42, 0.9); border-radius:10px; border:1px solid #334155; flex-wrap:wrap; gap:12px;">
+                                <div>
+                                    <strong style="color:#ffffff; font-size:14px;" id="bulkSelectedCountText">0 products selected</strong>
+                                    <span style="font-size:12px; color:#94a3b8; display:block;">Affiliate tag <code>tag=mp2tech20-21</code> will be automatically attached to each product.</span>
+                                </div>
+                                <button type="button" id="importBulkBtn" onclick="window.importSelectedBulkProducts()" class="ai-generate-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color:#ffffff; font-weight:800; width:auto; padding:12px 28px; font-size:14.5px;">
+                                    <i class="fa fa-download"></i> <span>Import Selected Products to Catalog</span>
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
 
                     <!-- Product Form & Live Preview -->
@@ -279,7 +429,7 @@
                                 <div class="form-group">
                                     <label for="prodAmazonUrl">Amazon Product Link (Affiliate URL) *</label>
                                     <input type="url" id="prodAmazonUrl" placeholder="https://www.amazon.in/dp/B07G3KGYMQ" required />
-                                    <span class="form-hint">Your affiliate tag (<code>tag=mp2tech-21</code>) will automatically attach on the live site.</span>
+                                    <span class="form-hint">Your affiliate tag (<code>tag=mp2tech20-21</code>) will automatically attach on the live site.</span>
                                 </div>
 
                                 <div class="form-group">
@@ -736,11 +886,19 @@
 
     <!-- Scripts -->
     <script type="module">
-        import * as AdminStudio from "./js/modules/adminStudio.js?v=20260818_hotfix4";
+        import * as AdminStudio from "./js/modules/adminStudio.js?v=20260819_bulk1";
         window.AdminStudio = AdminStudio;
         Object.assign(window, AdminStudio);
         window.extractAmazonProductWithAI = AdminStudio.extractAmazonProductWithAI;
         window.generateArticleWithAI = AdminStudio.generateArticleWithAI;
+        window.switchAmazonAiMode = AdminStudio.switchAmazonAiMode;
+        window.populateBulkDemo = AdminStudio.populateBulkDemo;
+        window.analyzeBulkAmazonLinksWithAI = AdminStudio.analyzeBulkAmazonLinksWithAI;
+        window.generateCategoryDiscoveryWithAI = AdminStudio.generateCategoryDiscoveryWithAI;
+        window.generateCustomDiscoveryWithAI = AdminStudio.generateCustomDiscoveryWithAI;
+        window.toggleAllBulkCandidates = AdminStudio.toggleAllBulkCandidates;
+        window.updateBulkSelectionCount = AdminStudio.updateBulkSelectionCount;
+        window.importSelectedBulkProducts = AdminStudio.importSelectedBulkProducts;
         window.setAiAmazonLink = AdminStudio.setAiAmazonLink;
         window.setAiTopic = AdminStudio.setAiTopic;
         window.saveGeminiApiKey = AdminStudio.saveGeminiApiKey;
