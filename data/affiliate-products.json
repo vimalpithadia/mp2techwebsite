@@ -1,39 +1,5 @@
 [
   {
-    "id": "prod-1410",
-    "name": "EVM 8GB DDR4 3200MHz SODIMM Laptop RAM (EVMT8G3200S88P)",
-    "category": "ram",
-    "brand": "EVM",
-    "priceEstimate": "₹4,400",
-    "rating": 4.4,
-    "reviewCount": 199,
-    "badge": "Technician Verified Upgrade",
-    "image": "https://images-na.ssl-images-amazon.com/images/P/B09XXQXKCY.01.LZZZZZZZ.jpg",
-    "amazonUrl": "https://www.amazon.in/dp/B09XXQXKCY/?tag=mp2tech-21",
-    "highlights": [
-      "8GB Capacity with DDR4 technology",
-      "3200MHz High-speed memory frequency",
-      "260-Pin SODIMM form factor for laptops"
-    ]
-  },
-  {
-    "id": "prod-1402",
-    "name": "EVM 8GB DDR4 2666MHz Long DIMM Desktop RAM (EVMT8G2666U88P)",
-    "category": "ram",
-    "brand": "EVM",
-    "priceEstimate": "₹1,499",
-    "rating": 4.3,
-    "reviewCount": 1500,
-    "badge": "Technician Verified Upgrade",
-    "image": "https://images-na.ssl-images-amazon.com/images/P/B09XXQZ5VQ.01.LZZZZZZZ.jpg",
-    "amazonUrl": "https://www.amazon.in/dp/B09XXQZ5VQ/?tag=mp2tech-21",
-    "highlights": [
-      "8GB DDR4 Desktop Memory (UDIMM)",
-      "2666MHz Memory Clock Speed",
-      "Reliable performance for daily computing"
-    ]
-  },
-  {
     "id": "prod-9737",
     "name": "TP-Link Nano USB Bluetooth 5.0 Adapter UB500 for PC",
     "category": "accessories",
