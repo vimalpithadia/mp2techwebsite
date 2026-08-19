@@ -1,5 +1,22 @@
 [
   {
+    "id": "prod-4953",
+    "name": "EVM 16GB 2133MHz DDR4 Long DIMM Desktop RAM (EVMT16G2133U88P)",
+    "category": "ram",
+    "brand": "EVM",
+    "priceEstimate": "₹9000",
+    "rating": 4.3,
+    "reviewCount": 5,
+    "badge": "Technician Verified Upgrade",
+    "image": "https://m.media-amazon.com/images/I/51FchiJbo3L.jpg",
+    "amazonUrl": "https://www.amazon.in/dp/B09XXPNN52/?tag=mp2tech-21",
+    "highlights": [
+      "16GB DDR4 Desktop Memory (Long DIMM)",
+      "2133MHz Clock Speed for stable performance",
+      "Compatible with standard desktop motherboards"
+    ]
+  },
+  {
     "id": "prod-8202",
     "name": "EVM 8GB DDR4 3200MHz SODIMM Laptop RAM (EVMT8G3200S88P)",
     "category": "ram",
