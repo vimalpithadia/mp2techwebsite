@@ -1,5 +1,22 @@
 [
   {
+    "id": "prod-2545",
+    "name": "Consistent 256GB 2.5-Inch SATA III Internal SSD (CTSSD256S6)",
+    "category": "storage",
+    "brand": "Consistent",
+    "priceEstimate": "₹3180",
+    "rating": 4.3,
+    "reviewCount": 3341,
+    "badge": "Technician Verified Upgrade",
+    "image": "https://m.media-amazon.com/images/I/61YaG1YInzL._SL1342_.jpg",
+    "amazonUrl": "https://www.amazon.in/dp/B08W35V9KV/?tag=mp2tech-21",
+    "highlights": [
+      "256GB Storage Capacity with SATA III 6Gb/s Interface",
+      "2.5-inch Form Factor compatible with Laptops and Desktops",
+      "Faster boot times and enhanced system responsiveness"
+    ]
+  },
+  {
     "id": "prod-5729",
     "name": "EVM 8GB DDR3 1600MHz Long DIMM Desktop RAM (EVMT8G1600U86P)",
     "category": "ram",
