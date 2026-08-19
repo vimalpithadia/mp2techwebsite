@@ -276,7 +276,7 @@ export function renderProductsTable() {
     return;
   }
 
-  const allVisibleSelected = filtered.length > 0 && filtered.every((p) => selectedProductIds.has(p.id));
+  const allVisibleSelected = filtered.length > 0 && filtered.every((p) => selectedProductIds.has(String(p.id)));
   const selectAllBox = document.getElementById("selectAllProds");
   if (selectAllBox) {
     selectAllBox.checked = allVisibleSelected;
@@ -284,11 +284,12 @@ export function renderProductsTable() {
 
   tbody.innerHTML = filtered
     .map((p) => {
-      const isChecked = selectedProductIds.has(p.id);
+      const strId = String(p.id);
+      const isChecked = selectedProductIds.has(strId);
       return `
-        <tr class="${isChecked ? "selected" : ""}">
+        <tr class="${isChecked ? "selected" : ""}" data-product-id="${strId}">
           <td style="width: 40px; text-align: center;">
-            <input type="checkbox" class="admin-checkbox prod-checkbox" value="${p.id}" ${isChecked ? "checked" : ""} onchange="window.toggleProductCheck('${p.id}', this.checked)" />
+            <input type="checkbox" class="admin-checkbox prod-checkbox" value="${strId}" ${isChecked ? "checked" : ""} onchange="window.toggleProductCheck('${strId}', this.checked)" />
           </td>
           <td style="width: 60px;">
             <img src="${p.image}" alt="${p.name}" class="table-thumb" onerror="this.src='img/service.jpg'" />
@@ -307,8 +308,8 @@ export function renderProductsTable() {
           </td>
           <td>
             <div class="action-btns">
-              <button class="action-btn" onclick="window.editProduct('${p.id}')" title="Edit Product"><i class="fa fa-pencil"></i></button>
-              <button class="action-btn delete" onclick="window.deleteProduct('${p.id}')" title="Delete Product"><i class="fa fa-trash"></i></button>
+              <button type="button" class="action-btn" onclick="window.editProduct('${strId}')" title="Edit Product"><i class="fa fa-pencil"></i></button>
+              <button type="button" class="action-btn delete" onclick="window.deleteProduct('${strId}')" title="Delete Product"><i class="fa fa-trash"></i></button>
             </div>
           </td>
         </tr>
@@ -322,25 +323,61 @@ export function renderProductsTable() {
 export function toggleSelectAllProducts(checked) {
   const filtered = getFilteredProducts();
   if (checked) {
-    filtered.forEach((p) => selectedProductIds.add(p.id));
+    filtered.forEach((p) => selectedProductIds.add(String(p.id)));
   } else {
-    filtered.forEach((p) => selectedProductIds.delete(p.id));
+    filtered.forEach((p) => selectedProductIds.delete(String(p.id)));
   }
-  renderProductsTable();
+
+  // Update table DOM directly without full redraw
+  document.querySelectorAll("input.prod-checkbox").forEach((cb) => {
+    cb.checked = checked;
+    const row = cb.closest("tr");
+    if (row) {
+      if (checked) row.classList.add("selected");
+      else row.classList.remove("selected");
+    }
+  });
+
+  const selectAllBox = document.getElementById("selectAllProds");
+  if (selectAllBox) selectAllBox.checked = checked;
+
+  updateBulkBar();
 }
 
 export function toggleProductCheck(id, checked) {
+  const strId = String(id);
   if (checked) {
-    selectedProductIds.add(id);
+    selectedProductIds.add(strId);
   } else {
-    selectedProductIds.delete(id);
+    selectedProductIds.delete(strId);
   }
-  renderProductsTable();
+
+  // Update single row visual selection state without tearing down DOM
+  const row = document.querySelector(`tr[data-product-id="${strId}"]`) || document.querySelector(`input.prod-checkbox[value="${strId}"]`)?.closest("tr");
+  if (row) {
+    if (checked) row.classList.add("selected");
+    else row.classList.remove("selected");
+  }
+
+  const filtered = getFilteredProducts();
+  const allVisibleSelected = filtered.length > 0 && filtered.every((p) => selectedProductIds.has(String(p.id)));
+  const selectAllBox = document.getElementById("selectAllProds");
+  if (selectAllBox) {
+    selectAllBox.checked = allVisibleSelected;
+  }
+
+  updateBulkBar();
 }
 
 export function deselectAllProducts() {
   selectedProductIds.clear();
-  renderProductsTable();
+  const selectAllBox = document.getElementById("selectAllProds");
+  if (selectAllBox) selectAllBox.checked = false;
+  document.querySelectorAll("input.prod-checkbox").forEach((cb) => {
+    cb.checked = false;
+    cb.closest("tr")?.classList.remove("selected");
+  });
+  updateBulkBar();
 }
 
 function updateBulkBar() {
@@ -361,7 +398,7 @@ export function bulkDeleteProducts() {
   if (count === 0) return;
 
   if (confirm(`Are you sure you want to delete all ${count} selected product(s)?`)) {
-    products = products.filter((p) => !selectedProductIds.has(p.id));
+    products = products.filter((p) => !selectedProductIds.has(String(p.id)));
     selectedProductIds.clear();
     saveDraftState();
     renderProductsTable();
@@ -388,11 +425,11 @@ export function saveProductFromForm() {
     return;
   }
 
-  if (editingProductId) {
-    const idx = products.findIndex((p) => p.id === editingProductId);
+  if (editingProductId !== null && editingProductId !== undefined) {
+    const idx = products.findIndex((p) => String(p.id) === String(editingProductId));
     if (idx !== -1) {
       products[idx] = {
-        id: editingProductId,
+        id: products[idx].id,
         name,
         category,
         brand,
@@ -433,31 +470,48 @@ export function saveProductFromForm() {
 }
 
 export function editProduct(id) {
-  const prod = products.find((p) => p.id === id);
-  if (!prod) return;
+  const prod = products.find((p) => String(p.id) === String(id));
+  if (!prod) {
+    showToast("Product not found in catalog", "error");
+    return;
+  }
 
-  editingProductId = id;
-  document.getElementById("prodName").value = prod.name;
-  document.getElementById("prodCategory").value = prod.category;
-  document.getElementById("prodBrand").value = prod.brand || "";
-  document.getElementById("prodPrice").value = (prod.priceEstimate || "").replace("₹", "");
-  document.getElementById("prodRating").value = prod.rating;
-  document.getElementById("prodReviews").value = prod.reviewCount || 1000;
-  document.getElementById("prodBadge").value = prod.badge || "Technician Verified";
-  document.getElementById("prodImage").value = prod.image || "";
-  document.getElementById("prodAmazonUrl").value = prod.amazonUrl || "";
-  document.getElementById("prodHighlights").value = (prod.highlights || []).join("\n");
+  editingProductId = prod.id;
+  
+  const nameEl = document.getElementById("prodName");
+  const catEl = document.getElementById("prodCategory");
+  const brandEl = document.getElementById("prodBrand");
+  const priceEl = document.getElementById("prodPrice");
+  const ratingEl = document.getElementById("prodRating");
+  const reviewsEl = document.getElementById("prodReviews");
+  const badgeEl = document.getElementById("prodBadge");
+  const imageEl = document.getElementById("prodImage");
+  const urlEl = document.getElementById("prodAmazonUrl");
+  const highlightsEl = document.getElementById("prodHighlights");
 
-  document.getElementById("productFormSubmitBtn").textContent = "Save Changes";
+  if (nameEl) nameEl.value = prod.name || "";
+  if (catEl) catEl.value = prod.category || "storage";
+  if (brandEl) brandEl.value = prod.brand || "";
+  if (priceEl) priceEl.value = (prod.priceEstimate || "").replace("₹", "").trim();
+  if (ratingEl) ratingEl.value = prod.rating || 4.5;
+  if (reviewsEl) reviewsEl.value = prod.reviewCount || 1000;
+  if (badgeEl) badgeEl.value = prod.badge || "Technician Verified";
+  if (imageEl) imageEl.value = prod.image || "";
+  if (urlEl) urlEl.value = prod.amazonUrl || "";
+  if (highlightsEl) highlightsEl.value = (prod.highlights || []).join("\n");
+
+  const submitBtn = document.getElementById("productFormSubmitBtn");
+  if (submitBtn) submitBtn.textContent = "Save Changes";
   updateProductLivePreview();
 
-  document.getElementById("productFormCard").scrollIntoView({ behavior: "smooth" });
+  const card = document.getElementById("productFormCard");
+  if (card) card.scrollIntoView({ behavior: "smooth" });
 }
 
 export function deleteProduct(id) {
   if (confirm("Are you sure you want to remove this product from the catalog?")) {
-    products = products.filter((p) => p.id !== id);
-    selectedProductIds.delete(id);
+    products = products.filter((p) => String(p.id) !== String(id));
+    selectedProductIds.delete(String(id));
     saveDraftState();
     renderProductsTable();
     populateRelatedProductsSelect();
@@ -2141,9 +2195,9 @@ export function importSelectedBulkProducts() {
       finalUrl = finalUrl.includes("?") ? `${finalUrl}&tag=mp2tech20-21` : `${finalUrl}?tag=mp2tech20-21`;
     }
 
-    maxId += 1;
+    const newId = `prod-${Date.now().toString().slice(-4)}-${importedCount + 1}`;
     const newProduct = {
-      id: maxId,
+      id: newId,
       name: finalName,
       brand: finalBrand,
       category: normalizeProductCategory(finalCat),
