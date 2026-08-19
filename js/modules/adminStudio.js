@@ -148,18 +148,45 @@ export function handleLogout() {
 }
 
 /**
+ * Bulletproof Amazon Affiliate Tag Normalizer (Always guarantees mp2tech20-21)
+ */
+export function ensureAffiliateTag(url, tag = "mp2tech20-21") {
+  if (!url) return "";
+  const asinMatch = url.match(/(?:dp|gp\/product|d|asin)\/([A-Z0-9]{10})/i);
+  if (asinMatch) {
+    return `https://www.amazon.in/dp/${asinMatch[1].toUpperCase()}/?tag=${tag}`;
+  }
+  try {
+    const u = new URL(url);
+    u.searchParams.set("tag", tag);
+    return u.toString();
+  } catch (e) {
+    if (url.includes("tag=")) {
+      return url.replace(/tag=[^&]+/g, `tag=${tag}`);
+    }
+    const sep = url.includes("?") ? "&" : "?";
+    return `${url}${sep}tag=${tag}`;
+  }
+}
+
+/**
  * Load initial datasets from JSON files
  */
 export async function loadData() {
   const localProds = sessionStorage.getItem("mp2tech_draft_products");
   const localPosts = sessionStorage.getItem("mp2tech_draft_posts");
   if (localProds) {
-    products = JSON.parse(localProds);
-    hasUnpublishedChanges = true;
+    try {
+      const parsed = JSON.parse(localProds);
+      products = parsed.map((p) => ({ ...p, amazonUrl: ensureAffiliateTag(p.amazonUrl) }));
+      hasUnpublishedChanges = true;
+    } catch (e) {}
   }
   if (localPosts) {
-    posts = JSON.parse(localPosts);
-    hasUnpublishedChanges = true;
+    try {
+      posts = JSON.parse(localPosts);
+      hasUnpublishedChanges = true;
+    } catch (e) {}
   }
 
   updateMetrics();
@@ -177,7 +204,9 @@ export async function loadData() {
 
     if (prodRes.ok) {
       const p = await prodRes.json();
-      if (Array.isArray(p) && p.length > 0 && !localProds) products = p;
+      if (Array.isArray(p) && p.length > 0 && !localProds) {
+        products = p.map((prod) => ({ ...prod, amazonUrl: ensureAffiliateTag(prod.amazonUrl) }));
+      }
     }
     if (postRes.ok) {
       const b = await postRes.json();
@@ -438,7 +467,7 @@ export function saveProductFromForm() {
         reviewCount: reviews,
         badge,
         image,
-        amazonUrl,
+        amazonUrl: ensureAffiliateTag(amazonUrl),
         highlights,
       };
       showToast(`Updated product: ${name}`);
@@ -457,7 +486,7 @@ export function saveProductFromForm() {
       reviewCount: reviews,
       badge,
       image,
-      amazonUrl,
+      amazonUrl: ensureAffiliateTag(amazonUrl),
       highlights,
     });
     showToast(`Added new product: ${name}`);
@@ -1507,12 +1536,7 @@ export async function extractAmazonProductWithAI() {
   const detectedAsin = asinMatch ? asinMatch[1].toUpperCase() : (slugMatch ? slugMatch[2].toUpperCase() : null);
 
   // Build clean Affiliate URL with tag=mp2tech20-21
-  let affiliateUrl = rawInput;
-  if (detectedAsin) {
-    affiliateUrl = `https://www.amazon.in/dp/${detectedAsin}/?tag=mp2tech20-21`;
-  } else if (rawInput.startsWith("http") && !rawInput.includes("tag=")) {
-    affiliateUrl = rawInput.includes("?") ? `${rawInput}&tag=mp2tech20-21` : `${rawInput}?tag=mp2tech20-21`;
-  }
+  const affiliateUrl = ensureAffiliateTag(rawInput);
 
   // UI Loading State
   if (btn) {
@@ -2188,12 +2212,7 @@ export function importSelectedBulkProducts() {
     const finalPrice = priceInput ? priceInput.value.trim() : candidate.priceEstimate;
 
     // Ensure Amazon Affiliate tag mp2tech20-21 is attached
-    let finalUrl = candidate.amazonUrl;
-    if (candidate.asin) {
-      finalUrl = `https://www.amazon.in/dp/${candidate.asin}/?tag=mp2tech20-21`;
-    } else if (finalUrl && !finalUrl.includes("tag=")) {
-      finalUrl = finalUrl.includes("?") ? `${finalUrl}&tag=mp2tech20-21` : `${finalUrl}?tag=mp2tech20-21`;
-    }
+    const finalUrl = ensureAffiliateTag(candidate.amazonUrl || (candidate.asin ? `https://www.amazon.in/dp/${candidate.asin}` : ""));
 
     const newId = `prod-${Date.now().toString().slice(-4)}-${importedCount + 1}`;
     const newProduct = {
