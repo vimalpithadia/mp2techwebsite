@@ -263,6 +263,21 @@
 
     <!-- Scripts -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script type="module" src="js/app.js?v=20260822_gstbulletproof"></script>
+    <script>
+      (function() {
+        function dismissPreloader() {
+          var p = document.getElementById('preloader');
+          if (p) p.style.display = 'none';
+          document.body.classList.add('loaded');
+        }
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+          dismissPreloader();
+        } else {
+          document.addEventListener('DOMContentLoaded', dismissPreloader);
+        }
+        setTimeout(dismissPreloader, 150);
+      })();
+    </script>
+    <script type="module" src="js/app.js?v=20260822_livefix"></script>
 </body>
 </html>
