@@ -258,42 +258,21 @@ export function updateCategoryUiState() {
   const subnavContainer = document.getElementById("subcategoryPillsContainer");
 
   if (subnavContainer && subnavWrap) {
-    let html = "";
-
-    if (currentDept === "all") {
-      // On All Products: Show clean, curated popular subcategories that have products
-      html = `
-        <span class="portal-subnav-prefix"><i class="fa fa-bolt"></i> Popular:</span>
-        <a href="javascript:void(0)" class="portal-subnav-item ${currentSubcategory === 'all' ? 'active' : ''}" onclick="window.filterBySubCategory('all')">
-          All Products (15)
-        </a>
-      `;
-
-      // Only show subcategories with products (>0) on the All view to avoid clutter
-      const populatedCategories = AMAZON_CATEGORIES.filter((cat) => {
-        const count = allProducts.filter((p) => p.category === cat.id || getCategoryById(p.category)?.id === cat.id).length;
-        return count > 0;
-      });
-
-      populatedCategories.forEach((cat) => {
-        const isAct = currentSubcategory === cat.id;
-        const count = allProducts.filter((p) => p.category === cat.id || getCategoryById(p.category)?.id === cat.id).length;
-        html += `
-          <a href="javascript:void(0)" class="portal-subnav-item ${isAct ? 'active' : ''}" onclick="window.filterBySubCategory('${cat.id}')">
-            ${cat.shortName || cat.name} <span class="portal-subnav-count">(${count})</span>
-          </a>
-        `;
-      });
+    if (currentDept === "all" && currentSubcategory === "all") {
+      // Auto-hide sub-menu bar on All Products (matching GST Portal Home tab)
+      subnavWrap.style.display = "none";
+      subnavContainer.innerHTML = "";
     } else {
-      // Specific Department: Show ONLY that department's subcategories
+      // Instantly open the Sub-Menu bar directly below the main menu
+      subnavWrap.style.display = "block";
       const subcats = getCategoriesByDepartment(currentDept);
+      
       const deptObj = AMAZON_DEPARTMENTS.find((d) => d.id === currentDept);
-      const deptTitle = deptObj ? deptObj.name : "Department";
+      const deptTitle = deptObj ? deptObj.name : "Products";
 
-      html = `
-        <span class="portal-subnav-prefix"><i class="fa ${deptObj?.icon || 'fa-folder-open'}"></i> ${deptTitle}:</span>
+      let html = `
         <a href="javascript:void(0)" class="portal-subnav-item ${currentSubcategory === 'all' ? 'active' : ''}" onclick="window.filterBySubCategory('all')">
-          All ${deptTitle}
+          All ${currentDept === 'all' ? 'Hardware' : deptTitle}
         </a>
       `;
 
@@ -306,10 +285,40 @@ export function updateCategoryUiState() {
           </a>
         `;
       });
-    }
 
-    subnavContainer.innerHTML = html;
+      subnavContainer.innerHTML = html;
+    }
   }
+
+  // Update Active Filter Strip & Breadcrumbs
+  const strip = document.getElementById("activeFilterStrip");
+  const deptLabel = document.getElementById("activeDeptName");
+  const subcatLabel = document.getElementById("activeSubcatName");
+  const sep = document.getElementById("activeBreadcrumbSep");
+
+  if (strip && deptLabel && subcatLabel) {
+    const isFiltered = currentDept !== "all" || currentSubcategory !== "all" || (currentProdSearch && currentProdSearch.trim() !== "");
+    
+    if (isFiltered) {
+      strip.style.display = "flex";
+      
+      const deptObj = AMAZON_DEPARTMENTS.find((d) => d.id === currentDept);
+      deptLabel.textContent = deptObj ? deptObj.name : "All Departments";
+
+      if (currentSubcategory !== "all") {
+        const subcatObj = getCategoryById(currentSubcategory);
+        subcatLabel.textContent = subcatObj ? subcatObj.name : currentSubcategory;
+        subcatLabel.style.display = "inline";
+        if (sep) sep.style.display = "inline";
+      } else {
+        subcatLabel.style.display = "none";
+        if (sep) sep.style.display = "none";
+      }
+    } else {
+      strip.style.display = "none";
+    }
+  }
+}
 
   // Update Active Filter Strip & Breadcrumbs
   const strip = document.getElementById("activeFilterStrip");
