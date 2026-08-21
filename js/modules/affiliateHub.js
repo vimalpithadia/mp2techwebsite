@@ -73,12 +73,12 @@ function renderStars(rating = 4.5) {
 }
 
 /**
- * Generate direct canonical share URL for a post
+ * Generate direct canonical share URL for a post (with WhatsApp Open Graph Preview)
  */
 export function getPostShareUrl(post) {
-  const origin = window.location.origin || "https://www.mp2tech.co.in";
-  const slugOrId = encodeURIComponent(post.slug || post.id);
-  return `${origin}/blog.html?post=${slugOrId}`;
+  const origin = "https://www.mp2tech.co.in";
+  const slugOrId = encodeURIComponent(post.slug || `post-${post.id}`);
+  return `${origin}/articles/${slugOrId}.html`;
 }
 
 /**
