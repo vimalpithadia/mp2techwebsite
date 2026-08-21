@@ -244,47 +244,36 @@ export function renderProducts(
 }
 
 /**
- * Synchronize UI Tabs, Subcategory Ribbon, and Breadcrumb Bar
+ * Synchronize Category Tree, Active Sidebar Links, Count Pills, and Breadcrumb Bar
  */
 export function updateCategoryUiState() {
-  // Update Department Tabs
-  document.querySelectorAll(".dept-tab-btn").forEach((btn) => {
-    const d = btn.getAttribute("data-department");
-    if (d === currentDept) btn.classList.add("active");
-    else btn.classList.remove("active");
+  // Update Tree Department Active State
+  document.querySelectorAll(".tree-dept-link").forEach((link) => {
+    const d = link.getAttribute("data-dept");
+    if (d === currentDept && currentSubcategory === "all") link.classList.add("active");
+    else link.classList.remove("active");
   });
 
-  // Render / Update Subcategory Ribbon
-  const subcatContainer = document.getElementById("subcategoryPillsContainer");
-  const ribbonWrap = document.getElementById("subcategoryRibbonWrap");
-  if (subcatContainer && ribbonWrap) {
-    const subcats = getCategoriesByDepartment(currentDept);
-    
-    let html = `
-      <button class="subcat-pill ${currentSubcategory === 'all' ? 'active' : ''}" onclick="window.filterBySubCategory('all')">
-        <i class="fa fa-th-large"></i> All ${currentDept === 'all' ? 'Hardware' : currentDept}
-      </button>
-    `;
+  // Update Tree Subcategory Active State
+  document.querySelectorAll(".tree-subcat-list li a").forEach((link) => {
+    const subcat = link.getAttribute("data-subcat");
+    if (subcat === currentSubcategory) {
+      link.classList.add("active");
+      // Highlight parent group
+      const parentGroup = link.closest(".tree-dept-group");
+      if (parentGroup) parentGroup.classList.add("active-parent");
+    } else {
+      link.classList.remove("active");
+    }
+  });
 
-    subcats.forEach((cat) => {
-      const isAct = currentSubcategory === cat.id;
-      // Count products in this category
-      const count = allProducts.filter((p) => p.category === cat.id || getCategoryById(p.category)?.id === cat.id).length;
-      html += `
-        <button class="subcat-pill ${isAct ? 'active' : ''}" onclick="window.filterBySubCategory('${cat.id}')">
-          <i class="fa ${cat.icon}"></i> ${cat.shortName || cat.name} ${count > 0 ? `<span style="opacity:0.75; font-size:10px;">(${count})</span>` : ''}
-        </button>
-      `;
-    });
-
-    subcatContainer.innerHTML = html;
-  }
-
-  // Update Featured Category Circle Active State
-  document.querySelectorAll(".featured-cat-item").forEach((item) => {
-    const catId = item.getAttribute("data-category");
-    if (catId === currentSubcategory) item.classList.add("active");
-    else item.classList.remove("active");
+  // Update Dynamic Live Product Counts in Category Tree Pills
+  document.querySelectorAll(".cat-count-pill").forEach((pill) => {
+    const subcatKey = pill.getAttribute("data-count-for");
+    if (subcatKey) {
+      const count = allProducts.filter((p) => p.category === subcatKey || getCategoryById(p.category)?.id === subcatKey).length;
+      pill.textContent = count > 0 ? `(${count})` : "";
+    }
   });
 
   // Update Active Filter Strip & Breadcrumbs
@@ -324,6 +313,7 @@ export function filterByDepartment(deptId = "all") {
   currentDept = deptId;
   currentSubcategory = "all";
   renderProducts(currentDept, currentSubcategory, currentProdSearch, currentSort);
+  closeMobileSidebar();
 }
 
 /**
@@ -338,12 +328,20 @@ export function filterBySubCategory(subcatId = "all", scrollToProducts = true) {
   }
 
   renderProducts(currentDept, currentSubcategory, currentProdSearch, currentSort);
+  closeMobileSidebar();
 
   if (scrollToProducts) {
     const productsSection = document.getElementById("products");
     if (productsSection) {
       productsSection.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+  }
+}
+
+function closeMobileSidebar() {
+  const sidebar = document.getElementById("storeSidebar");
+  if (sidebar && sidebar.classList.contains("open")) {
+    sidebar.classList.remove("open");
   }
 }
 
@@ -689,15 +687,14 @@ export function quickSearch(term = "") {
   
   currentProdSearch = term;
   
-  if (term) {
-    currentProdCategory = "all";
-    document.querySelectorAll(".category-pill:not(.blog-filter-btn)").forEach((btn) => {
-      if (btn.getAttribute("data-category") === "all") btn.classList.add("active");
-      else btn.classList.remove("active");
-    });
-  }
+  // Highlight active brand chip
+  document.querySelectorAll(".brand-chip").forEach((chip) => {
+    if (chip.textContent.trim().toLowerCase() === term.toLowerCase()) chip.classList.add("active");
+    else chip.classList.remove("active");
+  });
 
-  renderProducts(currentProdCategory, currentProdSearch, currentSort);
+  renderProducts(currentDept, currentSubcategory, currentProdSearch, currentSort);
+  closeMobileSidebar();
 
   const productsSection = document.getElementById("products");
   if (productsSection && term) {
@@ -741,28 +738,32 @@ export async function initAffiliateHub() {
     }
   });
 
-  // Department Tab Click Handlers (deals.html)
-  const deptBtns = document.querySelectorAll(".dept-tab-btn");
-  deptBtns.forEach((btn) => {
-    btn.addEventListener("click", function () {
-      const deptId = this.getAttribute("data-department") || "all";
-      filterByDepartment(deptId);
-    });
-  });
+  // Mobile Filter Drawer Toggle
+  const openMobileBtn = document.getElementById("openMobileFilterBtn");
+  const closeMobileBtn = document.getElementById("closeSidebarBtn");
+  const sidebar = document.getElementById("storeSidebar");
 
-  // Featured Category Carousel Scroll Buttons (deals.html)
-  const catCarousel = document.getElementById("featuredCatGrid");
-  const prevBtn = document.getElementById("catScrollPrev");
-  const nextBtn = document.getElementById("catScrollNext");
-
-  if (catCarousel && prevBtn && nextBtn) {
-    prevBtn.addEventListener("click", () => {
-      catCarousel.scrollBy({ left: -240, behavior: "smooth" });
-    });
-    nextBtn.addEventListener("click", () => {
-      catCarousel.scrollBy({ left: 240, behavior: "smooth" });
+  if (openMobileBtn && sidebar) {
+    openMobileBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      sidebar.classList.add("open");
     });
   }
+
+  if (closeMobileBtn && sidebar) {
+    closeMobileBtn.addEventListener("click", () => {
+      sidebar.classList.remove("open");
+    });
+  }
+
+  // Click outside sidebar to close on mobile
+  document.addEventListener("click", (e) => {
+    if (sidebar && sidebar.classList.contains("open")) {
+      if (!sidebar.contains(e.target) && e.target !== openMobileBtn && !openMobileBtn?.contains(e.target)) {
+        sidebar.classList.remove("open");
+      }
+    }
+  });
 
   // Product Search Input & Clear Button (deals.html)
   const searchInput = document.getElementById("heroSearchInput") || document.getElementById("productSearchInput");
