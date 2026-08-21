@@ -2,7 +2,7 @@ import { initPreloader } from "./modules/preloader.js";
 import { initMobileMenu } from "./modules/mobileMenu.js";
 import { initSwiperAbout } from "./modules/swiperAbout.js";
 import { initSmoothScrollAnchors } from "./modules/smoothScroll.js";
-import { initAffiliateHub } from "./modules/affiliateHub.js?v=20260822_deploy_final_1";
+import { initAffiliateHub } from "./modules/affiliateHub.js?v=20260822_gstdropdown";
 
 function onReady(fn) {
   if (document.readyState === "loading") {
