@@ -382,51 +382,64 @@
 
 /* Tier 2: Sub-Menu Horizontal Strip (Clean White Theme like GST Portal) */
 .portal-subnav-strip {
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  background: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  padding: 8px 0;
 }
 
 .portal-subnav-inner {
   display: flex;
   align-items: center;
-  gap: 6px 20px;
-  padding: 10px 0;
+  gap: 8px;
   overflow-x: auto;
   scrollbar-width: thin;
   -webkit-overflow-scrolling: touch;
   flex-wrap: wrap;
 }
 
-.portal-subnav-inner::-webkit-scrollbar {
-  height: 4px;
+.portal-subnav-prefix {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 4px;
 }
 
 .portal-subnav-item {
   color: #1e3a8a;
-  font-size: 13.5px;
-  font-weight: 600;
+  font-size: 12.5px;
+  font-weight: 700;
   text-decoration: none !important;
-  padding: 5px 8px;
+  padding: 6px 12px;
   border-radius: 4px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   transition: all 0.15s ease;
   cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .portal-subnav-item:hover {
   color: #0284c7;
-  background: #f0f9ff;
-  text-decoration: underline !important;
+  background: #e0f2fe;
+  border-color: #7dd3fc;
+  transform: translateY(-1px);
 }
 
 .portal-subnav-item.active {
-  color: #0284c7 !important;
+  color: #ffffff !important;
   font-weight: 800;
-  background: #e0f2fe;
+  background: #0284c7;
+  border-color: #0284c7;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3);
 }
 
 .portal-subnav-count {
@@ -439,8 +452,8 @@
 }
 
 .portal-subnav-item.active .portal-subnav-count {
-  background: #bae6fd;
-  color: #0369a1;
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
 }
 
 /* Active Filter Strip */
