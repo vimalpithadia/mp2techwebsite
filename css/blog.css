@@ -235,29 +235,28 @@
 /* Tier 1: Main Dark Navy Navigation Bar */
 #storeFilters .portal-main-bar {
   background: #132b50 !important;
-  padding: 0 !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding: 8px 0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
 }
 
 #storeFilters .portal-bar-inner {
   display: flex !important;
   flex-direction: column !important;
-  gap: 8px !important;
+  gap: 10px !important;
 }
 
 @media (min-width: 992px) {
   #storeFilters .portal-bar-inner {
     flex-direction: row !important;
-    align-items: stretch !important;
+    align-items: center !important;
     justify-content: space-between !important;
   }
 }
 
 #storeFilters .portal-tabs-list {
   display: flex !important;
-  align-items: stretch !important;
-  gap: 0 !important;
+  align-items: center !important;
+  gap: 6px !important;
   overflow-x: auto !important;
   scrollbar-width: none !important;
   -webkit-overflow-scrolling: touch !important;
@@ -271,46 +270,51 @@
 }
 
 #storeFilters .portal-tab-btn {
-  background: transparent !important;
+  background: #549bc7 !important; /* Exact blue buttons from user screenshot */
   color: #ffffff !important;
-  border: none !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
-  font-size: 13.5px !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 4px !important;
+  font-size: 12.5px !important;
   font-weight: 700 !important;
-  padding: 12px 18px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.3px !important;
+  padding: 9px 14px !important;
   cursor: pointer !important;
   white-space: nowrap !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 6px !important;
-  transition: all 0.15s ease !important;
-  border-radius: 0 !important;
+  transition: all 0.2s ease !important;
   line-height: 1.2 !important;
   outline: none !important;
   text-decoration: none !important;
-  box-shadow: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
 }
 
 #storeFilters .portal-tab-btn:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
+  background: #3b82c4 !important;
   color: #ffffff !important;
+  transform: translateY(-1px) !important;
 }
 
-/* Active tab styles */
-#storeFilters .portal-tab-btn.active {
-  background: #f0f4f8 !important;
-  color: #132b50 !important;
-  font-weight: 800 !important;
+/* Active & Toggled Open state */
+#storeFilters .portal-tab-btn.active,
+#storeFilters .portal-tab-btn.dropdown-open {
+  background: #173b75 !important;
+  color: #ffffff !important;
+  border-color: #00b4d8 !important;
+  box-shadow: 0 2px 6px rgba(0, 180, 216, 0.35) !important;
 }
 
 #storeFilters .portal-tab-btn[data-department="all"].active {
-  background: #00b4d8 !important; /* Teal highlight like GST Portal Home */
+  background: #0284c7 !important;
   color: #ffffff !important;
+  border-color: #38bdf8 !important;
 }
 
 #storeFilters .portal-caret {
-  font-size: 11px !important;
-  opacity: 0.85 !important;
+  font-size: 10px !important;
+  opacity: 0.9 !important;
   margin-left: 3px !important;
   display: inline-block !important;
   transition: transform 0.2s ease !important;
@@ -325,7 +329,7 @@
   display: flex !important;
   align-items: center !important;
   gap: 10px !important;
-  padding: 6px 0 !important;
+  padding: 0 !important;
   flex-wrap: wrap !important;
 }
 
@@ -409,7 +413,7 @@
   box-shadow: none !important;
 }
 
-/* Tier 2: Sub-Menu Exact Dropdown (GST Portal Inspired with #ebf0f2) */
+/* Tier 2: Sub-Menu IN-FLOW Expansion (Never covers or overlaps any component!) */
 #storeFilters .portal-subnav-strip {
   -webkit-text-size-adjust: 100% !important;
   -webkit-tap-highlight-color: transparent !important;
@@ -417,30 +421,26 @@
   line-height: 1.428571429 !important;
   color: #212121 !important;
   box-sizing: border-box !important;
-  position: absolute !important;
-  top: 100% !important;
-  left: 0 !important;
-  z-index: 1000 !important;
-  float: left !important;
-  min-width: 160px !important;
+  position: relative !important; /* In-flow: Pushes catalog down naturally */
+  top: auto !important;
+  left: auto !important;
+  z-index: 10 !important;
   width: 100% !important;
   list-style: none !important;
   font-size: 13.5px !important;
   text-align: left !important;
-  border: 1px solid rgba(0, 0, 0, 0.15) !important;
-  border-radius: 0px !important;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175) !important;
-  background: #ebf0f2 !important;
-  padding: 14px 20px !important;
-  margin-top: 0 !important;
-  border-top-right-radius: 0 !important;
-  border-top-left-radius: 0 !important;
+  border-bottom: 2px solid #cbd5e1 !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06) !important;
+  background: #ebf0f2 !important; /* GST Portal #ebf0f2 */
+  padding: 12px 0 !important;
+  margin: 0 !important;
 }
 
 #storeFilters .portal-subnav-inner {
   display: flex !important;
   align-items: center !important;
-  gap: 8px 14px !important;
+  gap: 8px 12px !important;
   flex-wrap: wrap !important;
   padding: 0 !important;
   margin: 0 !important;
@@ -448,10 +448,10 @@
 
 #storeFilters .portal-subnav-item {
   color: #173b75 !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
   text-decoration: none !important;
-  padding: 7px 14px !important;
+  padding: 6px 13px !important;
   border-radius: 4px !important;
   background: #ffffff !important;
   border: 1px solid #cbd5e1 !important;
