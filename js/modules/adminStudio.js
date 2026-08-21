@@ -908,20 +908,34 @@ function storeToken(t) {
   if (input && input.value !== t) input.value = t;
 }
 
+function optimizeOgImage(imgUrl) {
+  if (!imgUrl) return "https://www.mp2tech.co.in/img/service.jpg";
+  let finalUrl = imgUrl;
+  if (!finalUrl.startsWith("http://") && !finalUrl.startsWith("https://")) {
+    const clean = finalUrl.startsWith("/") ? finalUrl.slice(1) : finalUrl;
+    finalUrl = `https://www.mp2tech.co.in/${clean}`;
+  }
+  if (finalUrl.includes("images.unsplash.com")) {
+    return `${finalUrl.split("?")[0]}?auto=format&fit=crop&w=1200&h=630&q=85`;
+  }
+  if (finalUrl.includes("images.pexels.com")) {
+    return `${finalUrl.split("?")[0]}?auto=compress&cs=tinysrgb&w=1200&h=630&fit=crop`;
+  }
+  return finalUrl;
+}
+
 export function generateArticleStaticHtml(post) {
   const title = post.title || "Technical Diagnostic Guide | MP2TECH Mumbai";
   const excerpt = post.excerpt || "Step-by-step laptop repair walkthroughs and hardware upgrade tutorials by MP2TECH.";
   const slug = post.slug || `post-${post.id}`;
-  const imageUrl = post.image && (post.image.startsWith("http://") || post.image.startsWith("https://")) 
-    ? post.image 
-    : (post.image ? `https://www.mp2tech.co.in/${post.image.replace(/^\//, "")}` : "https://www.mp2tech.co.in/img/blog-banner.jpg");
+  const ogImageUrl = optimizeOgImage(post.image);
   const articleUrl = `https://www.mp2tech.co.in/articles/${encodeURIComponent(slug)}.html`;
   const blogRedirectUrl = `../blog.html?post=${encodeURIComponent(slug)}`;
 
   const escapeHtml = (s) => (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
   return `<!DOCTYPE html>
-<html lang="en-US">
+<html lang="en-US" prefix="og: https://ogp.me/ns#">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -932,26 +946,29 @@ export function generateArticleStaticHtml(post) {
     <meta name="title" content="${escapeHtml(title)} | MP2TECH Mumbai" />
     <meta name="description" content="${escapeHtml(excerpt)}" />
     <link rel="canonical" href="${articleUrl}" />
+    <link rel="image_src" href="${ogImageUrl}" />
     <link rel="icon" href="../img/favicon.png" type="image/png" />
 
-    <!-- Open Graph / Facebook / WhatsApp / LinkedIn -->
+    <!-- Open Graph / WhatsApp / Facebook / LinkedIn / Instagram -->
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="MP2TECH Mumbai" />
     <meta property="og:url" content="${articleUrl}" />
     <meta property="og:title" content="${escapeHtml(title)}" />
     <meta property="og:description" content="${escapeHtml(excerpt)}" />
-    <meta property="og:image" content="${imageUrl}" />
-    <meta property="og:image:secure_url" content="${imageUrl}" />
+    <meta property="og:image" content="${ogImageUrl}" />
+    <meta property="og:image:secure_url" content="${ogImageUrl}" />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="${escapeHtml(title)}" />
 
     <!-- Twitter / X Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@mp2tech" />
     <meta name="twitter:url" content="${articleUrl}" />
     <meta name="twitter:title" content="${escapeHtml(title)}" />
     <meta name="twitter:description" content="${escapeHtml(excerpt)}" />
-    <meta name="twitter:image" content="${imageUrl}" />
+    <meta name="twitter:image" content="${ogImageUrl}" />
 
     <!-- Instant Client-Side Redirect to Interactive Guide -->
     <meta http-equiv="refresh" content="0; url=${blogRedirectUrl}" />
@@ -961,7 +978,7 @@ export function generateArticleStaticHtml(post) {
 </head>
 <body style="margin:0; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background:#0b1120; color:#f8fafc; display:flex; align-items:center; justify-content:center; min-height:100vh; padding:20px; box-sizing:border-box;">
     <div style="max-width:640px; width:100%; background:#111a2e; border:1px solid #1e293b; border-radius:16px; padding:32px 24px; text-align:center; box-shadow:0 20px 40px rgba(0,0,0,0.5);">
-        <img src="${imageUrl}" alt="${escapeHtml(title)}" style="width:100%; max-height:300px; object-fit:cover; border-radius:10px; margin-bottom:20px;" onerror="this.src='../img/service.jpg'" />
+        <img src="${ogImageUrl}" alt="${escapeHtml(title)}" style="width:100%; max-height:320px; object-fit:cover; border-radius:10px; margin-bottom:20px;" onerror="this.src='../img/service.jpg'" />
         <span style="display:inline-block; padding:4px 12px; background:rgba(56,189,248,0.15); color:#38bdf8; border:1px solid rgba(56,189,248,0.3); border-radius:20px; font-size:12px; font-weight:700; margin-bottom:12px; text-transform:uppercase;">${escapeHtml(post.categoryName || post.category || "Guide")}</span>
         <h1 style="font-size:22px; line-height:1.4; color:#ffffff; margin:0 0 14px 0; font-weight:800;">${escapeHtml(title)}</h1>
         <p style="font-size:14px; line-height:1.6; color:#94a3b8; margin:0 0 24px 0;">${escapeHtml(excerpt)}</p>
