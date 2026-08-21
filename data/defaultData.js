@@ -2,14 +2,14 @@ export const DEFAULT_PRODUCTS = [
   {
     "id": "prod-6791",
     "name": "EVM 512GB NVMe M.2 SSD 2280 | PCIe Gen 3x4 Internal SSD | Up to 3200MB/s Read 2100MB/s Write | High Speed Storage for Laptop Desktop Gaming | 5 Year Warranty (EVMNV/512GB)",
-    "category": "storage",
+    "category": "internal-ssds",
     "brand": "EVM",
     "priceEstimate": "₹7899",
     "rating": 4.6,
     "reviewCount": 1500,
     "badge": "Technician Verified",
     "image": "https://m.media-amazon.com/images/I/51SGy2XYNxL._SL1100_.jpg",
-    "amazonUrl": "https://link.amazon/B01WE7elJ",
+    "amazonUrl": "https://link.amazon/B01WE7elJ?tag=mp2tech20-21",
     "highlights": [
       "Blazing NVMe PCIe Gen 3x4 Speed – Up to 3200MB/s Read: Experience the massive performance leap from SATA to NVMe with up to 3200MB/s read and 2100MB/s write speeds – perfect for gaming, content creation, and professional workloads.",
       "M.2 2280 Form Factor – Universal NVMe Compatibility: Fits all laptops, desktops, and gaming PCs with an M.2 PCIe/NVMe slot. Compatible with Intel and AMD platforms, making it a versatile upgrade across system generations.",
@@ -21,7 +21,7 @@ export const DEFAULT_PRODUCTS = [
   {
     "id": "prod-12",
     "name": "Logitech MK295 Silent Wireless Keyboard and Mouse Combo",
-    "category": "accessories",
+    "category": "keyboards-mice",
     "brand": "Logitech",
     "rating": 4.5,
     "reviewCount": 27400,
