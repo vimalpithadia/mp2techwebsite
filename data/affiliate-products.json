@@ -1,5 +1,38 @@
 [
   {
+    "id": "prod-1053",
+    "name": "Seagate One Touch 1TB External HDD with Password Protection",
+    "category": "storage",
+    "brand": "Seagate",
+    "priceEstimate": "₹10199",
+    "rating": 4.6,
+    "reviewCount": 21750,
+    "badge": "Technician Verified",
+    "image": "https://m.media-amazon.com/images/I/81uLs51EWeL._SL1500_.jpg",
+    "amazonUrl": "https://www.amazon.in/dp/B094R15QT3/?tag=mp2tech20-21",
+    "highlights": [
+      "Light Blue, for Windows and Mac,",
+      "with 3 Yr Data Recovery Services (STKY1000402)"
+    ]
+  },
+  {
+    "id": "prod-7934",
+    "name": "Western Digital WD Elements 1TB Portable External Hard Drive",
+    "category": "storage",
+    "brand": "Western Digital",
+    "priceEstimate": "₹11349",
+    "rating": 4.5,
+    "reviewCount": 17302,
+    "badge": "Amazon's Choice",
+    "image": "https://m.media-amazon.com/images/I/510+J06fz0L._SL1000_.jpg",
+    "amazonUrl": "https://www.amazon.in/dp/B07VTWX8MN/?tag=mp2tech20-21",
+    "highlights": [
+      "1TB storage capacity for complete data backup",
+      "USB 3.0 connectivity for fast file transfers",
+      "Compact and durable portable design"
+    ]
+  },
+  {
     "id": "prod-3311-5",
     "name": "Kingston A400 480GB 2.5-inch SATA III Internal SSD",
     "brand": "Kingston",
