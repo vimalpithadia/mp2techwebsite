@@ -1,19 +1,35 @@
 [
   {
-    "id": "prod-3311-6",
-    "name": "Western Digital WD Black SN850X 1TB NVMe Gaming SSD",
+    "id": "prod-1053",
+    "name": "Seagate One Touch 1TB External HDD with Password Protection",
+    "category": "storage",
+    "brand": "Seagate",
+    "priceEstimate": "₹10199",
+    "rating": 4.6,
+    "reviewCount": 21750,
+    "badge": "Technician Verified",
+    "image": "https://m.media-amazon.com/images/I/81uLs51EWeL._SL1500_.jpg",
+    "amazonUrl": "https://www.amazon.in/dp/B094R15QT3/?tag=mp2tech20-21",
+    "highlights": [
+      "Light Blue, for Windows and Mac,",
+      "with 3 Yr Data Recovery Services (STKY1000402)"
+    ]
+  },
+  {
+    "id": "prod-7934",
+    "name": "Western Digital WD Elements 1TB Portable External Hard Drive",
     "category": "storage",
     "brand": "Western Digital",
-    "priceEstimate": "₹Currently unavailable.",
-    "rating": 4.8,
-    "reviewCount": 21400,
-    "badge": "Top Rated",
-    "image": "https://images-na.ssl-images-amazon.com/images/P/B0B7CKZGN6.01.LZZZZZZZ.jpg",
-    "amazonUrl": "https://www.amazon.in/dp/B0B7CKZGN6/?tag=mp2tech20-21",
+    "priceEstimate": "₹11349",
+    "rating": 4.5,
+    "reviewCount": 17302,
+    "badge": "Amazon's Choice",
+    "image": "https://m.media-amazon.com/images/I/510+J06fz0L._SL1000_.jpg",
+    "amazonUrl": "https://www.amazon.in/dp/B07VTWX8MN/?tag=mp2tech20-21",
     "highlights": [
-      "Ridiculous top-tier speeds up to 7,300 MB/s for hardcore gaming",
-      "Game Mode 2.0 offers PC performance-boosting features",
-      "Heatsink option available to maintain peak performance during marathons"
+      "1TB storage capacity for complete data backup",
+      "USB 3.0 connectivity for fast file transfers",
+      "Compact and durable portable design"
     ]
   },
   {
@@ -111,7 +127,7 @@
     "reviewCount": 3341,
     "badge": "Technician Verified Upgrade",
     "image": "https://m.media-amazon.com/images/I/61YaG1YInzL._SL1342_.jpg",
-    "amazonUrl": "https://www.amazon.in/dp/B08W35V9KV/?tag=mp2tech-21",
+    "amazonUrl": "https://www.amazon.in/dp/B08W35V9KV/?tag=mp2tech20-21",
     "highlights": [
       "256GB Storage Capacity with SATA III 6Gb/s Interface",
       "2.5-inch Form Factor compatible with Laptops and Desktops",
@@ -128,7 +144,7 @@
     "reviewCount": 524,
     "badge": "Technician Verified Upgrade",
     "image": "https://m.media-amazon.com/images/I/515m2W95tPL._SL1100_.jpg",
-    "amazonUrl": "https://www.amazon.in/dp/B09XXTMSD9/?tag=mp2tech-21",
+    "amazonUrl": "https://www.amazon.in/dp/B09XXTMSD9/?tag=mp2tech20-21",
     "highlights": [
       "8GB DDR3 Desktop Memory (Long DIMM)",
       "Fast 1600MHz Clock Speed",
@@ -145,7 +161,7 @@
     "reviewCount": 5,
     "badge": "Technician Verified Upgrade",
     "image": "https://m.media-amazon.com/images/I/51FchiJbo3L.jpg",
-    "amazonUrl": "https://www.amazon.in/dp/B09XXPNN52/?tag=mp2tech-21",
+    "amazonUrl": "https://www.amazon.in/dp/B09XXPNN52/?tag=mp2tech20-21",
     "highlights": [
       "16GB DDR4 Desktop Memory (Long DIMM)",
       "2133MHz Clock Speed for stable performance",
@@ -162,7 +178,7 @@
     "reviewCount": 199,
     "badge": "Technician Verified Upgrade",
     "image": "https://m.media-amazon.com/images/I/51jJd1NIJ7L._SL1100_.jpg",
-    "amazonUrl": "https://www.amazon.in/dp/B09XXQXKCY/?tag=mp2tech-21",
+    "amazonUrl": "https://www.amazon.in/dp/B09XXQXKCY/?tag=mp2tech20-21",
     "highlights": [
       "8GB DDR4 SODIMM memory module",
       "High-speed 3200MHz clock frequency",
@@ -179,7 +195,7 @@
     "reviewCount": 45200,
     "badge": "Amazon's Choice",
     "image": "https://images-na.ssl-images-amazon.com/images/P/B098K3H92Z.01.LZZZZZZZ.jpg",
-    "amazonUrl": "https://www.amazon.in/dp/B098K3H92Z/?tag=mp2tech-21",
+    "amazonUrl": "https://www.amazon.in/dp/B098K3H92Z/?tag=mp2tech20-21",
     "highlights": [
       "Bluetooth 5.0 technology with backward compatibility",
       "Nano-sized ultra-small design for convenient portability",
@@ -196,7 +212,7 @@
     "reviewCount": 69,
     "badge": "Technician Verified Upgrade",
     "image": "https://images-na.ssl-images-amazon.com/images/P/B0C4ZQXM6X.01.LZZZZZZZ.jpg",
-    "amazonUrl": "https://link.amazon/B09ujZXvN",
+    "amazonUrl": "https://link.amazon/B09ujZXvN?tag=mp2tech20-21",
     "highlights": [
       "Supports 10th and 11th Gen Intel Core Processors",
       "Dual Channel Non-ECC Unbuffered DDR4 Memory",
@@ -213,7 +229,7 @@
     "reviewCount": 15500,
     "badge": "Technician Verified",
     "image": "https://m.media-amazon.com/images/I/711vfmr7pOL._SL1500_.jpg",
-    "amazonUrl": "https://www.amazon.in/Dell-Wireless-Keyboard-Mouse-Spill-Resistant/dp/B09T3H12GV?crid=33CQZ7MFB33Z3&dib=eyJ2IjoiMSJ9.i_dBkKIinMRnfFkoOAv1Z_ciOtQRsW0Eg5Wa2Fd8QVD7S4pgThWd1Ih8cSkjmZbexQtewTUmg3JRPpByk8ihyhbyuenPN0TIAp7u3ul8-gOFhWjlyUgmx-TG_ibVgLF44HiwlsS2J3bPhy1fsoSp6Zkg1qwvOnZhLlS0gs6mX7jz0KpRbKV-vFMwhc9RlG0Ii6CQu9MsyQH9nnvQXDQWGLT4vyI1fM9GHdksUg_dRL4.VhN7x-HGoh1QTe7Q29pzkWYTi_XS_9pIkYY-yM2c904&dib_tag=se&keywords=Logitech+MK295+Silent+Wireless+Keyboard+and+Mouse+Combo&nsdOptOutParam=true&qid=1786993798&sprefix=%2Caps%2C660&sr=8-2-spons&aref=7SFLP45YtF&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1&linkCode=ll2&tag=mp2tech20-21&linkId=d2b7806d97e34bd8a0e84490a9b03354&ref_=as_li_ss_tl",
+    "amazonUrl": "https://www.amazon.in/dp/B09T3H12GV/?tag=mp2tech20-21",
     "highlights": [
       "Anti-Fade & Spill-Resistant Keys, up to 36 Month Battery Life, 3Y Advance Exchange Warranty - Black Visit the Dell Store"
     ]
@@ -228,7 +244,7 @@
     "reviewCount": 1500,
     "badge": "Technician Verified",
     "image": "https://m.media-amazon.com/images/I/51SGy2XYNxL._SL1100_.jpg",
-    "amazonUrl": "https://link.amazon/B01WE7elJ",
+    "amazonUrl": "https://link.amazon/B01WE7elJ?tag=mp2tech20-21",
     "highlights": [
       "5 Year Warranty: Every unit passes EVM's quality checks before shipping. Backed by a 5-Year warranty with convenient doorstep pickup and replacement support across India."
     ]
