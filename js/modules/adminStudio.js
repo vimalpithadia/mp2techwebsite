@@ -1306,15 +1306,96 @@ export function saveGeminiApiKey() {
 }
 
 /**
- * Normalizes free-form category returned by AI into exact select dropdown values
+ * Normalizes free-form category returned by AI into exact Amazon India select dropdown values
  */
-function normalizeProductCategory(rawCategory = "") {
-  const c = String(rawCategory).toLowerCase();
-  if (c.includes("ssd") || c.includes("storage") || c.includes("hard drive") || c.includes("hdd") || c.includes("nvme") || c.includes("drive") || c.includes("m.2")) return "storage";
-  if (c.includes("ram") || c.includes("memory") || c.includes("sodimm") || c.includes("dimm") || c.includes("ddr")) return "ram";
-  if (c.includes("cooling") || c.includes("thermal") || c.includes("paste") || c.includes("fan") || c.includes("heatsink") || c.includes("cooler") || c.includes("pad")) return "cooling";
-  if (c.includes("tool") || c.includes("screw") || c.includes("tester") || c.includes("multimeter") || c.includes("clean") || c.includes("kit")) return "tools";
-  return "accessories";
+function normalizeProductCategory(rawCategory = "", title = "", brand = "") {
+  const c = (String(rawCategory) + " " + String(title) + " " + String(brand)).toLowerCase();
+
+  // 1. Components
+  if (c.includes("nvme") || c.includes("m.2") || c.includes("sata ssd") || c.includes("solid state drive") || (c.includes("ssd") && !c.includes("portable") && !c.includes("external"))) {
+    return "internal-ssds";
+  }
+  if (c.includes("ram") || c.includes("memory") || c.includes("ddr3") || c.includes("ddr4") || c.includes("ddr5") || c.includes("sodimm") || c.includes("dimm") || c.includes("long dimm")) {
+    return "memory-ram";
+  }
+  if (c.includes("motherboard") || c.includes("mainboard")) {
+    return "motherboards";
+  }
+  if (c.includes("thermal paste") || c.includes("thermal compound") || c.includes("cooling") || c.includes("fan") || c.includes("heatsink") || c.includes("cooler") || c.includes("thermal pad") || c.includes("arctic mx")) {
+    return "fans-cooling";
+  }
+  if (c.includes("power supply") || c.includes("psu") || c.includes("smps")) {
+    return "power-supplies";
+  }
+  if (c.includes("processor") || c.includes("cpu") || c.includes("ryzen") || c.includes("intel core")) {
+    return "processors";
+  }
+  if (c.includes("graphic") || c.includes("gpu") || c.includes("geforce") || c.includes("rtx") || c.includes("gtx") || c.includes("radeon") || c.includes("vga")) {
+    return "graphics-cards";
+  }
+  if (c.includes("cabinet") || c.includes("pc case") || c.includes("chassis")) {
+    return "computer-cases";
+  }
+  if (c.includes("internal hard drive") || c.includes("internal hdd")) {
+    return "internal-hard-drives";
+  }
+  if (c.includes("screw") || c.includes("standoff")) {
+    return "computer-screws";
+  }
+  if (c.includes("io port") || c.includes("expansion card") || c.includes("pci")) {
+    return "io-port-cards";
+  }
+  if (c.includes("barebone") || c.includes("nuc")) {
+    return "barebones";
+  }
+
+  // 2. External Storage
+  if (c.includes("external hard drive") || c.includes("external hdd") || c.includes("portable hard drive") || c.includes("one touch") || c.includes("elements")) {
+    return "external-hard-drives";
+  }
+  if (c.includes("external ssd") || c.includes("portable ssd") || c.includes("t7") || c.includes("extreme portable")) {
+    return "external-ssds";
+  }
+  if (c.includes("pen drive") || c.includes("flash drive") || c.includes("usb drive") || c.includes("sd card") || c.includes("microsd")) {
+    return "pen-drives";
+  }
+
+  // 3. Accessories & Peripherals
+  if (c.includes("keyboard") || c.includes("mouse") || c.includes("trackpad")) {
+    return "keyboards-mice";
+  }
+  if (c.includes("adapter") || c.includes("dongle") || c.includes("charger") || c.includes("bluetooth") || c.includes("ub500")) {
+    return "adapters";
+  }
+  if (c.includes("cable") || c.includes("hdmi") || c.includes("displayport") || c.includes("sata cable") || c.includes("type c cable")) {
+    return "cables-accessories";
+  }
+  if (c.includes("usb hub") || c.includes("type c hub") || c.includes("dock") || c.includes("multiport")) {
+    return "usb-hubs";
+  }
+  if (c.includes("laptop stand") || c.includes("cooling pad") || c.includes("laptop bag") || c.includes("sleeve")) {
+    return "laptop-accessories";
+  }
+  if (c.includes("ups") || c.includes("inverter") || c.includes("power backup")) {
+    return "uninterrupted-power-supplies";
+  }
+  if (c.includes("gaming") && (c.includes("headset") || c.includes("controller") || c.includes("mousepad"))) {
+    return "pc-gaming-peripherals";
+  }
+  if (c.includes("tool") || c.includes("screwdriver") || c.includes("multimeter") || c.includes("cleaner") || c.includes("blower") || c.includes("brush")) {
+    return "cleaners-tools";
+  }
+  if (c.includes("headphone") || c.includes("headset") || c.includes("webcam") || c.includes("speaker") || c.includes("mic")) {
+    return "audio-video-accessories";
+  }
+
+  // 4. Systems & Networking
+  if (c.includes("laptop") || c.includes("notebook") || c.includes("macbook")) return "laptops";
+  if (c.includes("desktop") || c.includes("all-in-one") || c.includes("aio")) return "desktops";
+  if (c.includes("monitor") || c.includes("display")) return "monitors";
+  if (c.includes("router") || c.includes("wifi") || c.includes("switch") || c.includes("ethernet")) return "networking-devices";
+
+  return "adapters";
 }
 
 /**
@@ -1693,7 +1774,11 @@ Extract, standardize, and format the product data to accurately match the exact 
 Guidelines:
 1. 'name': Full, standardized product title with model & capacity (50-80 chars, e.g. "Crucial BX500 480GB 3D NAND SATA 2.5-inch Internal SSD" or "Samsung 990 PRO 1TB PCIe 4.0 NVMe M.2 SSD").
 2. 'brand': Exact Brand Name (e.g. Samsung, Crucial, Corsair, Noctua, iFixit, Kingston, Western Digital).
-3. 'category': exactly one of: "storage", "ram", "cooling", "tools", "accessories".
+3. 'category': exactly one of the official Amazon India category IDs:
+   - Components: "internal-ssds", "memory-ram", "motherboards", "fans-cooling", "power-supplies", "processors", "graphics-cards", "computer-cases", "internal-hard-drives", "io-port-cards", "computer-screws", "barebones"
+   - Accessories: "keyboards-mice", "adapters", "cables-accessories", "usb-hubs", "laptop-accessories", "uninterrupted-power-supplies", "pc-gaming-peripherals", "cleaners-tools", "audio-video-accessories"
+   - External Storage: "external-hard-drives", "external-ssds", "pen-drives"
+   - Systems & Networking: "laptops", "desktops", "monitors", "networking-devices"
 4. 'price': Most accurate realistic current Amazon.in selling price in Indian Rupees (INR) as a clean string without rupee symbol (e.g. "2,499", "11,299", "899").
 5. 'rating': Accurate customer star rating out of 5 (e.g. 4.5, 4.6, 4.8).
 6. 'reviews': Accurate total customer review count (e.g. 18500, 42000).
@@ -1704,7 +1789,7 @@ Respond ONLY with a single valid JSON object (no markdown backticks, no extra te
 {
   "name": "Clean product title with model and capacity",
   "brand": "Brand Name",
-  "category": "storage",
+  "category": "internal-ssds",
   "price": "2,499",
   "rating": 4.6,
   "reviews": 18500,
@@ -1975,7 +2060,12 @@ Given the following list of ${lines.length} Amazon product links or product quer
 ${lines.map((l, i) => `${i + 1}. ${l}`).join("\n")}
 
 Extract, standardize, and format each product accurately for the Amazon India catalog.
-Category must be exactly one of: "storage", "ram", "cooling", "tools", "accessories".
+Category must be exactly one of the official Amazon India category IDs:
+- Components: "internal-ssds", "memory-ram", "motherboards", "fans-cooling", "power-supplies", "processors", "graphics-cards", "computer-cases", "internal-hard-drives", "io-port-cards", "computer-screws", "barebones"
+- Accessories: "keyboards-mice", "adapters", "cables-accessories", "usb-hubs", "laptop-accessories", "uninterrupted-power-supplies", "pc-gaming-peripherals", "cleaners-tools", "audio-video-accessories"
+- External Storage: "external-hard-drives", "external-ssds", "pen-drives"
+- Systems & Networking: "laptops", "desktops", "monitors", "networking-devices"
+
 Price must be estimated in Indian Rupees (INR) as a clean string without currency symbol (e.g. "2,499", "11,299", "899").
 Affiliate URLs must include tag=mp2tech20-21.
 If an ASIN is detectable, format image as "https://images-na.ssl-images-amazon.com/images/P/{ASIN}.01.LZZZZZZZ.jpg" and amazonUrl as "https://www.amazon.in/dp/{ASIN}/?tag=mp2tech20-21".
@@ -1985,7 +2075,7 @@ Respond ONLY with a valid JSON array of ${lines.length} objects (no markdown bac
   {
     "name": "Full standardized product title with model & capacity (50-80 chars)",
     "brand": "Brand Name",
-    "category": "storage",
+    "category": "internal-ssds",
     "priceEstimate": "2,499",
     "rating": 4.6,
     "reviewCount": 18500,
@@ -2019,14 +2109,16 @@ export async function generateCategoryDiscoveryWithAI(categoryKey) {
   }
 
   const categoryDescriptions = {
-    storage: "top 10 best-selling internal SSDs on Amazon India (Crucial BX500, Samsung 980/990 PRO, WD Blue SN580, Kingston NV2, Samsung 870 EVO, EVM)",
-    ram: "top 10 best-selling laptop and desktop RAM modules on Amazon India (Crucial 8GB/16GB DDR4 & DDR5 SODIMM, Corsair Vengeance DDR4/DDR5)",
-    cooling: "top 8 high-performance thermal pastes, cooling pads, and thermal compounds on Amazon India (Noctua NT-H1, Arctic MX-4, Thermal Grizzly, Klim cooling pad)",
-    tools: "top 8 PC & laptop repair diagnostic toolkits and precision screwdriver sets on Amazon India (iFixit toolkit, STREBITO, Digital Multimeters, Anti-static mats)",
-    accessories: "top 8 USB-C hubs, multi-port display docks, and diagnostic adapters on Amazon India (TP-Link, UGREEN, Anker)"
+    "internal-ssds": "top 10 best-selling internal SSDs on Amazon India (Crucial BX500, Samsung 980/990 PRO, WD Blue SN580, Kingston NV2, Samsung 870 EVO, EVM)",
+    "memory-ram": "top 10 best-selling laptop and desktop RAM modules on Amazon India (Crucial 8GB/16GB DDR4 & DDR5 SODIMM, Corsair Vengeance DDR4/DDR5, EVM)",
+    "fans-cooling": "top 8 high-performance thermal pastes, cooling pads, and thermal compounds on Amazon India (Noctua NT-H1, Arctic MX-4, Thermal Grizzly, Klim cooling pad)",
+    "cleaners-tools": "top 8 PC & laptop repair diagnostic toolkits and precision screwdriver sets on Amazon India (iFixit toolkit, STREBITO, Digital Multimeters, Anti-static mats)",
+    "motherboards": "top 8 Intel and AMD desktop motherboards on Amazon India (Gigabyte, ASUS Prime, MSI)",
+    "adapters": "top 8 USB-C hubs, multi-port display docks, and diagnostic adapters on Amazon India (TP-Link, UGREEN, Anker)",
+    "keyboards-mice": "top 8 wireless keyboard and mouse combos on Amazon India (Dell KM3322W, Logitech MK295, HP)"
   };
 
-  const desc = categoryDescriptions[categoryKey] || `top 8 products for ${categoryKey}`;
+  const desc = categoryDescriptions[categoryKey] || `top 8 products for category ${categoryKey}`;
 
   if (feedback) {
     feedback.className = "ai-feedback-box";
@@ -2262,13 +2354,44 @@ export function renderBulkReviewGrid(candidates, title = "Bulk Products Review",
           <td style="width:110px;">
             <input type="text" class="candidate-editable-input candidate-brand-input" value="${item.brand || "Verified"}" />
           </td>
-          <td style="width:130px;">
-            <select class="candidate-editable-input candidate-cat-select" style="padding:4px 6px;">
-              <option value="storage" ${normalizedCat === "storage" ? "selected" : ""}>SSDs & Storage</option>
-              <option value="ram" ${normalizedCat === "ram" ? "selected" : ""}>RAM Modules</option>
-              <option value="cooling" ${normalizedCat === "cooling" ? "selected" : ""}>Cooling & Thermal</option>
-              <option value="tools" ${normalizedCat === "tools" ? "selected" : ""}>Diagnostic Tools</option>
-              <option value="accessories" ${normalizedCat === "accessories" ? "selected" : ""}>Accessories & Docks</option>
+          <td style="width:140px;">
+            <select class="candidate-editable-input candidate-cat-select" style="padding:4px 6px; font-size:11px;">
+              <optgroup label="Components">
+                <option value="internal-ssds" ${normalizedCat === "internal-ssds" ? "selected" : ""}>Internal SSDs</option>
+                <option value="memory-ram" ${normalizedCat === "memory-ram" ? "selected" : ""}>Memory (RAM)</option>
+                <option value="motherboards" ${normalizedCat === "motherboards" ? "selected" : ""}>Motherboards</option>
+                <option value="fans-cooling" ${normalizedCat === "fans-cooling" ? "selected" : ""}>Fans & Cooling</option>
+                <option value="power-supplies" ${normalizedCat === "power-supplies" ? "selected" : ""}>Power Supplies</option>
+                <option value="processors" ${normalizedCat === "processors" ? "selected" : ""}>Processors</option>
+                <option value="graphics-cards" ${normalizedCat === "graphics-cards" ? "selected" : ""}>Graphics Cards</option>
+                <option value="computer-cases" ${normalizedCat === "computer-cases" ? "selected" : ""}>Computer Cases</option>
+                <option value="internal-hard-drives" ${normalizedCat === "internal-hard-drives" ? "selected" : ""}>Internal HDDs</option>
+                <option value="io-port-cards" ${normalizedCat === "io-port-cards" ? "selected" : ""}>I/O Port Cards</option>
+                <option value="computer-screws" ${normalizedCat === "computer-screws" ? "selected" : ""}>Computer Screws</option>
+                <option value="barebones" ${normalizedCat === "barebones" ? "selected" : ""}>Barebones</option>
+              </optgroup>
+              <optgroup label="Accessories & Peripherals">
+                <option value="keyboards-mice" ${normalizedCat === "keyboards-mice" ? "selected" : ""}>Keyboards & Mice</option>
+                <option value="adapters" ${normalizedCat === "adapters" ? "selected" : ""}>Adapters</option>
+                <option value="cables-accessories" ${normalizedCat === "cables-accessories" ? "selected" : ""}>Cables & Interconnects</option>
+                <option value="usb-hubs" ${normalizedCat === "usb-hubs" ? "selected" : ""}>USB Hubs & Docks</option>
+                <option value="laptop-accessories" ${normalizedCat === "laptop-accessories" ? "selected" : ""}>Laptop Accessories</option>
+                <option value="uninterrupted-power-supplies" ${normalizedCat === "uninterrupted-power-supplies" ? "selected" : ""}>UPS Units</option>
+                <option value="pc-gaming-peripherals" ${normalizedCat === "pc-gaming-peripherals" ? "selected" : ""}>Gaming Peripherals</option>
+                <option value="cleaners-tools" ${normalizedCat === "cleaners-tools" ? "selected" : ""}>Tools & Cleaners</option>
+                <option value="audio-video-accessories" ${normalizedCat === "audio-video-accessories" ? "selected" : ""}>Audio & Video</option>
+              </optgroup>
+              <optgroup label="External Storage">
+                <option value="external-hard-drives" ${normalizedCat === "external-hard-drives" ? "selected" : ""}>External HDDs</option>
+                <option value="external-ssds" ${normalizedCat === "external-ssds" ? "selected" : ""}>External SSDs</option>
+                <option value="pen-drives" ${normalizedCat === "pen-drives" ? "selected" : ""}>Pen Drives</option>
+              </optgroup>
+              <optgroup label="Systems & Networking">
+                <option value="laptops" ${normalizedCat === "laptops" ? "selected" : ""}>Laptops</option>
+                <option value="desktops" ${normalizedCat === "desktops" ? "selected" : ""}>Desktops</option>
+                <option value="monitors" ${normalizedCat === "monitors" ? "selected" : ""}>Monitors</option>
+                <option value="networking-devices" ${normalizedCat === "networking-devices" ? "selected" : ""}>Networking</option>
+              </optgroup>
             </select>
           </td>
           <td style="width:90px;">
