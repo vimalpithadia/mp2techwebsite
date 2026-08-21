@@ -311,7 +311,13 @@
 #storeFilters .portal-caret {
   font-size: 11px !important;
   opacity: 0.85 !important;
-  margin-left: 2px !important;
+  margin-left: 3px !important;
+  display: inline-block !important;
+  transition: transform 0.2s ease !important;
+}
+
+#storeFilters .portal-tab-btn.dropdown-open .portal-caret {
+  transform: rotate(180deg) !important;
 }
 
 /* Right Controls (Search & Sort) */

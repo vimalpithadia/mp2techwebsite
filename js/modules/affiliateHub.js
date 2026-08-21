@@ -28,6 +28,8 @@ let currentDept = "all";
 let currentSubcategory = "all";
 let currentProdSearch = "";
 let currentSort = "default";
+let isSubmenuOpen = false;
+let activeToggleDept = null;
 
 let currentBlogCategory = "all";
 let currentBlogSearch = "";
@@ -247,32 +249,43 @@ export function renderProducts(
  * Synchronize GST Portal-Style Department Tabs, Sub-Menu Strip, and Breadcrumb Bar
  */
 export function updateCategoryUiState() {
-  // Update Department Tabs active state
+  // Update Department Tabs active state and caret rotation
   document.querySelectorAll(".portal-tab-btn, .dept-tab-btn").forEach((btn) => {
     const d = btn.getAttribute("data-department");
-    if (d === currentDept) btn.classList.add("active");
-    else btn.classList.remove("active");
+    if (d === "all") {
+      if (!isSubmenuOpen && currentDept === "all") {
+        btn.classList.add("active");
+      } else {
+        btn.classList.remove("active");
+      }
+    } else {
+      if (isSubmenuOpen && activeToggleDept === d) {
+        btn.classList.add("active", "dropdown-open");
+      } else if (!isSubmenuOpen && currentDept === d) {
+        btn.classList.add("active");
+        btn.classList.remove("dropdown-open");
+      } else {
+        btn.classList.remove("active", "dropdown-open");
+      }
+    }
   });
 
   const subnavWrap = document.getElementById("subcategoryPillsWrap");
   const subnavContainer = document.getElementById("subcategoryPillsContainer");
 
   if (subnavContainer && subnavWrap) {
-    if (currentDept === "all" && currentSubcategory === "all") {
-      // Auto-hide sub-menu bar on All Products (matching GST Portal Home tab)
+    if (!isSubmenuOpen || !activeToggleDept) {
       subnavWrap.style.display = "none";
       subnavContainer.innerHTML = "";
     } else {
-      // Instantly open the Sub-Menu bar directly below the main menu
       subnavWrap.style.display = "block";
-      const subcats = getCategoriesByDepartment(currentDept);
-      
-      const deptObj = AMAZON_DEPARTMENTS.find((d) => d.id === currentDept);
+      const subcats = getCategoriesByDepartment(activeToggleDept);
+      const deptObj = AMAZON_DEPARTMENTS.find((d) => d.id === activeToggleDept);
       const deptTitle = deptObj ? deptObj.name : "Products";
 
       let html = `
         <a href="javascript:void(0)" class="portal-subnav-item ${currentSubcategory === 'all' ? 'active' : ''}" onclick="window.filterBySubCategory('all')">
-          All ${currentDept === 'all' ? 'Hardware' : deptTitle}
+          All ${deptTitle}
         </a>
       `;
 
@@ -321,12 +334,31 @@ export function updateCategoryUiState() {
 }
 
 /**
- * Filter by Department Tab
+ * Filter by Department Tab (Dropdown Toggle)
  */
 export function filterByDepartment(deptId = "all") {
-  currentDept = deptId;
-  currentSubcategory = "all";
-  renderProducts(currentDept, currentSubcategory, currentProdSearch, currentSort);
+  if (deptId === "all") {
+    currentDept = "all";
+    currentSubcategory = "all";
+    isSubmenuOpen = false;
+    activeToggleDept = null;
+    renderProducts("all", "all", currentProdSearch, currentSort);
+    return;
+  }
+
+  if (isSubmenuOpen && activeToggleDept === deptId) {
+    // User clicked the open department again -> TOGGLE CLOSE
+    isSubmenuOpen = false;
+    activeToggleDept = null;
+    updateCategoryUiState();
+  } else {
+    // TOGGLE OPEN
+    isSubmenuOpen = true;
+    activeToggleDept = deptId;
+    currentDept = deptId;
+    currentSubcategory = "all";
+    renderProducts(currentDept, "all", currentProdSearch, currentSort);
+  }
 }
 
 /**
@@ -338,8 +370,11 @@ export function filterBySubCategory(subcatId = "all", scrollToProducts = false) 
   } else {
     currentSubcategory = subcatId;
     currentDept = getDepartmentForCategory(subcatId);
+    activeToggleDept = currentDept;
   }
 
+  // Close dropdown on selection
+  isSubmenuOpen = false;
   renderProducts(currentDept, currentSubcategory, currentProdSearch, currentSort);
 
   if (scrollToProducts) {
@@ -357,6 +392,8 @@ export function clearActiveCategoryFilters() {
   currentDept = "all";
   currentSubcategory = "all";
   currentProdSearch = "";
+  isSubmenuOpen = false;
+  activeToggleDept = null;
   
   const searchInput = document.getElementById("heroSearchInput") || document.getElementById("productSearchInput");
   const clearBtn = document.getElementById("clearSearchBtn");
@@ -743,10 +780,23 @@ export async function initAffiliateHub() {
     }
   });
 
-  // Department Tab Click Handlers (deals.html GST Portal Bar)
+  // Click outside store filters closes the dropdown toggle
+  document.addEventListener("click", function (e) {
+    const storeNav = document.getElementById("storeFilters");
+    if (storeNav && !storeNav.contains(e.target)) {
+      if (isSubmenuOpen) {
+        isSubmenuOpen = false;
+        activeToggleDept = null;
+        updateCategoryUiState();
+      }
+    }
+  });
+
+  // Department Tab Click Handlers (deals.html GST Portal Bar with Toggle Support)
   const deptBtns = document.querySelectorAll(".portal-tab-btn, .dept-tab-btn");
   deptBtns.forEach((btn) => {
-    btn.addEventListener("click", function () {
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
       const deptId = this.getAttribute("data-department") || "all";
       filterByDepartment(deptId);
     });
