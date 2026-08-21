@@ -320,36 +320,6 @@ export function updateCategoryUiState() {
   }
 }
 
-  // Update Active Filter Strip & Breadcrumbs
-  const strip = document.getElementById("activeFilterStrip");
-  const deptLabel = document.getElementById("activeDeptName");
-  const subcatLabel = document.getElementById("activeSubcatName");
-  const sep = document.getElementById("activeBreadcrumbSep");
-
-  if (strip && deptLabel && subcatLabel) {
-    const isFiltered = currentDept !== "all" || currentSubcategory !== "all" || (currentProdSearch && currentProdSearch.trim() !== "");
-    
-    if (isFiltered) {
-      strip.style.display = "flex";
-      
-      const deptObj = AMAZON_DEPARTMENTS.find((d) => d.id === currentDept);
-      deptLabel.textContent = deptObj ? deptObj.name : "All Departments";
-
-      if (currentSubcategory !== "all") {
-        const subcatObj = getCategoryById(currentSubcategory);
-        subcatLabel.textContent = subcatObj ? subcatObj.name : currentSubcategory;
-        subcatLabel.style.display = "inline";
-        if (sep) sep.style.display = "inline";
-      } else {
-        subcatLabel.style.display = "none";
-        if (sep) sep.style.display = "none";
-      }
-    } else {
-      strip.style.display = "none";
-    }
-  }
-}
-
 /**
  * Filter by Department Tab
  */
