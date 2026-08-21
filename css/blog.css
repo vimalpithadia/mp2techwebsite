@@ -221,118 +221,131 @@
   color: var(--amz-orange);
 }
 
-/* --------------------------------------------------------------------------
-   2. GST Portal-Style Multi-Tier Storefront Navigation Bar
-   -------------------------------------------------------------------------- */
-.portal-nav-section {
-  background: #ffffff;
-  position: relative;
-  z-index: 90;
+/* ==========================================================================
+   GST PORTAL MULTI-TIER STOREFRONT NAVIGATION (STRICT CONTAINER OVERRIDES)
+   ========================================================================== */
+#storeFilters.portal-nav-section {
+  background: #ffffff !important;
+  position: relative !important;
+  z-index: 90 !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-/* Tier 1: Main Dark Navy Navigation Bar (Matches GST Portal Screenshot) */
-.portal-main-bar {
-  background: #132b50; /* Official GST Portal Navy Blue */
-  padding: 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+/* Tier 1: Main Dark Navy Navigation Bar */
+#storeFilters .portal-main-bar {
+  background: #132b50 !important;
+  padding: 0 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-.portal-bar-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+#storeFilters .portal-bar-inner {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
 }
 
 @media (min-width: 992px) {
-  .portal-bar-inner {
-    flex-direction: row;
-    align-items: stretch;
-    justify-content: space-between;
+  #storeFilters .portal-bar-inner {
+    flex-direction: row !important;
+    align-items: stretch !important;
+    justify-content: space-between !important;
   }
 }
 
-.portal-tabs-list {
-  display: flex;
-  align-items: stretch;
-  gap: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-  margin: 0;
-  padding: 0;
+#storeFilters .portal-tabs-list {
+  display: flex !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
 }
 
-.portal-tabs-list::-webkit-scrollbar {
-  display: none;
+#storeFilters .portal-tabs-list::-webkit-scrollbar {
+  display: none !important;
 }
 
-.portal-tab-btn {
-  background: transparent;
-  color: #ffffff;
-  border: none;
-  border-right: 1px solid rgba(255, 255, 255, 0.15);
-  font-size: 13.5px;
-  font-weight: 700;
-  padding: 12px 18px;
-  cursor: pointer;
-  white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.15s ease;
-  border-radius: 0;
-  line-height: 1.2;
+#storeFilters .portal-tab-btn {
+  background: transparent !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  padding: 12px 18px !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  transition: all 0.15s ease !important;
+  border-radius: 0 !important;
+  line-height: 1.2 !important;
+  outline: none !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
 }
 
-.portal-tab-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-}
-
-/* Active tab style matches GST Portal Services / Home tab */
-.portal-tab-btn.active {
-  background: #f0f4f8 !important; /* Seamlessly connects to the sub-menu */
-  color: #132b50 !important;
-  font-weight: 800;
-}
-
-.portal-tab-btn[data-department="all"].active {
-  background: #00b4d8 !important; /* Teal/Cyan highlight like GST Portal Home tab */
+#storeFilters .portal-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
   color: #ffffff !important;
 }
 
-.portal-caret {
-  font-size: 11px;
-  opacity: 0.85;
-  margin-left: 2px;
+/* Active tab styles */
+#storeFilters .portal-tab-btn.active {
+  background: #f0f4f8 !important;
+  color: #132b50 !important;
+  font-weight: 800 !important;
 }
 
-/* Search & Sort inside Main Bar */
-.portal-top-controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 0;
-  flex-wrap: wrap;
+#storeFilters .portal-tab-btn[data-department="all"].active {
+  background: #00b4d8 !important; /* Teal highlight like GST Portal Home */
+  color: #ffffff !important;
 }
 
-.portal-search-box {
-  position: relative;
-  width: 230px;
-  max-width: 100%;
+#storeFilters .portal-caret {
+  font-size: 11px !important;
+  opacity: 0.85 !important;
+  margin-left: 2px !important;
 }
 
-.portal-search-box .portal-search-icon {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #94a3b8;
-  font-size: 12px;
-  pointer-events: none;
+/* Right Controls (Search & Sort) */
+#storeFilters .portal-top-controls {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 6px 0 !important;
+  flex-wrap: wrap !important;
 }
 
-.portal-search-input {
+#storeFilters .portal-search-box {
+  position: relative !important;
+  width: 220px !important;
+  max-width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  margin: 0 !important;
+}
+
+#storeFilters .portal-search-icon {
+  position: absolute !important;
+  left: 10px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: #94a3b8 !important;
+  font-size: 12px !important;
+  pointer-events: none !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#storeFilters .portal-search-input {
   width: 100% !important;
   box-sizing: border-box !important;
   padding: 6px 26px 6px 30px !important;
@@ -343,114 +356,172 @@
   font-size: 12.5px !important;
   color: #0f172a !important;
   outline: none !important;
+  margin: 0 !important;
+  line-height: normal !important;
+  box-shadow: none !important;
 }
 
-.portal-search-input:focus {
+#storeFilters .portal-search-input:focus {
   border-color: #00b4d8 !important;
   box-shadow: 0 0 0 2px rgba(0, 180, 216, 0.2) !important;
 }
 
-.portal-search-clear {
-  position: absolute;
-  right: 6px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: #cbd5e1;
-  border: none;
-  color: #334155;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
+#storeFilters .portal-search-clear {
+  position: absolute !important;
+  right: 6px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: #cbd5e1 !important;
+  border: none !important;
+  color: #334155 !important;
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 50% !important;
   display: none;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 10px;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  font-size: 10px !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
 }
 
-.portal-sort-select {
-  padding: 4px 10px;
-  height: 32px;
-  border: 1px solid #cbd5e1;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #0f172a;
-  background: #ffffff;
-  outline: none;
-  cursor: pointer;
+#storeFilters .portal-sort-select {
+  padding: 4px 10px !important;
+  height: 32px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #0f172a !important;
+  background: #ffffff !important;
+  outline: none !important;
+  cursor: pointer !important;
+  margin: 0 !important;
+  box-shadow: none !important;
 }
 
 /* Tier 2: Sub-Menu Horizontal Strip (Clean White/Gray Theme like GST Portal) */
-.portal-subnav-strip {
-  background: #f0f4f8; /* Matches active tab color seamlessly */
-  border-bottom: 1px solid #cbd5e1;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
-  padding: 0;
+#storeFilters .portal-subnav-strip {
+  background: #f0f4f8 !important;
+  border-bottom: 1px solid #cbd5e1 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08) !important;
+  padding: 0 !important;
 }
 
-.portal-subnav-inner {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  overflow-x: auto;
-  scrollbar-width: thin;
-  -webkit-overflow-scrolling: touch;
-  flex-wrap: wrap;
-  padding: 0;
+#storeFilters .portal-subnav-inner {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0 !important;
+  overflow-x: auto !important;
+  scrollbar-width: thin !important;
+  -webkit-overflow-scrolling: touch !important;
+  flex-wrap: wrap !important;
+  padding: 0 !important;
 }
 
-.portal-subnav-item {
-  color: #132b50;
-  font-size: 13px;
-  font-weight: 600;
+#storeFilters .portal-subnav-item {
+  color: #132b50 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
   text-decoration: none !important;
-  padding: 10px 18px;
-  border-radius: 0;
-  background: transparent;
-  border: none;
-  border-right: 1px solid rgba(0, 0, 0, 0.06);
-  white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.15s ease;
-  cursor: pointer;
+  padding: 10px 18px !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  transition: all 0.15s ease !important;
+  cursor: pointer !important;
+  margin: 0 !important;
+  box-shadow: none !important;
 }
 
-.portal-subnav-item:hover {
-  color: #0284c7;
-  background: #e2e8f0;
+#storeFilters .portal-subnav-item:hover {
+  color: #0284c7 !important;
+  background: #e2e8f0 !important;
   text-decoration: underline !important;
 }
 
-.portal-subnav-item.active {
+#storeFilters .portal-subnav-item.active {
   color: #0284c7 !important;
-  font-weight: 800;
-  background: #ffffff;
-  box-shadow: inset 0 -3px 0 0 #0284c7;
+  font-weight: 800 !important;
+  background: #ffffff !important;
+  box-shadow: inset 0 -3px 0 0 #0284c7 !important;
 }
 
-.portal-subnav-count {
-  font-size: 11px;
-  color: #64748b;
-  font-weight: 700;
+#storeFilters .portal-subnav-count {
+  font-size: 11px !important;
+  color: #64748b !important;
+  font-weight: 700 !important;
 }
 
-.portal-subnav-item.active .portal-subnav-count {
-  color: #0284c7;
+#storeFilters .portal-subnav-item.active .portal-subnav-count {
+  color: #0284c7 !important;
 }
 
-/* Active Filter Strip */
-.active-filter-strip {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 6px;
-  padding: 8px 14px;
-  margin-top: 12px;
+/* Tier 3: Active Filter Strip */
+#storeFilters .active-filter-strip {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background: #eff6ff !important;
+  border: 1px solid #bfdbfe !important;
+  border-radius: 6px !important;
+  padding: 8px 14px !important;
+  margin: 12px 0 0 0 !important;
+}
+
+#storeFilters .active-filter-breadcrumbs {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #1e3a8a !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex-wrap: wrap !important;
+}
+
+#storeFilters .active-filter-breadcrumbs .breadcrumb-label {
+  color: #64748b !important;
+  font-weight: 700 !important;
+}
+
+#storeFilters .active-filter-breadcrumbs .breadcrumb-dept {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+#storeFilters .active-filter-breadcrumbs .breadcrumb-subcat {
+  color: #0284c7 !important;
+  font-weight: 800 !important;
+}
+
+#storeFilters .clear-filter-btn {
+  background: #fee2e2 !important;
+  border: 1px solid #fca5a5 !important;
+  color: #b91c1c !important;
+  padding: 4px 10px !important;
+  border-radius: 4px !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  transition: var(--transition) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+#storeFilters .clear-filter-btn:hover {
+  background: #ef4444 !important;
+  color: #ffffff !important;
 }
 
 /* Active Filter Strip */
