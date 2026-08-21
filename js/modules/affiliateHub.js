@@ -244,7 +244,7 @@ export function renderProducts(
 }
 
 /**
- * Synchronize Department Tabs, Subcategory Pills, and Breadcrumb Bar
+ * Synchronize Department Tabs, Subcategory Pills (Auto-Hidden on All Departments), and Breadcrumb Bar
  */
 export function updateCategoryUiState() {
   // Update Department Tabs active state
@@ -254,28 +254,40 @@ export function updateCategoryUiState() {
     else btn.classList.remove("active");
   });
 
-  // Dynamically render Subcategory Pills matching the selected department (or all)
+  const pillsWrap = document.getElementById("subcategoryPillsWrap");
   const pillsContainer = document.getElementById("subcategoryPillsContainer");
-  if (pillsContainer) {
-    const subcats = getCategoriesByDepartment(currentDept);
-    
-    let html = `
-      <button type="button" class="subcat-pill ${currentSubcategory === 'all' ? 'active' : ''}" onclick="window.filterBySubCategory('all')">
-        <i class="fa fa-th-large"></i> ALL ${currentDept === 'all' ? 'HARDWARE' : currentDept.toUpperCase()}
-      </button>
-    `;
 
-    subcats.forEach((cat) => {
-      const isAct = currentSubcategory === cat.id;
-      const count = allProducts.filter((p) => p.category === cat.id || getCategoryById(p.category)?.id === cat.id).length;
-      html += `
-        <button type="button" class="subcat-pill ${isAct ? 'active' : ''}" onclick="window.filterBySubCategory('${cat.id}')">
-          <i class="fa ${cat.icon}"></i> ${cat.name.toUpperCase()} ${count > 0 ? `<span class="subcat-count">(${count})</span>` : ''}
+  if (pillsContainer && pillsWrap) {
+    if (currentDept === "all" && currentSubcategory === "all") {
+      // Auto-hide subcategories on All Departments to keep page clean & uncluttered
+      pillsWrap.style.display = "none";
+      pillsContainer.innerHTML = "";
+    } else {
+      // Show ONLY subcategories belonging to the active department
+      pillsWrap.style.display = "block";
+      const subcats = getCategoriesByDepartment(currentDept);
+      
+      const deptObj = AMAZON_DEPARTMENTS.find((d) => d.id === currentDept);
+      const deptTitle = deptObj ? deptObj.name : "Department";
+
+      let html = `
+        <button type="button" class="subcat-pill ${currentSubcategory === 'all' ? 'active' : ''}" onclick="window.filterBySubCategory('all')">
+          <i class="fa fa-th-large"></i> All ${deptTitle}
         </button>
       `;
-    });
 
-    pillsContainer.innerHTML = html;
+      subcats.forEach((cat) => {
+        const isAct = currentSubcategory === cat.id;
+        const count = allProducts.filter((p) => p.category === cat.id || getCategoryById(p.category)?.id === cat.id).length;
+        html += `
+          <button type="button" class="subcat-pill ${isAct ? 'active' : ''}" onclick="window.filterBySubCategory('${cat.id}')">
+            <i class="fa ${cat.icon}"></i> ${cat.name} ${count > 0 ? `<span class="subcat-count">(${count})</span>` : ''}
+          </button>
+        `;
+      });
+
+      pillsContainer.innerHTML = html;
+    }
   }
 
   // Update Active Filter Strip & Breadcrumbs
