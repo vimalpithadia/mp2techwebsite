@@ -244,50 +244,42 @@ export function renderProducts(
 }
 
 /**
- * Synchronize Department Tabs, Subcategory Pills (Auto-Hidden on All Departments), and Breadcrumb Bar
+ * Synchronize GST Portal-Style Department Tabs, Sub-Menu Strip, and Breadcrumb Bar
  */
 export function updateCategoryUiState() {
   // Update Department Tabs active state
-  document.querySelectorAll(".dept-tab-btn").forEach((btn) => {
+  document.querySelectorAll(".portal-tab-btn, .dept-tab-btn").forEach((btn) => {
     const d = btn.getAttribute("data-department");
     if (d === currentDept) btn.classList.add("active");
     else btn.classList.remove("active");
   });
 
-  const pillsWrap = document.getElementById("subcategoryPillsWrap");
-  const pillsContainer = document.getElementById("subcategoryPillsContainer");
+  const subnavWrap = document.getElementById("subcategoryPillsWrap");
+  const subnavContainer = document.getElementById("subcategoryPillsContainer");
 
-  if (pillsContainer && pillsWrap) {
-    if (currentDept === "all" && currentSubcategory === "all") {
-      // Auto-hide subcategories on All Departments to keep page clean & uncluttered
-      pillsWrap.style.display = "none";
-      pillsContainer.innerHTML = "";
-    } else {
-      // Show ONLY subcategories belonging to the active department
-      pillsWrap.style.display = "block";
-      const subcats = getCategoriesByDepartment(currentDept);
-      
-      const deptObj = AMAZON_DEPARTMENTS.find((d) => d.id === currentDept);
-      const deptTitle = deptObj ? deptObj.name : "Department";
+  if (subnavContainer && subnavWrap) {
+    const subcats = getCategoriesByDepartment(currentDept);
+    
+    const deptObj = AMAZON_DEPARTMENTS.find((d) => d.id === currentDept);
+    const deptTitle = deptObj ? deptObj.name : "Products";
 
-      let html = `
-        <button type="button" class="subcat-pill ${currentSubcategory === 'all' ? 'active' : ''}" onclick="window.filterBySubCategory('all')">
-          <i class="fa fa-th-large"></i> All ${deptTitle}
-        </button>
+    let html = `
+      <a href="javascript:void(0)" class="portal-subnav-item ${currentSubcategory === 'all' ? 'active' : ''}" onclick="window.filterBySubCategory('all')">
+        <i class="fa fa-th-large"></i> All ${currentDept === 'all' ? 'Hardware' : deptTitle}
+      </a>
+    `;
+
+    subcats.forEach((cat) => {
+      const isAct = currentSubcategory === cat.id;
+      const count = allProducts.filter((p) => p.category === cat.id || getCategoryById(p.category)?.id === cat.id).length;
+      html += `
+        <a href="javascript:void(0)" class="portal-subnav-item ${isAct ? 'active' : ''}" onclick="window.filterBySubCategory('${cat.id}')">
+          ${cat.shortName || cat.name} ${count > 0 ? `<span class="portal-subnav-count">(${count})</span>` : ''}
+        </a>
       `;
+    });
 
-      subcats.forEach((cat) => {
-        const isAct = currentSubcategory === cat.id;
-        const count = allProducts.filter((p) => p.category === cat.id || getCategoryById(p.category)?.id === cat.id).length;
-        html += `
-          <button type="button" class="subcat-pill ${isAct ? 'active' : ''}" onclick="window.filterBySubCategory('${cat.id}')">
-            <i class="fa ${cat.icon}"></i> ${cat.name} ${count > 0 ? `<span class="subcat-count">(${count})</span>` : ''}
-          </button>
-        `;
-      });
-
-      pillsContainer.innerHTML = html;
-    }
+    subnavContainer.innerHTML = html;
   }
 
   // Update Active Filter Strip & Breadcrumbs
@@ -743,8 +735,8 @@ export async function initAffiliateHub() {
     }
   });
 
-  // Department Tab Click Handlers (deals.html)
-  const deptBtns = document.querySelectorAll(".dept-tab-btn");
+  // Department Tab Click Handlers (deals.html GST Portal Bar)
+  const deptBtns = document.querySelectorAll(".portal-tab-btn, .dept-tab-btn");
   deptBtns.forEach((btn) => {
     btn.addEventListener("click", function () {
       const deptId = this.getAttribute("data-department") || "all";
