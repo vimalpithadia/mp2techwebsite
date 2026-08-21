@@ -222,44 +222,66 @@
 }
 
 /* --------------------------------------------------------------------------
-   2. Amazon-Grade Storefront Header & 2-Column Sidebar Layout
+   2. Full-Width Streamlined Store Filter Navigation Bar (Matching Screenshot)
    -------------------------------------------------------------------------- */
-.storefront-header-bar {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  color: #ffffff;
-  padding: 24px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+.store-filter-section {
+  background: #ffffff;
+  padding: 24px 0 14px 0;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-.storefront-toolbar {
+.store-filter-row-top {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
 @media (min-width: 992px) {
-  .storefront-toolbar {
+  .store-filter-row-top {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
   }
 }
 
-.storefront-title-box h1 {
-  font-size: 24px;
-  font-weight: 800;
+/* Department Tabs */
+.department-tabs-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dept-tab-btn {
+  background: #3898ec;
   color: #ffffff;
-  margin: 4px 0 6px 0;
-  letter-spacing: -0.5px;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 10px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-.storefront-title-box .hero-subtext {
-  font-size: 13.5px;
-  color: #94a3b8;
-  margin: 0;
-  max-width: 520px;
+.dept-tab-btn:hover {
+  background: #2782d2;
+  transform: translateY(-1px);
 }
 
+.dept-tab-btn.active {
+  background: #0284c7;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(2, 132, 199, 0.3);
+}
+
+/* Top Search & Sort */
 .store-top-controls {
   display: flex;
   align-items: center;
@@ -269,7 +291,7 @@
 
 .store-top-controls .nav-search-box {
   position: relative;
-  width: 260px;
+  width: 250px;
   max-width: 100%;
 }
 
@@ -287,10 +309,10 @@
   width: 100% !important;
   box-sizing: border-box !important;
   padding: 8px 30px 8px 34px !important;
-  height: 40px !important;
-  background: #ffffff !important;
-  border: 1.5px solid #cbd5e1 !important;
-  border-radius: 8px !important;
+  height: 38px !important;
+  background: #f8fafc !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 20px !important;
   font-size: 13px !important;
   color: #0f172a !important;
   outline: none !important;
@@ -298,8 +320,9 @@
 }
 
 .store-top-controls .nav-search-input:focus {
-  border-color: #ff9900 !important;
-  box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.2) !important;
+  background: #ffffff !important;
+  border-color: #3898ec !important;
+  box-shadow: 0 0 0 3px rgba(56, 152, 236, 0.15) !important;
 }
 
 .store-top-controls .nav-search-clear {
@@ -321,270 +344,63 @@
 }
 
 .store-top-controls .sort-filter-select {
-  padding: 8px 12px;
-  height: 40px;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 8px;
+  padding: 6px 14px;
+  height: 38px;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
   font-size: 12.5px;
-  font-weight: 700;
-  color: #0f172a;
+  font-weight: 600;
+  color: #334155;
   background: #ffffff;
   outline: none;
   cursor: pointer;
 }
 
-/* --------------------------------------------------------------------------
-   3. Amazon Store 2-Column Grid Layout & Sidebar Architecture
-   -------------------------------------------------------------------------- */
-.store-layout-grid {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 28px;
-  align-items: start;
+/* Subcategory Pills Grid (Matching Screenshot) */
+.subcategory-pills-wrap {
+  margin-top: 4px;
+  padding-top: 6px;
 }
 
-/* Left Sidebar */
-.store-sidebar {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 20px 16px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-  position: sticky;
-  top: 20px;
-}
-
-.sidebar-header-mobile {
-  display: none;
-}
-
-.sidebar-widget {
-  margin-bottom: 20px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.sidebar-widget:last-child {
-  margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: none;
-}
-
-.sidebar-widget-header {
+.subcategory-pills-grid {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
+  gap: 8px 10px;
 }
 
-.sidebar-widget-title {
-  font-size: 14px;
-  font-weight: 800;
-  color: #0f172a;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 0;
-}
-
-.sidebar-reset-btn {
-  background: transparent;
+.subcat-pill {
+  background: #4aa3df;
+  color: #ffffff;
   border: none;
-  font-size: 11.5px;
-  font-weight: 700;
-  color: #0284c7;
-  cursor: pointer;
-  padding: 0;
-}
-
-.sidebar-reset-btn:hover {
-  text-decoration: underline;
-  color: #0369a1;
-}
-
-/* Amazon Category Tree */
-.amz-category-tree {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.tree-dept-item {
-  margin-bottom: 4px;
-}
-
-.tree-dept-link {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #0f172a;
-  padding: 6px 10px;
-  border-radius: 6px;
-  text-decoration: none !important;
-  background: #f8fafc;
-  transition: all 0.15s ease;
-}
-
-.tree-dept-link:hover,
-.tree-dept-link.active {
-  background: #0f172a;
-  color: #ffffff !important;
-}
-
-.tree-dept-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.tree-dept-title {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 13px;
-  font-weight: 800;
-  color: #1e293b;
-  text-decoration: none !important;
-  padding: 5px 6px;
-  border-radius: 6px;
-  transition: color 0.15s;
-}
-
-.tree-dept-title:hover {
-  color: #0284c7;
-}
-
-.tree-dept-title i {
-  color: #64748b;
   font-size: 12px;
-}
-
-.tree-subcat-list {
-  list-style: none;
-  padding: 0 0 0 16px;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.tree-subcat-list li a {
-  display: flex;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 8px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  font-size: 12.5px;
-  color: #475569;
-  text-decoration: none !important;
-  padding: 4px 8px;
-  border-radius: 6px;
+  gap: 6px;
   transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
-.tree-subcat-list li a:hover {
-  color: #0284c7;
-  background: #f0f9ff;
-  padding-left: 10px;
+.subcat-pill:hover {
+  background: #318ecc;
+  transform: translateY(-1px);
 }
 
-.tree-subcat-list li a.active {
-  color: #0369a1;
-  font-weight: 800;
-  background: #e0f2fe;
-  border-left: 3px solid #0284c7;
-  padding-left: 8px;
+.subcat-pill.active {
+  background: #0284c7;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.cat-count-pill {
+.subcat-pill span.subcat-count {
   font-size: 11px;
   font-weight: 600;
-  color: #94a3b8;
-  margin-left: auto;
-}
-
-.tree-subcat-list li a.active .cat-count-pill {
-  color: #0369a1;
-}
-
-/* Brand Chips */
-.sidebar-brand-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.brand-chip {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  color: #475569;
-  font-size: 11.5px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.brand-chip:hover,
-.brand-chip.active {
-  background: #0f172a;
-  color: #ffffff;
-  border-color: #0f172a;
-}
-
-/* Right Showcase */
-.store-main-showcase {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.catalog-top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 12px 18px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
-}
-
-.catalog-heading-box {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.catalog-heading-box h2 {
-  font-size: 17px;
-  font-weight: 800;
-  color: #0f172a;
-  margin: 0;
-}
-
-.catalog-heading-box .product-count {
-  font-size: 12px;
-  font-weight: 700;
-  color: #64748b;
-  background: #f1f5f9;
-  padding: 3px 10px;
-  border-radius: var(--radius-full);
-}
-
-.mobile-filter-btn {
-  display: none;
-  align-items: center;
-  gap: 6px;
-  background: #0f172a;
-  color: #ffffff;
-  border: none;
-  padding: 7px 14px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
+  opacity: 0.85;
 }
 
 /* Active Filter Strip */
@@ -594,8 +410,9 @@
   justify-content: space-between;
   background: #eff6ff;
   border: 1px solid #bfdbfe;
-  border-radius: 8px;
+  border-radius: 6px;
   padding: 8px 14px;
+  margin-top: 12px;
 }
 
 .active-filter-breadcrumbs {
@@ -628,7 +445,7 @@
   border: 1px solid #fca5a5;
   color: #b91c1c;
   padding: 4px 10px;
-  border-radius: 6px;
+  border-radius: 4px;
   font-size: 11.5px;
   font-weight: 700;
   cursor: pointer;
@@ -643,60 +460,59 @@
   color: #ffffff;
 }
 
-/* Responsive Mobile Sidebar (Offcanvas Drawer) */
+/* Products Section & Grid */
+.products-section {
+  padding: 24px 0 60px 0;
+  background: #f8fafc;
+}
+
+.section-title-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.section-title-wrap h2 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.section-title-wrap .product-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  background: #ffffff;
+  padding: 4px 14px;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
 @media (max-width: 991px) {
-  .store-layout-grid {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .product-grid {
     grid-template-columns: 1fr;
-  }
-
-  .mobile-filter-btn {
-    display: inline-flex;
-  }
-
-  .store-sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 300px;
-    max-width: 85vw;
-    height: 100vh;
-    z-index: 1050;
-    overflow-y: auto;
-    border-radius: 0;
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.35);
-    transform: translateX(-100%);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .store-sidebar.open {
-    transform: translateX(0);
-  }
-
-  .sidebar-header-mobile {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-bottom: 14px;
-    margin-bottom: 14px;
-    border-bottom: 1px solid #e2e8f0;
-    font-weight: 800;
-    font-size: 15px;
-    color: #0f172a;
-  }
-
-  .sidebar-close-btn {
-    background: #f1f5f9;
-    border: none;
-    font-size: 22px;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    line-height: 1;
-    color: #334155;
   }
 }
   border-radius: 50%;

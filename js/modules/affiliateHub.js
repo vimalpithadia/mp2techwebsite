@@ -244,37 +244,39 @@ export function renderProducts(
 }
 
 /**
- * Synchronize Category Tree, Active Sidebar Links, Count Pills, and Breadcrumb Bar
+ * Synchronize Department Tabs, Subcategory Pills, and Breadcrumb Bar
  */
 export function updateCategoryUiState() {
-  // Update Tree Department Active State
-  document.querySelectorAll(".tree-dept-link").forEach((link) => {
-    const d = link.getAttribute("data-dept");
-    if (d === currentDept && currentSubcategory === "all") link.classList.add("active");
-    else link.classList.remove("active");
+  // Update Department Tabs active state
+  document.querySelectorAll(".dept-tab-btn").forEach((btn) => {
+    const d = btn.getAttribute("data-department");
+    if (d === currentDept) btn.classList.add("active");
+    else btn.classList.remove("active");
   });
 
-  // Update Tree Subcategory Active State
-  document.querySelectorAll(".tree-subcat-list li a").forEach((link) => {
-    const subcat = link.getAttribute("data-subcat");
-    if (subcat === currentSubcategory) {
-      link.classList.add("active");
-      // Highlight parent group
-      const parentGroup = link.closest(".tree-dept-group");
-      if (parentGroup) parentGroup.classList.add("active-parent");
-    } else {
-      link.classList.remove("active");
-    }
-  });
+  // Dynamically render Subcategory Pills matching the selected department (or all)
+  const pillsContainer = document.getElementById("subcategoryPillsContainer");
+  if (pillsContainer) {
+    const subcats = getCategoriesByDepartment(currentDept);
+    
+    let html = `
+      <button type="button" class="subcat-pill ${currentSubcategory === 'all' ? 'active' : ''}" onclick="window.filterBySubCategory('all')">
+        <i class="fa fa-th-large"></i> ALL ${currentDept === 'all' ? 'HARDWARE' : currentDept.toUpperCase()}
+      </button>
+    `;
 
-  // Update Dynamic Live Product Counts in Category Tree Pills
-  document.querySelectorAll(".cat-count-pill").forEach((pill) => {
-    const subcatKey = pill.getAttribute("data-count-for");
-    if (subcatKey) {
-      const count = allProducts.filter((p) => p.category === subcatKey || getCategoryById(p.category)?.id === subcatKey).length;
-      pill.textContent = count > 0 ? `(${count})` : "";
-    }
-  });
+    subcats.forEach((cat) => {
+      const isAct = currentSubcategory === cat.id;
+      const count = allProducts.filter((p) => p.category === cat.id || getCategoryById(p.category)?.id === cat.id).length;
+      html += `
+        <button type="button" class="subcat-pill ${isAct ? 'active' : ''}" onclick="window.filterBySubCategory('${cat.id}')">
+          <i class="fa ${cat.icon}"></i> ${cat.name.toUpperCase()} ${count > 0 ? `<span class="subcat-count">(${count})</span>` : ''}
+        </button>
+      `;
+    });
+
+    pillsContainer.innerHTML = html;
+  }
 
   // Update Active Filter Strip & Breadcrumbs
   const strip = document.getElementById("activeFilterStrip");
@@ -313,13 +315,12 @@ export function filterByDepartment(deptId = "all") {
   currentDept = deptId;
   currentSubcategory = "all";
   renderProducts(currentDept, currentSubcategory, currentProdSearch, currentSort);
-  closeMobileSidebar();
 }
 
 /**
  * Filter by Granular Subcategory
  */
-export function filterBySubCategory(subcatId = "all", scrollToProducts = true) {
+export function filterBySubCategory(subcatId = "all", scrollToProducts = false) {
   if (subcatId === "all") {
     currentSubcategory = "all";
   } else {
@@ -328,20 +329,12 @@ export function filterBySubCategory(subcatId = "all", scrollToProducts = true) {
   }
 
   renderProducts(currentDept, currentSubcategory, currentProdSearch, currentSort);
-  closeMobileSidebar();
 
   if (scrollToProducts) {
     const productsSection = document.getElementById("products");
     if (productsSection) {
       productsSection.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-  }
-}
-
-function closeMobileSidebar() {
-  const sidebar = document.getElementById("storeSidebar");
-  if (sidebar && sidebar.classList.contains("open")) {
-    sidebar.classList.remove("open");
   }
 }
 
@@ -738,31 +731,13 @@ export async function initAffiliateHub() {
     }
   });
 
-  // Mobile Filter Drawer Toggle
-  const openMobileBtn = document.getElementById("openMobileFilterBtn");
-  const closeMobileBtn = document.getElementById("closeSidebarBtn");
-  const sidebar = document.getElementById("storeSidebar");
-
-  if (openMobileBtn && sidebar) {
-    openMobileBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      sidebar.classList.add("open");
+  // Department Tab Click Handlers (deals.html)
+  const deptBtns = document.querySelectorAll(".dept-tab-btn");
+  deptBtns.forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const deptId = this.getAttribute("data-department") || "all";
+      filterByDepartment(deptId);
     });
-  }
-
-  if (closeMobileBtn && sidebar) {
-    closeMobileBtn.addEventListener("click", () => {
-      sidebar.classList.remove("open");
-    });
-  }
-
-  // Click outside sidebar to close on mobile
-  document.addEventListener("click", (e) => {
-    if (sidebar && sidebar.classList.contains("open")) {
-      if (!sidebar.contains(e.target) && e.target !== openMobileBtn && !openMobileBtn?.contains(e.target)) {
-        sidebar.classList.remove("open");
-      }
-    }
   });
 
   // Product Search Input & Clear Button (deals.html)
