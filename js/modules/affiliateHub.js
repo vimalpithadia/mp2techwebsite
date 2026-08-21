@@ -258,26 +258,55 @@ export function updateCategoryUiState() {
   const subnavContainer = document.getElementById("subcategoryPillsContainer");
 
   if (subnavContainer && subnavWrap) {
-    const subcats = getCategoriesByDepartment(currentDept);
-    
-    const deptObj = AMAZON_DEPARTMENTS.find((d) => d.id === currentDept);
-    const deptTitle = deptObj ? deptObj.name : "Products";
+    let html = "";
 
-    let html = `
-      <a href="javascript:void(0)" class="portal-subnav-item ${currentSubcategory === 'all' ? 'active' : ''}" onclick="window.filterBySubCategory('all')">
-        <i class="fa fa-th-large"></i> All ${currentDept === 'all' ? 'Hardware' : deptTitle}
-      </a>
-    `;
-
-    subcats.forEach((cat) => {
-      const isAct = currentSubcategory === cat.id;
-      const count = allProducts.filter((p) => p.category === cat.id || getCategoryById(p.category)?.id === cat.id).length;
-      html += `
-        <a href="javascript:void(0)" class="portal-subnav-item ${isAct ? 'active' : ''}" onclick="window.filterBySubCategory('${cat.id}')">
-          ${cat.shortName || cat.name} ${count > 0 ? `<span class="portal-subnav-count">(${count})</span>` : ''}
+    if (currentDept === "all") {
+      // On All Products: Show clean, curated popular subcategories that have products
+      html = `
+        <span class="portal-subnav-prefix"><i class="fa fa-bolt"></i> Popular:</span>
+        <a href="javascript:void(0)" class="portal-subnav-item ${currentSubcategory === 'all' ? 'active' : ''}" onclick="window.filterBySubCategory('all')">
+          All Products (15)
         </a>
       `;
-    });
+
+      // Only show subcategories with products (>0) on the All view to avoid clutter
+      const populatedCategories = AMAZON_CATEGORIES.filter((cat) => {
+        const count = allProducts.filter((p) => p.category === cat.id || getCategoryById(p.category)?.id === cat.id).length;
+        return count > 0;
+      });
+
+      populatedCategories.forEach((cat) => {
+        const isAct = currentSubcategory === cat.id;
+        const count = allProducts.filter((p) => p.category === cat.id || getCategoryById(p.category)?.id === cat.id).length;
+        html += `
+          <a href="javascript:void(0)" class="portal-subnav-item ${isAct ? 'active' : ''}" onclick="window.filterBySubCategory('${cat.id}')">
+            ${cat.shortName || cat.name} <span class="portal-subnav-count">(${count})</span>
+          </a>
+        `;
+      });
+    } else {
+      // Specific Department: Show ONLY that department's subcategories
+      const subcats = getCategoriesByDepartment(currentDept);
+      const deptObj = AMAZON_DEPARTMENTS.find((d) => d.id === currentDept);
+      const deptTitle = deptObj ? deptObj.name : "Department";
+
+      html = `
+        <span class="portal-subnav-prefix"><i class="fa ${deptObj?.icon || 'fa-folder-open'}"></i> ${deptTitle}:</span>
+        <a href="javascript:void(0)" class="portal-subnav-item ${currentSubcategory === 'all' ? 'active' : ''}" onclick="window.filterBySubCategory('all')">
+          All ${deptTitle}
+        </a>
+      `;
+
+      subcats.forEach((cat) => {
+        const isAct = currentSubcategory === cat.id;
+        const count = allProducts.filter((p) => p.category === cat.id || getCategoryById(p.category)?.id === cat.id).length;
+        html += `
+          <a href="javascript:void(0)" class="portal-subnav-item ${isAct ? 'active' : ''}" onclick="window.filterBySubCategory('${cat.id}')">
+            ${cat.shortName || cat.name} ${count > 0 ? `<span class="portal-subnav-count">(${count})</span>` : ''}
+          </a>
+        `;
+      });
+    }
 
     subnavContainer.innerHTML = html;
   }
