@@ -8,6 +8,13 @@
  */
 
 import { DEFAULT_PRODUCTS, DEFAULT_POSTS } from "../../data/defaultData.js";
+import {
+  AMAZON_DEPARTMENTS,
+  AMAZON_CATEGORIES,
+  getCategoryById,
+  getCategoriesByDepartment,
+  getDepartmentForCategory,
+} from "../../data/categories.js";
 
 export const AMAZON_CONFIG = {
   defaultAffiliateTag: "mp2tech20-21",
@@ -16,7 +23,9 @@ export const AMAZON_CONFIG = {
 
 let allProducts = [...DEFAULT_PRODUCTS];
 let allPosts = [...DEFAULT_POSTS];
-let currentProdCategory = "all";
+
+let currentDept = "all";
+let currentSubcategory = "all";
 let currentProdSearch = "";
 let currentSort = "default";
 
@@ -82,29 +91,57 @@ export function getPostShareUrl(post) {
 }
 
 /**
- * Render Amazon Affiliate Product Cards (deals.html)
+ * Render Amazon Affiliate Product Cards with Multi-Level Category Filter (deals.html)
  */
-export function renderProducts(category = "all", searchQuery = "", sortOrder = "default") {
+export function renderProducts(
+  dept = currentDept,
+  subcat = currentSubcategory,
+  searchQuery = currentProdSearch,
+  sortOrder = currentSort
+) {
+  currentDept = dept;
+  currentSubcategory = subcat;
+  currentProdSearch = searchQuery;
+  currentSort = sortOrder;
+
   const container = document.getElementById("affiliateProductGrid");
   if (!container) return;
 
   let filtered = [...allProducts];
 
-  // Filter by category
-  if (category && category !== "all") {
-    filtered = filtered.filter((p) => p.category === category);
+  // Filter by department
+  if (dept && dept !== "all") {
+    filtered = filtered.filter((p) => {
+      const pDept = getDepartmentForCategory(p.category);
+      return pDept === dept;
+    });
+  }
+
+  // Filter by subcategory
+  if (subcat && subcat !== "all") {
+    filtered = filtered.filter((p) => {
+      if (p.category === subcat) return true;
+      const catObj = getCategoryById(p.category);
+      return catObj && catObj.id === subcat;
+    });
   }
 
   // Filter by search query
   if (searchQuery && searchQuery.trim() !== "") {
     const q = searchQuery.toLowerCase().trim();
-    filtered = filtered.filter(
-      (p) =>
+    filtered = filtered.filter((p) => {
+      const catObj = getCategoryById(p.category);
+      const catName = catObj ? catObj.name.toLowerCase() : "";
+      const catKeywords = catObj ? catObj.keywords.join(" ") : "";
+      return (
         p.name.toLowerCase().includes(q) ||
         (p.brand && p.brand.toLowerCase().includes(q)) ||
         p.category.toLowerCase().includes(q) ||
+        catName.includes(q) ||
+        catKeywords.includes(q) ||
         (p.highlights && p.highlights.some((h) => h.toLowerCase().includes(q)))
-    );
+      );
+    });
   }
 
   // Sorting
@@ -118,19 +155,36 @@ export function renderProducts(category = "all", searchQuery = "", sortOrder = "
     filtered.sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  // Update product count indicator if present
+  // Update Section Title and Counter
+  const titleEl = document.getElementById("catalogSectionTitle");
   const counter = document.getElementById("productCounter");
+
+  if (titleEl) {
+    if (subcat !== "all") {
+      const c = getCategoryById(subcat);
+      titleEl.textContent = c ? c.name : "Verified Products";
+    } else if (dept !== "all") {
+      const d = AMAZON_DEPARTMENTS.find((x) => x.id === dept);
+      titleEl.textContent = d ? `${d.name} Catalog` : "Hardware Catalog";
+    } else {
+      titleEl.textContent = "Verified Hardware Catalog";
+    }
+  }
+
   if (counter) {
     counter.textContent = `${filtered.length} Verified ${filtered.length === 1 ? "Product" : "Products"}`;
   }
+
+  // Update UI Navigation Elements
+  updateCategoryUiState();
 
   if (filtered.length === 0) {
     container.innerHTML = `
       <div class="affiliate-empty-state" style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: #ffffff; border-radius: 16px; border: 1.5px dashed #cbd5e1;">
         <i class="fa fa-search" style="font-size: 32px; color: #94a3b8; margin-bottom: 12px; display: block;"></i>
         <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">No Hardware Found</h3>
-        <p style="font-size: 14px; color: #64748b; margin-bottom: 18px;">No products match your search "${searchQuery}".</p>
-        <button onclick="window.quickSearch('')" class="btn-primary" style="background:#0284c7; padding: 9px 20px; font-size: 13px;">View All Products</button>
+        <p style="font-size: 14px; color: #64748b; margin-bottom: 18px;">No products match your active category filter or search query.</p>
+        <button onclick="window.clearActiveCategoryFilters()" class="btn-primary" style="background:#0284c7; color:#fff; border:none; padding: 9px 20px; font-size: 13px; border-radius:8px; cursor:pointer; font-weight:700;">Show All Products</button>
       </div>
     `;
     return;
@@ -139,6 +193,8 @@ export function renderProducts(category = "all", searchQuery = "", sortOrder = "
   container.innerHTML = filtered
     .map((product) => {
       const affiliateUrl = buildAffiliateUrl(product.amazonUrl);
+      const catObj = getCategoryById(product.category);
+      const catDisplay = catObj ? catObj.shortName || catObj.name : product.category;
       const highlights = (product.highlights || [])
         .slice(0, 2)
         .map((h) => `<span class="spec-chip"><i class="fa fa-check"></i> ${h.length > 42 ? h.slice(0, 40) + '...' : h}</span>`)
@@ -147,7 +203,7 @@ export function renderProducts(category = "all", searchQuery = "", sortOrder = "
       return `
         <article class="product-card">
           <div class="product-card-top">
-            <span class="product-brand-tag">${product.brand || "Verified Hardware"}</span>
+            <span class="product-brand-tag" title="Category: ${catDisplay}"><i class="fa ${catObj ? catObj.icon : 'fa-tag'}"></i> ${catDisplay}</span>
             <span class="product-verified-badge"><i class="fa fa-shield"></i> ${product.badge || "Technician Tested"}</span>
           </div>
 
@@ -185,6 +241,126 @@ export function renderProducts(category = "all", searchQuery = "", sortOrder = "
       `;
     })
     .join("");
+}
+
+/**
+ * Synchronize UI Tabs, Subcategory Ribbon, and Breadcrumb Bar
+ */
+export function updateCategoryUiState() {
+  // Update Department Tabs
+  document.querySelectorAll(".dept-tab-btn").forEach((btn) => {
+    const d = btn.getAttribute("data-department");
+    if (d === currentDept) btn.classList.add("active");
+    else btn.classList.remove("active");
+  });
+
+  // Render / Update Subcategory Ribbon
+  const subcatContainer = document.getElementById("subcategoryPillsContainer");
+  const ribbonWrap = document.getElementById("subcategoryRibbonWrap");
+  if (subcatContainer && ribbonWrap) {
+    const subcats = getCategoriesByDepartment(currentDept);
+    
+    let html = `
+      <button class="subcat-pill ${currentSubcategory === 'all' ? 'active' : ''}" onclick="window.filterBySubCategory('all')">
+        <i class="fa fa-th-large"></i> All ${currentDept === 'all' ? 'Hardware' : currentDept}
+      </button>
+    `;
+
+    subcats.forEach((cat) => {
+      const isAct = currentSubcategory === cat.id;
+      // Count products in this category
+      const count = allProducts.filter((p) => p.category === cat.id || getCategoryById(p.category)?.id === cat.id).length;
+      html += `
+        <button class="subcat-pill ${isAct ? 'active' : ''}" onclick="window.filterBySubCategory('${cat.id}')">
+          <i class="fa ${cat.icon}"></i> ${cat.shortName || cat.name} ${count > 0 ? `<span style="opacity:0.75; font-size:10px;">(${count})</span>` : ''}
+        </button>
+      `;
+    });
+
+    subcatContainer.innerHTML = html;
+  }
+
+  // Update Featured Category Circle Active State
+  document.querySelectorAll(".featured-cat-item").forEach((item) => {
+    const catId = item.getAttribute("data-category");
+    if (catId === currentSubcategory) item.classList.add("active");
+    else item.classList.remove("active");
+  });
+
+  // Update Active Filter Strip & Breadcrumbs
+  const strip = document.getElementById("activeFilterStrip");
+  const deptLabel = document.getElementById("activeDeptName");
+  const subcatLabel = document.getElementById("activeSubcatName");
+  const sep = document.getElementById("activeBreadcrumbSep");
+
+  if (strip && deptLabel && subcatLabel) {
+    const isFiltered = currentDept !== "all" || currentSubcategory !== "all" || (currentProdSearch && currentProdSearch.trim() !== "");
+    
+    if (isFiltered) {
+      strip.style.display = "flex";
+      
+      const deptObj = AMAZON_DEPARTMENTS.find((d) => d.id === currentDept);
+      deptLabel.textContent = deptObj ? deptObj.name : "All Departments";
+
+      if (currentSubcategory !== "all") {
+        const subcatObj = getCategoryById(currentSubcategory);
+        subcatLabel.textContent = subcatObj ? subcatObj.name : currentSubcategory;
+        subcatLabel.style.display = "inline";
+        if (sep) sep.style.display = "inline";
+      } else {
+        subcatLabel.style.display = "none";
+        if (sep) sep.style.display = "none";
+      }
+    } else {
+      strip.style.display = "none";
+    }
+  }
+}
+
+/**
+ * Filter by Department Tab
+ */
+export function filterByDepartment(deptId = "all") {
+  currentDept = deptId;
+  currentSubcategory = "all";
+  renderProducts(currentDept, currentSubcategory, currentProdSearch, currentSort);
+}
+
+/**
+ * Filter by Granular Subcategory
+ */
+export function filterBySubCategory(subcatId = "all", scrollToProducts = true) {
+  if (subcatId === "all") {
+    currentSubcategory = "all";
+  } else {
+    currentSubcategory = subcatId;
+    currentDept = getDepartmentForCategory(subcatId);
+  }
+
+  renderProducts(currentDept, currentSubcategory, currentProdSearch, currentSort);
+
+  if (scrollToProducts) {
+    const productsSection = document.getElementById("products");
+    if (productsSection) {
+      productsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+}
+
+/**
+ * Reset all active filters
+ */
+export function clearActiveCategoryFilters() {
+  currentDept = "all";
+  currentSubcategory = "all";
+  currentProdSearch = "";
+  
+  const searchInput = document.getElementById("heroSearchInput") || document.getElementById("productSearchInput");
+  const clearBtn = document.getElementById("clearSearchBtn");
+  if (searchInput) searchInput.value = "";
+  if (clearBtn) clearBtn.style.display = "none";
+
+  renderProducts("all", "all", "", currentSort);
 }
 
 /**
@@ -548,7 +724,7 @@ function handleDeepLinking() {
  */
 export async function initAffiliateHub() {
   // Initial render
-  renderProducts("all", "", "default");
+  renderProducts(currentDept, currentSubcategory, "", "default");
   renderBlogPosts("all", "");
 
   // Deep linking initial check
@@ -565,16 +741,28 @@ export async function initAffiliateHub() {
     }
   });
 
-  // Product Category Filters (deals.html)
-  const prodFilterBtns = document.querySelectorAll(".category-pill:not(.blog-filter-btn)");
-  prodFilterBtns.forEach((btn) => {
+  // Department Tab Click Handlers (deals.html)
+  const deptBtns = document.querySelectorAll(".dept-tab-btn");
+  deptBtns.forEach((btn) => {
     btn.addEventListener("click", function () {
-      prodFilterBtns.forEach((b) => b.classList.remove("active"));
-      this.classList.add("active");
-      currentProdCategory = this.getAttribute("data-category") || "all";
-      renderProducts(currentProdCategory, currentProdSearch, currentSort);
+      const deptId = this.getAttribute("data-department") || "all";
+      filterByDepartment(deptId);
     });
   });
+
+  // Featured Category Carousel Scroll Buttons (deals.html)
+  const catCarousel = document.getElementById("featuredCatGrid");
+  const prevBtn = document.getElementById("catScrollPrev");
+  const nextBtn = document.getElementById("catScrollNext");
+
+  if (catCarousel && prevBtn && nextBtn) {
+    prevBtn.addEventListener("click", () => {
+      catCarousel.scrollBy({ left: -240, behavior: "smooth" });
+    });
+    nextBtn.addEventListener("click", () => {
+      catCarousel.scrollBy({ left: 240, behavior: "smooth" });
+    });
+  }
 
   // Product Search Input & Clear Button (deals.html)
   const searchInput = document.getElementById("heroSearchInput") || document.getElementById("productSearchInput");
@@ -584,7 +772,7 @@ export async function initAffiliateHub() {
     searchInput.addEventListener("input", function () {
       currentProdSearch = this.value;
       if (clearBtn) clearBtn.style.display = this.value ? "flex" : "none";
-      renderProducts(currentProdCategory, currentProdSearch, currentSort);
+      renderProducts(currentDept, currentSubcategory, currentProdSearch, currentSort);
     });
   }
 
@@ -596,7 +784,7 @@ export async function initAffiliateHub() {
       }
       currentProdSearch = "";
       clearBtn.style.display = "none";
-      renderProducts(currentProdCategory, "", currentSort);
+      renderProducts(currentDept, currentSubcategory, "", currentSort);
     });
   }
 
@@ -605,7 +793,7 @@ export async function initAffiliateHub() {
   if (sortSelect) {
     sortSelect.addEventListener("change", function () {
       currentSort = this.value;
-      renderProducts(currentProdCategory, currentProdSearch, currentSort);
+      renderProducts(currentDept, currentSubcategory, currentProdSearch, currentSort);
     });
   }
 
@@ -656,7 +844,7 @@ export async function initAffiliateHub() {
       const p = await prodRes.json();
       if (Array.isArray(p) && p.length > 0) {
         allProducts = p;
-        renderProducts(currentProdCategory, currentProdSearch, currentSort);
+        renderProducts(currentDept, currentSubcategory, currentProdSearch, currentSort);
       }
     }
     if (postRes.ok) {
@@ -672,6 +860,9 @@ export async function initAffiliateHub() {
   }
 
   // Global helpers
+  window.filterByDepartment = filterByDepartment;
+  window.filterBySubCategory = filterBySubCategory;
+  window.clearActiveCategoryFilters = clearActiveCategoryFilters;
   window.showArticle = showArticle;
   window.showAllArticlesView = showAllArticlesView;
   window.sharePostDirect = sharePostDirect;

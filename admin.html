@@ -391,11 +391,42 @@
                                     <div class="form-group">
                                         <label for="prodCategory">Category</label>
                                         <select id="prodCategory">
-                                            <option value="storage">SSDs & Storage</option>
-                                            <option value="ram">RAM Modules</option>
-                                            <option value="cooling">Cooling & Thermal</option>
-                                            <option value="tools">Diagnostic Tools</option>
-                                            <option value="accessories">Accessories & Hubs</option>
+                                            <optgroup label="Components">
+                                                <option value="internal-ssds">Internal Solid State Drives (SSDs)</option>
+                                                <option value="memory-ram">Memory (RAM)</option>
+                                                <option value="motherboards">Motherboards</option>
+                                                <option value="fans-cooling">Fans & Cooling / Thermal</option>
+                                                <option value="power-supplies">Power Supplies (PSUs)</option>
+                                                <option value="processors">Processors (CPUs)</option>
+                                                <option value="graphics-cards">Graphics Cards (GPUs)</option>
+                                                <option value="computer-cases">Computer Cases & Cabinets</option>
+                                                <option value="internal-hard-drives">Internal Hard Drives (HDDs)</option>
+                                                <option value="io-port-cards">I/O Port Cards & Expansion</option>
+                                                <option value="computer-screws">Computer Screws & Standoffs</option>
+                                                <option value="barebones">Barebones Systems</option>
+                                            </optgroup>
+                                            <optgroup label="Accessories & Peripherals">
+                                                <option value="keyboards-mice">Keyboards, Mice & Input Devices</option>
+                                                <option value="adapters">Adapters & Power Bricks</option>
+                                                <option value="cables-accessories">Cables & Interconnects</option>
+                                                <option value="usb-hubs">USB Hubs & Type-C Docks</option>
+                                                <option value="laptop-accessories">Laptop Accessories & Stands</option>
+                                                <option value="uninterrupted-power-supplies">Uninterrupted Power Supplies (UPS)</option>
+                                                <option value="pc-gaming-peripherals">PC Gaming Peripherals</option>
+                                                <option value="cleaners-tools">Diagnostic Tools & Cleaners</option>
+                                                <option value="audio-video-accessories">Audio & Video Accessories</option>
+                                            </optgroup>
+                                            <optgroup label="External Devices & Data Storage">
+                                                <option value="external-hard-drives">External Hard Drives (HDDs)</option>
+                                                <option value="external-ssds">External Solid State Drives (SSDs)</option>
+                                                <option value="pen-drives">Pen Drives & Flash Storage</option>
+                                            </optgroup>
+                                            <optgroup label="Systems & Networking">
+                                                <option value="laptops">Laptops & Notebooks</option>
+                                                <option value="desktops">Desktops & All-in-Ones</option>
+                                                <option value="monitors">Monitors & Displays</option>
+                                                <option value="networking-devices">Networking Devices & Routers</option>
+                                            </optgroup>
                                         </select>
                                     </div>
                                     <div class="form-group">
@@ -503,11 +534,42 @@
                             <div class="table-filters-group">
                                 <select id="prodTableCategoryFilter" class="table-filter-select">
                                     <option value="all">All Categories</option>
-                                    <option value="storage">SSDs & Storage</option>
-                                    <option value="ram">RAM Modules</option>
-                                    <option value="cooling">Cooling & Thermal</option>
-                                    <option value="tools">Diagnostic Tools</option>
-                                    <option value="accessories">Accessories</option>
+                                    <optgroup label="Components">
+                                        <option value="internal-ssds">Internal SSDs</option>
+                                        <option value="memory-ram">Memory (RAM)</option>
+                                        <option value="motherboards">Motherboards</option>
+                                        <option value="fans-cooling">Fans & Cooling</option>
+                                        <option value="power-supplies">Power Supplies</option>
+                                        <option value="processors">Processors</option>
+                                        <option value="graphics-cards">Graphics Cards</option>
+                                        <option value="computer-cases">Computer Cases</option>
+                                        <option value="internal-hard-drives">Internal HDDs</option>
+                                        <option value="io-port-cards">I/O Port Cards</option>
+                                        <option value="computer-screws">Computer Screws</option>
+                                        <option value="barebones">Barebones</option>
+                                    </optgroup>
+                                    <optgroup label="Accessories & Peripherals">
+                                        <option value="keyboards-mice">Keyboards & Mice</option>
+                                        <option value="adapters">Adapters</option>
+                                        <option value="cables-accessories">Cables & Interconnects</option>
+                                        <option value="usb-hubs">USB Hubs & Docks</option>
+                                        <option value="laptop-accessories">Laptop Accessories</option>
+                                        <option value="uninterrupted-power-supplies">UPS Units</option>
+                                        <option value="pc-gaming-peripherals">Gaming Peripherals</option>
+                                        <option value="cleaners-tools">Tools & Cleaners</option>
+                                        <option value="audio-video-accessories">Audio & Video</option>
+                                    </optgroup>
+                                    <optgroup label="External Devices & Data Storage">
+                                        <option value="external-hard-drives">External HDDs</option>
+                                        <option value="external-ssds">External SSDs</option>
+                                        <option value="pen-drives">Pen Drives</option>
+                                    </optgroup>
+                                    <optgroup label="Systems & Networking">
+                                        <option value="laptops">Laptops</option>
+                                        <option value="desktops">Desktops</option>
+                                        <option value="monitors">Monitors</option>
+                                        <option value="networking-devices">Networking</option>
+                                    </optgroup>
                                 </select>
                                 <select id="prodTableSort" class="table-filter-select">
                                     <option value="default">Default Order</option>
@@ -886,7 +948,7 @@
 
     <!-- Scripts -->
     <script type="module">
-        import * as AdminStudio from "./js/modules/adminStudio.js?v=20260821_og2";
+        import * as AdminStudio from "./js/modules/adminStudio.js?v=20260822_amzcat";
         window.AdminStudio = AdminStudio;
         Object.assign(window, AdminStudio);
         window.extractAmazonProductWithAI = AdminStudio.extractAmazonProductWithAI;
