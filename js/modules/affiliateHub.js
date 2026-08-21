@@ -272,9 +272,8 @@ function setupSocialShareButtons(post, prefix = "single") {
   const shareUrl = getPostShareUrl(post);
   const shareTitle = post.title;
   const shareText = `${shareTitle} - Read this technical diagnostic guide by MP2TECH Mumbai:`;
-
   // WhatsApp
-  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + "\n\n" + shareUrl)}`;
+  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareUrl)}`;
   const waTop = document.getElementById(`${prefix}ShareWhatsapp`);
   const waBottom = document.getElementById(`${prefix}ShareWhatsappBottom`);
   if (waTop) waTop.href = waUrl;
@@ -319,15 +318,21 @@ function setupSocialShareButtons(post, prefix = "single") {
   };
 
   if (cpTop) {
-    cpTop.onclick = () => copyHandler(cpTop, `${prefix}CopyLinkText`);
+    cpTop.onclick = (e) => {
+      e.preventDefault();
+      copyHandler(cpTop, `${prefix}CopyLinkText`);
+    };
   }
   if (cpBottom) {
-    cpBottom.onclick = () => copyHandler(cpBottom, `${prefix}CopyLinkTextBottom`);
+    cpBottom.onclick = (e) => {
+      e.preventDefault();
+      copyHandler(cpBottom, `${prefix}CopyLinkTextBottom`);
+    };
   }
 }
 
 /**
- * Show Dedicated Full-Page Article View
+ * Open Single Article View
  */
 export function showArticle(identifier, updateHistory = true) {
   const post = allPosts.find(
@@ -338,8 +343,7 @@ export function showArticle(identifier, updateHistory = true) {
   );
 
   if (!post) {
-    // If not found, show catalog
-    showAllArticlesView(false);
+    showAllArticlesView();
     return;
   }
 
@@ -347,36 +351,44 @@ export function showArticle(identifier, updateHistory = true) {
 
   const singleSection = document.getElementById("singleArticleSection");
   const allSection = document.getElementById("allArticlesSection");
-
   if (!singleSection || !allSection) return;
 
-  // Populate Single Article View
-  document.getElementById("singleCategory").textContent = post.categoryName || post.category;
-  document.getElementById("singleTitle").textContent = post.title;
-  document.getElementById("singleDate").innerHTML = `<i class="fa fa-calendar-o"></i> ${post.date}`;
-  document.getElementById("singleReadTime").innerHTML = `<i class="fa fa-clock-o"></i> ${post.readTime}`;
-  
-  const imgEl = document.getElementById("singleImage");
+  // Populate Single Post DOM
+  const catEl = document.getElementById("singleCategory") || document.getElementById("singleArticleCategory");
+  const titleEl = document.getElementById("singleTitle") || document.getElementById("singleArticleTitle");
+  const dateEl = document.getElementById("singleDate") || document.getElementById("singleArticleDate");
+  const readTimeEl = document.getElementById("singleReadTime") || document.getElementById("singleArticleReadTime");
+  const imgEl = document.getElementById("singleImage") || document.getElementById("singleArticleImage");
+  const excerptEl = document.getElementById("singleExcerpt") || document.getElementById("singleArticleExcerpt");
+  const bodyEl = document.getElementById("singleBody") || document.getElementById("singleArticleBody");
+
+  if (catEl) catEl.textContent = post.categoryName || post.category || "General";
+  if (titleEl) titleEl.textContent = post.title;
+  if (dateEl) dateEl.innerHTML = `<i class="fa fa-calendar-o"></i> ${post.date}`;
+  if (readTimeEl) readTimeEl.innerHTML = `<i class="fa fa-clock-o"></i> ${post.readTime}`;
   if (imgEl) {
     imgEl.src = post.image;
     imgEl.alt = post.title;
   }
+  if (excerptEl) excerptEl.textContent = post.excerpt;
+  if (bodyEl) bodyEl.innerHTML = post.body;
 
-  document.getElementById("singleBody").innerHTML = post.body;
-
-  // Setup social share links
+  // Setup Social Sharing Buttons
   setupSocialShareButtons(post, "single");
 
-  // Render related Amazon hardware products
-  const relContainer = document.getElementById("singleRelatedProducts");
+  // In-Article Related Hardware
+  const relContainer = document.getElementById("singleRelatedProducts") || document.getElementById("inArticleRelatedProducts");
   if (relContainer) {
-    if (post.relatedProductIds && post.relatedProductIds.length > 0) {
-      const relProducts = allProducts.filter((p) => post.relatedProductIds.includes(p.id));
+    if (Array.isArray(post.relatedProductIds) && post.relatedProductIds.length > 0) {
+      const relProducts = allProducts.filter((p) =>
+        post.relatedProductIds.some((rId) => String(rId) === String(p.id))
+      );
+
       if (relProducts.length > 0) {
         relContainer.innerHTML = `
-          <div class="in-article-affiliate-box">
-            <div class="affiliate-box-header">
-              <span class="affiliate-box-title"><i class="fa fa-amazon" style="color:#ff9900"></i> Recommended Hardware & Tools for this Guide</span>
+          <div class="in-article-hardware-box">
+            <div class="in-article-box-header">
+              <h3><i class="fa fa-wrench"></i> Recommended Upgrade Hardware for this Guide</h3>
               <span class="affiliate-tag-badge">Genuine Amazon Links</span>
             </div>
             <div class="in-article-product-grid">
@@ -400,11 +412,6 @@ export function showArticle(identifier, updateHistory = true) {
                 })
                 .join("")}
             </div>
-            <div style="text-align:center; padding-top: 16px; border-top: 1px dashed #e2e8f0; margin-top: 16px;">
-              <a href="deals.html" class="nav-deals-btn">
-                <i class="fa fa-shopping-bag"></i> Explore Full MP2TECH Store ➔
-              </a>
-            </div>
           </div>
         `;
         relContainer.style.display = "block";
@@ -420,11 +427,15 @@ export function showArticle(identifier, updateHistory = true) {
   allSection.style.display = "none";
   singleSection.style.display = "block";
 
-  // Update browser URL query parameter
-  if (updateHistory && window.history && window.history.pushState) {
-    const slugOrId = post.slug || post.id;
-    const newUrl = `${window.location.pathname}?post=${encodeURIComponent(slugOrId)}`;
-    window.history.pushState({ postId: post.id, slug: post.slug }, post.title, newUrl);
+  // Update browser URL query parameter & address bar to direct article URL
+  if (updateHistory && window.history && window.history.replaceState) {
+    const slugOrId = post.slug || `post-${post.id}`;
+    const newUrl = `articles/${encodeURIComponent(slugOrId)}.html`;
+    try {
+      window.history.replaceState({ postId: post.id, slug: post.slug }, post.title, newUrl);
+    } catch (e) {
+      window.history.replaceState({ postId: post.id, slug: post.slug }, post.title, `blog.html?post=${encodeURIComponent(slugOrId)}`);
+    }
     document.title = `${post.title} | MP2TECH Diagnostic Guides`;
   }
 
