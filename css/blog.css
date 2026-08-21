@@ -222,199 +222,225 @@
 }
 
 /* --------------------------------------------------------------------------
-   2. Full-Width Streamlined Store Filter Navigation Bar (Matching Screenshot)
+   2. GST Portal-Style Multi-Tier Storefront Navigation Bar
    -------------------------------------------------------------------------- */
-.store-filter-section {
+.portal-nav-section {
   background: #ffffff;
-  padding: 24px 0 14px 0;
-  border-bottom: 1px solid #e2e8f0;
+  position: relative;
+  z-index: 90;
 }
 
-.store-filter-row-top {
+/* Tier 1: Main Dark Navy Navigation Bar (Matches GST Portal Screenshot) */
+.portal-main-bar {
+  background: #173b75; /* Official GST Portal Navy Blue */
+  padding: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.portal-bar-inner {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 14px;
+  gap: 8px;
 }
 
 @media (min-width: 992px) {
-  .store-filter-row-top {
+  .portal-bar-inner {
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
     justify-content: space-between;
   }
 }
 
-/* Department Tabs */
-.department-tabs-wrap {
+.portal-tabs-list {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 1px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  margin: 0;
+  padding: 0;
 }
 
-.dept-tab-btn {
-  background: #3898ec;
-  color: #ffffff;
+.portal-tabs-list::-webkit-scrollbar {
+  display: none;
+}
+
+.portal-tab-btn {
+  background: transparent;
+  color: #dbeafe;
   border: none;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  padding: 10px 18px;
-  border-radius: 4px;
+  padding: 13px 18px;
   cursor: pointer;
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   transition: all 0.15s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-radius: 0;
+  line-height: 1.2;
 }
 
-.dept-tab-btn:hover {
-  background: #2782d2;
-  transform: translateY(-1px);
+.portal-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
 }
 
-.dept-tab-btn.active {
-  background: #0284c7;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(2, 132, 199, 0.3);
+/* Active tab style matches GST Portal Services / Home tab */
+.portal-tab-btn.active {
+  background: #ffffff !important;
+  color: #173b75 !important;
+  font-weight: 800;
 }
 
-/* Top Search & Sort */
-.store-top-controls {
+.portal-tab-btn[data-department="all"].active {
+  background: #00b4d8 !important; /* Teal/Cyan highlight like GST Portal Home tab */
+  color: #ffffff !important;
+}
+
+.portal-caret {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-left: 2px;
+}
+
+/* Search & Sort inside Main Bar */
+.portal-top-controls {
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 6px 0;
   flex-wrap: wrap;
 }
 
-.store-top-controls .nav-search-box {
+.portal-search-box {
   position: relative;
-  width: 250px;
+  width: 230px;
   max-width: 100%;
 }
 
-.store-top-controls .nav-search-box .nav-search-icon {
+.portal-search-box .portal-search-icon {
   position: absolute;
-  left: 12px;
+  left: 10px;
   top: 50%;
   transform: translateY(-50%);
   color: #94a3b8;
-  font-size: 13px;
+  font-size: 12px;
   pointer-events: none;
 }
 
-.store-top-controls .nav-search-input {
+.portal-search-input {
   width: 100% !important;
   box-sizing: border-box !important;
-  padding: 8px 30px 8px 34px !important;
-  height: 38px !important;
-  background: #f8fafc !important;
+  padding: 6px 26px 6px 30px !important;
+  height: 32px !important;
+  background: #ffffff !important;
   border: 1px solid #cbd5e1 !important;
-  border-radius: 20px !important;
-  font-size: 13px !important;
+  border-radius: 4px !important;
+  font-size: 12.5px !important;
   color: #0f172a !important;
   outline: none !important;
-  transition: var(--transition) !important;
 }
 
-.store-top-controls .nav-search-input:focus {
-  background: #ffffff !important;
-  border-color: #3898ec !important;
-  box-shadow: 0 0 0 3px rgba(56, 152, 236, 0.15) !important;
+.portal-search-input:focus {
+  border-color: #00b4d8 !important;
+  box-shadow: 0 0 0 2px rgba(0, 180, 216, 0.2) !important;
 }
 
-.store-top-controls .nav-search-clear {
+.portal-search-clear {
   position: absolute;
-  right: 10px;
+  right: 6px;
   top: 50%;
   transform: translateY(-50%);
   background: #cbd5e1;
   border: none;
   color: #334155;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   display: none;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 10px;
 }
 
-.store-top-controls .sort-filter-select {
-  padding: 6px 14px;
-  height: 38px;
+.portal-sort-select {
+  padding: 4px 10px;
+  height: 32px;
   border: 1px solid #cbd5e1;
-  border-radius: 20px;
-  font-size: 12.5px;
+  border-radius: 4px;
+  font-size: 12px;
   font-weight: 600;
-  color: #334155;
+  color: #0f172a;
   background: #ffffff;
   outline: none;
   cursor: pointer;
 }
 
-/* Subcategory Pills Grid (Auto-Toggled by Active Department) */
-.subcategory-pills-wrap {
-  margin-top: 12px;
-  padding: 12px 16px;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-}
-
-.subcategory-pills-grid {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 10px;
-}
-
-.subcat-pill {
+/* Tier 2: Sub-Menu Horizontal Strip (Clean White Theme like GST Portal) */
+.portal-subnav-strip {
   background: #ffffff;
-  color: #1e293b;
-  border: 1px solid #cbd5e1;
-  font-size: 12.5px;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+}
+
+.portal-subnav-inner {
+  display: flex;
+  align-items: center;
+  gap: 6px 20px;
+  padding: 10px 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+  flex-wrap: wrap;
+}
+
+.portal-subnav-inner::-webkit-scrollbar {
+  height: 4px;
+}
+
+.portal-subnav-item {
+  color: #1e3a8a;
+  font-size: 13.5px;
   font-weight: 600;
-  letter-spacing: 0.2px;
-  padding: 7px 14px;
-  border-radius: 6px;
-  cursor: pointer;
+  text-decoration: none !important;
+  padding: 5px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   transition: all 0.15s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
 }
 
-.subcat-pill:hover {
+.portal-subnav-item:hover {
+  color: #0284c7;
+  background: #f0f9ff;
+  text-decoration: underline !important;
+}
+
+.portal-subnav-item.active {
+  color: #0284c7 !important;
+  font-weight: 800;
   background: #e0f2fe;
-  color: #0369a1;
-  border-color: #7dd3fc;
-  transform: translateY(-1px);
 }
 
-.subcat-pill.active {
-  background: #0284c7;
-  color: #ffffff;
-  border-color: #0284c7;
-  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3);
-}
-
-.subcat-pill span.subcat-count {
+.portal-subnav-count {
   font-size: 11px;
+  color: #64748b;
   font-weight: 700;
-  opacity: 0.85;
-  background: rgba(0, 0, 0, 0.06);
+  background: #f1f5f9;
   padding: 1px 6px;
   border-radius: 10px;
 }
 
-.subcat-pill.active span.subcat-count {
-  background: rgba(255, 255, 255, 0.25);
-  color: #ffffff;
+.portal-subnav-item.active .portal-subnav-count {
+  background: #bae6fd;
+  color: #0369a1;
 }
 
 /* Active Filter Strip */

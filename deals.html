@@ -115,59 +115,65 @@
     </header>
     <!-- Header Ends -->
 
-    <!-- DIRECT STREAMLINED AMAZON STOREFRONT NAVIGATION & FILTERS -->
-    <section class="store-filter-section" id="storeFilters">
-        <div class="container">
-            
-            <!-- Row 1: Department Tabs + Search & Sort -->
-            <div class="store-filter-row-top">
-                <!-- Left: Department Tabs -->
-                <div class="department-tabs-wrap" id="departmentTabsWrap">
-                    <button type="button" class="dept-tab-btn active" data-department="all">
-                        <i class="fa fa-th-large"></i> ALL DEPARTMENTS
-                    </button>
-                    <button type="button" class="dept-tab-btn" data-department="components">
-                        <i class="fa fa-microchip"></i> COMPONENTS
-                    </button>
-                    <button type="button" class="dept-tab-btn" data-department="accessories">
-                        <i class="fa fa-keyboard-o"></i> ACCESSORIES &amp; PERIPHERALS
-                    </button>
-                    <button type="button" class="dept-tab-btn" data-department="external-storage">
-                        <i class="fa fa-hdd-o"></i> EXTERNAL STORAGE
-                    </button>
-                    <button type="button" class="dept-tab-btn" data-department="systems-networking">
-                        <i class="fa fa-laptop"></i> SYSTEMS &amp; NETWORKING
-                    </button>
-                </div>
+    <!-- GST PORTAL-STYLE MULTI-TIER STOREFRONT NAVIGATION -->
+    <section class="portal-nav-section" id="storeFilters">
+        
+        <!-- Tier 1: Main Department Navigation Bar (GST Portal Dark Theme) -->
+        <div class="portal-main-bar">
+            <div class="container">
+                <div class="portal-bar-inner">
+                    <!-- Left: Department Tabs with Caret -->
+                    <nav class="portal-tabs-list" id="departmentTabsWrap">
+                        <button type="button" class="portal-tab-btn active" data-department="all">
+                            <i class="fa fa-th-large"></i> All Products
+                        </button>
+                        <button type="button" class="portal-tab-btn" data-department="components">
+                            <i class="fa fa-microchip"></i> Components <i class="fa fa-caret-down portal-caret"></i>
+                        </button>
+                        <button type="button" class="portal-tab-btn" data-department="accessories">
+                            <i class="fa fa-keyboard-o"></i> Accessories &amp; Peripherals <i class="fa fa-caret-down portal-caret"></i>
+                        </button>
+                        <button type="button" class="portal-tab-btn" data-department="external-storage">
+                            <i class="fa fa-hdd-o"></i> External Storage <i class="fa fa-caret-down portal-caret"></i>
+                        </button>
+                        <button type="button" class="portal-tab-btn" data-department="systems-networking">
+                            <i class="fa fa-laptop"></i> Systems &amp; Networking <i class="fa fa-caret-down portal-caret"></i>
+                        </button>
+                    </nav>
 
-                <!-- Right: Search & Sort Controls -->
-                <div class="store-top-controls">
-                    <div class="nav-search-box">
-                        <i class="fa fa-search nav-search-icon"></i>
-                        <input type="text" id="heroSearchInput" class="nav-search-input" placeholder="Search hardware, SSDs, RAM, tools..." autocomplete="off" />
-                        <button type="button" id="clearSearchBtn" class="nav-search-clear" title="Clear search">&times;</button>
+                    <!-- Right: Search & Sort Controls -->
+                    <div class="portal-top-controls">
+                        <div class="portal-search-box">
+                            <i class="fa fa-search portal-search-icon"></i>
+                            <input type="text" id="heroSearchInput" class="portal-search-input" placeholder="Search hardware, SSDs, RAM..." autocomplete="off" />
+                            <button type="button" id="clearSearchBtn" class="portal-search-clear" title="Clear search">&times;</button>
+                        </div>
+                        <select id="productSortSelect" class="portal-sort-select" aria-label="Sort products">
+                            <option value="default">Sort: Recommended</option>
+                            <option value="price-asc">Price: Low to High</option>
+                            <option value="price-desc">Price: High to Low</option>
+                            <option value="rating">Highest Rated</option>
+                            <option value="name">Product Name (A-Z)</option>
+                        </select>
                     </div>
-                    <select id="productSortSelect" class="sort-filter-select" aria-label="Sort products">
-                        <option value="default">Sort: Recommended</option>
-                        <option value="price-asc">Price: Low to High</option>
-                        <option value="price-desc">Price: High to Low</option>
-                        <option value="rating">Highest Rated</option>
-                        <option value="name">Product Name (A-Z)</option>
-                    </select>
                 </div>
             </div>
+        </div>
 
-            <!-- Row 2: Subcategory Pills -->
-            <div class="subcategory-pills-wrap" id="subcategoryPillsWrap">
-                <div class="subcategory-pills-grid" id="subcategoryPillsContainer">
+        <!-- Tier 2: Sub-Menu Horizontal Strip (Clean White Theme like GST Portal) -->
+        <div class="portal-subnav-strip" id="subcategoryPillsWrap">
+            <div class="container">
+                <div class="portal-subnav-inner" id="subcategoryPillsContainer">
                     <!-- Populated dynamically by affiliateHub.js -->
                 </div>
             </div>
+        </div>
 
-            <!-- Row 3: Active Filters & Breadcrumbs Strip (Visible when filtered) -->
+        <!-- Tier 3: Active Filters & Breadcrumbs Strip (Visible when filtered) -->
+        <div class="container">
             <div class="active-filter-strip" id="activeFilterStrip" style="display:none;">
                 <div class="active-filter-breadcrumbs">
-                    <span class="breadcrumb-label"><i class="fa fa-filter"></i> Viewing:</span>
+                    <span class="breadcrumb-label"><i class="fa fa-filter"></i> Active Filter:</span>
                     <span class="breadcrumb-dept" id="activeDeptName">All Departments</span>
                     <i class="fa fa-angle-right breadcrumb-sep" id="activeBreadcrumbSep" style="display:none;"></i>
                     <span class="breadcrumb-subcat" id="activeSubcatName" style="display:none;"></span>
@@ -176,8 +182,8 @@
                     <i class="fa fa-times-circle"></i> Clear Filter
                 </button>
             </div>
-
         </div>
+
     </section>
 
     <!-- MAIN PRODUCTS CATALOG SECTION -->
@@ -257,6 +263,6 @@
 
     <!-- Scripts -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script type="module" src="js/app.js?v=20260822_amzautohide"></script>
+    <script type="module" src="js/app.js?v=20260822_gstportal"></script>
 </body>
 </html>
