@@ -115,7 +115,7 @@
     </header>
     <!-- Header Ends -->
 
-    <!-- STREAMLINED WORLD-CLASS STOREFRONT HERO -->
+    <!-- STREAMLINED WORLD-CLASS STOREFRONT HEADER BAR -->
     <section class="storefront-header-bar">
         <div class="container">
             <div class="storefront-toolbar">
@@ -129,118 +129,9 @@
                     <p class="hero-subtext">
                         Benchmarked SSDs, RAM, cooling solutions, and repair tools verified in our lab.
                     </p>
-                    <div class="hero-trust-bar">
-                        <span><i class="fa fa-shield"></i> 100% Genuine</span>
-                        <span><i class="fa fa-bolt"></i> Speed Benchmarked</span>
-                        <span><i class="fa fa-amazon"></i> Prime Delivery</span>
-                    </div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- AMAZON-STYLE FEATURED CATEGORIES VISUAL CIRCLE RIBBON -->
-    <section class="featured-categories-ribbon">
-        <div class="container">
-            <div class="featured-cat-header">
-                <div>
-                    <h3 class="featured-cat-title"><i class="fa fa-th-large" style="color:var(--amz-orange);"></i> Featured Hardware Categories</h3>
-                    <span class="featured-cat-subtitle">Browse official Amazon component & peripheral categories</span>
-                </div>
-                <div class="featured-cat-scroll-btns">
-                    <button type="button" class="cat-scroll-btn prev" id="catScrollPrev" aria-label="Scroll left"><i class="fa fa-chevron-left"></i></button>
-                    <button type="button" class="cat-scroll-btn next" id="catScrollNext" aria-label="Scroll right"><i class="fa fa-chevron-right"></i></button>
-                </div>
-            </div>
-            
-            <div class="featured-cat-carousel" id="featuredCatGrid">
-                <!-- Dynamically populated or rendered from categories.js -->
-                <div class="featured-cat-item" data-category="internal-ssds" onclick="window.filterBySubCategory('internal-ssds')">
-                    <div class="featured-cat-circle">
-                        <img src="https://m.media-amazon.com/images/I/61YaG1YInzL._SL1342_.jpg" alt="Internal SSDs" onerror="this.src='img/service.jpg'" />
-                    </div>
-                    <span class="featured-cat-label">Internal SSDs</span>
-                </div>
-                <div class="featured-cat-item" data-category="memory-ram" onclick="window.filterBySubCategory('memory-ram')">
-                    <div class="featured-cat-circle">
-                        <img src="https://m.media-amazon.com/images/I/515m2W95tPL._SL1100_.jpg" alt="Memory (RAM)" onerror="this.src='img/service.jpg'" />
-                    </div>
-                    <span class="featured-cat-label">Memory (RAM)</span>
-                </div>
-                <div class="featured-cat-item" data-category="motherboards" onclick="window.filterBySubCategory('motherboards')">
-                    <div class="featured-cat-circle">
-                        <img src="https://images-na.ssl-images-amazon.com/images/P/B0C4ZQXM6X.01.LZZZZZZZ.jpg" alt="Motherboards" onerror="this.src='img/service.jpg'" />
-                    </div>
-                    <span class="featured-cat-label">Motherboards</span>
-                </div>
-                <div class="featured-cat-item" data-category="fans-cooling" onclick="window.filterBySubCategory('fans-cooling')">
-                    <div class="featured-cat-circle">
-                        <img src="https://m.media-amazon.com/images/I/61tJ0W7zV+L._SL1000_.jpg" alt="Fans & Cooling" onerror="this.src='img/service.jpg'" />
-                    </div>
-                    <span class="featured-cat-label">Fans & Cooling</span>
-                </div>
-                <div class="featured-cat-item" data-category="power-supplies" onclick="window.filterBySubCategory('power-supplies')">
-                    <div class="featured-cat-circle">
-                        <img src="https://m.media-amazon.com/images/I/71YyP9f1UYL._SL1500_.jpg" alt="Power Supplies" onerror="this.src='img/service.jpg'" />
-                    </div>
-                    <span class="featured-cat-label">Power Supplies</span>
-                </div>
-                <div class="featured-cat-item" data-category="processors" onclick="window.filterBySubCategory('processors')">
-                    <div class="featured-cat-circle">
-                        <img src="https://m.media-amazon.com/images/I/51w7w00Z9xL._SL1000_.jpg" alt="Processors" onerror="this.src='img/service.jpg'" />
-                    </div>
-                    <span class="featured-cat-label">Processors</span>
-                </div>
-                <div class="featured-cat-item" data-category="graphics-cards" onclick="window.filterBySubCategory('graphics-cards')">
-                    <div class="featured-cat-circle">
-                        <img src="https://m.media-amazon.com/images/I/71h6PpGaq3L._SL1500_.jpg" alt="Graphics Cards" onerror="this.src='img/service.jpg'" />
-                    </div>
-                    <span class="featured-cat-label">Graphics Cards</span>
-                </div>
-                <div class="featured-cat-item" data-category="external-hard-drives" onclick="window.filterBySubCategory('external-hard-drives')">
-                    <div class="featured-cat-circle">
-                        <img src="https://m.media-amazon.com/images/I/81uLs51EWeL._SL1500_.jpg" alt="External HDDs" onerror="this.src='img/service.jpg'" />
-                    </div>
-                    <span class="featured-cat-label">External HDDs</span>
-                </div>
-                <div class="featured-cat-item" data-category="keyboards-mice" onclick="window.filterBySubCategory('keyboards-mice')">
-                    <div class="featured-cat-circle">
-                        <img src="https://m.media-amazon.com/images/I/711vfmr7pOL._SL1500_.jpg" alt="Keyboards & Mice" onerror="this.src='img/service.jpg'" />
-                    </div>
-                    <span class="featured-cat-label">Keyboards & Mice</span>
-                </div>
-                <div class="featured-cat-item" data-category="adapters" onclick="window.filterBySubCategory('adapters')">
-                    <div class="featured-cat-circle">
-                        <img src="https://images-na.ssl-images-amazon.com/images/P/B098K3H92Z.01.LZZZZZZZ.jpg" alt="Adapters" onerror="this.src='img/service.jpg'" />
-                    </div>
-                    <span class="featured-cat-label">Adapters</span>
-                </div>
-                <div class="featured-cat-item" data-category="cleaners-tools" onclick="window.filterBySubCategory('cleaners-tools')">
-                    <div class="featured-cat-circle">
-                        <img src="https://m.media-amazon.com/images/I/71c6S-9Y1WL._SL1500_.jpg" alt="Tools & Cleaners" onerror="this.src='img/service.jpg'" />
-                    </div>
-                    <span class="featured-cat-label">Tools & Cleaners</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- STICKY UNIFIED DEPARTMENT & SEARCH TOOLBAR -->
-    <nav class="category-filter-nav">
-        <div class="container">
-            <!-- Row 1: Main Departments & Search -->
-            <div class="category-nav-container">
-                <!-- Left: Department Tabs -->
-                <div class="department-tabs-wrap" id="departmentTabsWrap">
-                    <button class="dept-tab-btn active" data-department="all"><i class="fa fa-th-large"></i> All Departments</button>
-                    <button class="dept-tab-btn" data-department="components"><i class="fa fa-microchip"></i> Components</button>
-                    <button class="dept-tab-btn" data-department="accessories"><i class="fa fa-keyboard-o"></i> Accessories & Peripherals</button>
-                    <button class="dept-tab-btn" data-department="external-storage"><i class="fa fa-hdd-o"></i> External Storage</button>
-                    <button class="dept-tab-btn" data-department="systems-networking"><i class="fa fa-laptop"></i> Systems & Networking</button>
-                </div>
-
-                <!-- Right: Search & Sort Controls -->
-                <div class="category-controls-wrap">
+                <!-- Search & Sort Controls -->
+                <div class="store-top-controls">
                     <div class="nav-search-box">
                         <i class="fa fa-search nav-search-icon"></i>
                         <input type="text" id="heroSearchInput" class="nav-search-input" placeholder="Search hardware, SSDs, RAM, tools..." autocomplete="off" />
@@ -255,41 +146,156 @@
                     </select>
                 </div>
             </div>
-
-            <!-- Row 2: Subcategory Specific Filter Ribbon -->
-            <div class="subcategory-ribbon-wrap" id="subcategoryRibbonWrap">
-                <div class="subcategory-pills" id="subcategoryPillsContainer">
-                    <!-- Populated dynamically based on selected Department -->
-                </div>
-            </div>
-
-            <!-- Row 3: Active Filters & Breadcrumb Strip (Visible when filtered) -->
-            <div class="active-filter-strip" id="activeFilterStrip" style="display:none;">
-                <div class="active-filter-breadcrumbs">
-                    <span class="breadcrumb-label"><i class="fa fa-filter"></i> Active Filter:</span>
-                    <span class="breadcrumb-dept" id="activeDeptName">Components</span>
-                    <i class="fa fa-angle-right breadcrumb-sep" id="activeBreadcrumbSep"></i>
-                    <span class="breadcrumb-subcat" id="activeSubcatName">Internal Solid State Drives</span>
-                </div>
-                <button type="button" class="clear-filter-btn" id="clearAllFiltersBtn" onclick="window.clearActiveCategoryFilters()">
-                    <i class="fa fa-times-circle"></i> Clear Filter
-                </button>
-            </div>
         </div>
-    </nav>
+    </section>
 
-    <!-- MAIN PRODUCTS SHOWCASE -->
+    <!-- MAIN TWO-COLUMN STORE LAYOUT (AMAZON-GRADE ARCHITECTURE) -->
     <main class="products-section" id="products">
         <div class="container">
-            <div class="section-title-wrap">
-                <h2><i class="fa fa-shopping-bag" style="color:var(--amz-orange);"></i> <span id="catalogSectionTitle">Verified Hardware Catalog</span></h2>
-                <span class="product-count" id="productCounter">15 Verified Products</span>
+            
+            <div class="store-layout-grid">
+                
+                <!-- LEFT COLUMN: AMAZON CATEGORY & REFINEMENT SIDEBAR -->
+                <aside class="store-sidebar" id="storeSidebar">
+                    <div class="sidebar-header-mobile">
+                        <span><i class="fa fa-sliders"></i> Filter Hardware</span>
+                        <button type="button" class="sidebar-close-btn" id="closeSidebarBtn" aria-label="Close Filters">&times;</button>
+                    </div>
+
+                    <!-- Category Hierarchy (Matching Amazon India) -->
+                    <div class="sidebar-widget">
+                        <div class="sidebar-widget-header">
+                            <h3 class="sidebar-widget-title">Category</h3>
+                            <button type="button" class="sidebar-reset-btn" onclick="window.clearActiveCategoryFilters()">Clear</button>
+                        </div>
+                        
+                        <div class="amz-category-tree" id="amazonCategoryTree">
+                            <!-- All Categories Reset -->
+                            <div class="tree-dept-item">
+                                <a href="javascript:void(0)" class="tree-dept-link active" data-dept="all" onclick="window.filterByDepartment('all')">
+                                    <i class="fa fa-th-large"></i> All Departments
+                                </a>
+                            </div>
+
+                            <!-- Department 1: Components -->
+                            <div class="tree-dept-group" data-dept="components">
+                                <a href="javascript:void(0)" class="tree-dept-title" onclick="window.filterByDepartment('components')">
+                                    <i class="fa fa-microchip"></i> Components
+                                </a>
+                                <ul class="tree-subcat-list">
+                                    <li><a href="javascript:void(0)" data-subcat="internal-ssds" onclick="window.filterBySubCategory('internal-ssds')">Internal Solid State Drives <span class="cat-count-pill" data-count-for="internal-ssds"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="memory-ram" onclick="window.filterBySubCategory('memory-ram')">Memory (RAM) <span class="cat-count-pill" data-count-for="memory-ram"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="motherboards" onclick="window.filterBySubCategory('motherboards')">Motherboards <span class="cat-count-pill" data-count-for="motherboards"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="fans-cooling" onclick="window.filterBySubCategory('fans-cooling')">Fans & Cooling <span class="cat-count-pill" data-count-for="fans-cooling"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="power-supplies" onclick="window.filterBySubCategory('power-supplies')">Power Supplies (PSUs) <span class="cat-count-pill" data-count-for="power-supplies"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="processors" onclick="window.filterBySubCategory('processors')">Processors (CPUs) <span class="cat-count-pill" data-count-for="processors"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="graphics-cards" onclick="window.filterBySubCategory('graphics-cards')">Graphics Cards (GPUs) <span class="cat-count-pill" data-count-for="graphics-cards"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="computer-cases" onclick="window.filterBySubCategory('computer-cases')">Computer Cases & Cabinets <span class="cat-count-pill" data-count-for="computer-cases"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="internal-hard-drives" onclick="window.filterBySubCategory('internal-hard-drives')">Internal Hard Drives (HDDs) <span class="cat-count-pill" data-count-for="internal-hard-drives"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="io-port-cards" onclick="window.filterBySubCategory('io-port-cards')">I/O Port Cards <span class="cat-count-pill" data-count-for="io-port-cards"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="computer-screws" onclick="window.filterBySubCategory('computer-screws')">Computer Screws & Standoffs <span class="cat-count-pill" data-count-for="computer-screws"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="barebones" onclick="window.filterBySubCategory('barebones')">Barebones Systems <span class="cat-count-pill" data-count-for="barebones"></span></a></li>
+                                </ul>
+                            </div>
+
+                            <!-- Department 2: Accessories & Peripherals -->
+                            <div class="tree-dept-group" data-dept="accessories">
+                                <a href="javascript:void(0)" class="tree-dept-title" onclick="window.filterByDepartment('accessories')">
+                                    <i class="fa fa-keyboard-o"></i> Accessories & Peripherals
+                                </a>
+                                <ul class="tree-subcat-list">
+                                    <li><a href="javascript:void(0)" data-subcat="keyboards-mice" onclick="window.filterBySubCategory('keyboards-mice')">Keyboards, Mice & Input <span class="cat-count-pill" data-count-for="keyboards-mice"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="adapters" onclick="window.filterBySubCategory('adapters')">Adapters & Power Bricks <span class="cat-count-pill" data-count-for="adapters"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="cables-accessories" onclick="window.filterBySubCategory('cables-accessories')">Cables & Interconnects <span class="cat-count-pill" data-count-for="cables-accessories"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="usb-hubs" onclick="window.filterBySubCategory('usb-hubs')">USB Hubs & Type-C Docks <span class="cat-count-pill" data-count-for="usb-hubs"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="laptop-accessories" onclick="window.filterBySubCategory('laptop-accessories')">Laptop Stands & Sleeves <span class="cat-count-pill" data-count-for="laptop-accessories"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="uninterrupted-power-supplies" onclick="window.filterBySubCategory('uninterrupted-power-supplies')">UPS Units <span class="cat-count-pill" data-count-for="uninterrupted-power-supplies"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="cleaners-tools" onclick="window.filterBySubCategory('cleaners-tools')">Diagnostic Tools & Cleaners <span class="cat-count-pill" data-count-for="cleaners-tools"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="audio-video-accessories" onclick="window.filterBySubCategory('audio-video-accessories')">Audio & Video Accessories <span class="cat-count-pill" data-count-for="audio-video-accessories"></span></a></li>
+                                </ul>
+                            </div>
+
+                            <!-- Department 3: External Storage -->
+                            <div class="tree-dept-group" data-dept="external-storage">
+                                <a href="javascript:void(0)" class="tree-dept-title" onclick="window.filterByDepartment('external-storage')">
+                                    <i class="fa fa-hdd-o"></i> External Devices & Storage
+                                </a>
+                                <ul class="tree-subcat-list">
+                                    <li><a href="javascript:void(0)" data-subcat="external-hard-drives" onclick="window.filterBySubCategory('external-hard-drives')">External Hard Drives (HDDs) <span class="cat-count-pill" data-count-for="external-hard-drives"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="external-ssds" onclick="window.filterBySubCategory('external-ssds')">External Solid State Drives <span class="cat-count-pill" data-count-for="external-ssds"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="pen-drives" onclick="window.filterBySubCategory('pen-drives')">Pen Drives & Flash Storage <span class="cat-count-pill" data-count-for="pen-drives"></span></a></li>
+                                </ul>
+                            </div>
+
+                            <!-- Department 4: Systems & Networking -->
+                            <div class="tree-dept-group" data-dept="systems-networking">
+                                <a href="javascript:void(0)" class="tree-dept-title" onclick="window.filterByDepartment('systems-networking')">
+                                    <i class="fa fa-laptop"></i> Systems & Networking
+                                </a>
+                                <ul class="tree-subcat-list">
+                                    <li><a href="javascript:void(0)" data-subcat="laptops" onclick="window.filterBySubCategory('laptops')">Laptops & Notebooks <span class="cat-count-pill" data-count-for="laptops"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="desktops" onclick="window.filterBySubCategory('desktops')">Desktops & All-in-Ones <span class="cat-count-pill" data-count-for="desktops"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="monitors" onclick="window.filterBySubCategory('monitors')">Monitors & Displays <span class="cat-count-pill" data-count-for="monitors"></span></a></li>
+                                    <li><a href="javascript:void(0)" data-subcat="networking-devices" onclick="window.filterBySubCategory('networking-devices')">Networking & Wi-Fi Routers <span class="cat-count-pill" data-count-for="networking-devices"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Brands Filter -->
+                    <div class="sidebar-widget">
+                        <h3 class="sidebar-widget-title">Popular Brands</h3>
+                        <div class="sidebar-brand-pills">
+                            <button type="button" class="brand-chip" onclick="window.quickSearch('Crucial')">Crucial</button>
+                            <button type="button" class="brand-chip" onclick="window.quickSearch('Samsung')">Samsung</button>
+                            <button type="button" class="brand-chip" onclick="window.quickSearch('EVM')">EVM</button>
+                            <button type="button" class="brand-chip" onclick="window.quickSearch('Western Digital')">WD</button>
+                            <button type="button" class="brand-chip" onclick="window.quickSearch('Seagate')">Seagate</button>
+                            <button type="button" class="brand-chip" onclick="window.quickSearch('Dell')">Dell</button>
+                            <button type="button" class="brand-chip" onclick="window.quickSearch('TP-Link')">TP-Link</button>
+                            <button type="button" class="brand-chip" onclick="window.quickSearch('Gigabyte')">Gigabyte</button>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- RIGHT COLUMN: MAIN PRODUCT SHOWCASE -->
+                <div class="store-main-showcase">
+                    
+                    <!-- Top Catalog Toolbar & Active Filter Bar -->
+                    <div class="catalog-top-bar">
+                        <div class="catalog-heading-box">
+                            <h2 id="catalogSectionTitle">Verified Hardware Catalog</h2>
+                            <span class="product-count" id="productCounter">15 Verified Products</span>
+                        </div>
+
+                        <!-- Mobile Filter Trigger Button -->
+                        <button type="button" class="mobile-filter-btn" id="openMobileFilterBtn">
+                            <i class="fa fa-sliders"></i> Filter Categories
+                        </button>
+                    </div>
+
+                    <!-- Active Filter Strip & Breadcrumbs -->
+                    <div class="active-filter-strip" id="activeFilterStrip" style="display:none;">
+                        <div class="active-filter-breadcrumbs">
+                            <span class="breadcrumb-label"><i class="fa fa-filter"></i> Viewing:</span>
+                            <span class="breadcrumb-dept" id="activeDeptName">All Departments</span>
+                            <i class="fa fa-angle-right breadcrumb-sep" id="activeBreadcrumbSep" style="display:none;"></i>
+                            <span class="breadcrumb-subcat" id="activeSubcatName" style="display:none;"></span>
+                        </div>
+                        <button type="button" class="clear-filter-btn" onclick="window.clearActiveCategoryFilters()">
+                            <i class="fa fa-times-circle"></i> Clear Filter
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Product Grid -->
+                    <div class="product-grid" id="affiliateProductGrid">
+                        <!-- Dynamically rendered by affiliateHub.js -->
+                    </div>
+
+                </div>
+
             </div>
 
-            <!-- Dynamic Product Grid -->
-            <div class="product-grid" id="affiliateProductGrid">
-                <!-- Dynamically rendered by affiliateHub.js -->
-            </div>
         </div>
     </main>
 
@@ -352,6 +358,6 @@
 
     <!-- Scripts -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script type="module" src="js/app.js?v=20260822_amzcat"></script>
+    <script type="module" src="js/app.js?v=20260822_amzside"></script>
 </body>
 </html>
