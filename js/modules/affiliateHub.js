@@ -487,13 +487,32 @@ export function renderBlogPosts(category = "all", searchQuery = "") {
 function setupSocialShareButtons(post, prefix = "single") {
   const shareUrl = getPostShareUrl(post);
   const shareTitle = post.title;
-  const shareText = `${shareTitle} - Read this technical diagnostic guide by MP2TECH Mumbai:`;
-  // WhatsApp
-  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareUrl)}`;
+  const shareText = `*${shareTitle}*\n\nRead this diagnostic guide by MP2TECH:\n${shareUrl}`;
+  
+  // WhatsApp: wa.me with instant app launch
+  const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
   const waTop = document.getElementById(`${prefix}ShareWhatsapp`);
   const waBottom = document.getElementById(`${prefix}ShareWhatsappBottom`);
-  if (waTop) waTop.href = waUrl;
-  if (waBottom) waBottom.href = waUrl;
+
+  const attachWaHandler = (btn) => {
+    if (!btn) return;
+    btn.href = waUrl;
+    btn.setAttribute("target", "_blank");
+    btn.setAttribute("rel", "noopener noreferrer");
+    btn.onclick = function(e) {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile) {
+        window.location.href = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
+        setTimeout(() => {
+          window.open(waUrl, "_blank");
+        }, 600);
+        return false;
+      }
+    };
+  };
+
+  attachWaHandler(waTop);
+  attachWaHandler(waBottom);
 
   // LinkedIn
   const liUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
@@ -683,7 +702,10 @@ export function showAllArticlesView(updateHistory = true) {
  * Quick Direct Share from card
  */
 export function sharePostDirect(event, identifier) {
-  if (event) event.stopPropagation();
+  if (event) {
+    event.stopPropagation();
+    event.preventDefault();
+  }
   const post = allPosts.find(
     (p) =>
       p.slug === String(identifier) ||
@@ -693,25 +715,22 @@ export function sharePostDirect(event, identifier) {
   if (!post) return;
 
   const shareUrl = getPostShareUrl(post);
+  const shareText = `*${post.title}*\n\nRead this diagnostic guide by MP2TECH:\n${shareUrl}`;
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-  if (navigator.share) {
+  if (navigator.share && isMobile) {
     navigator
       .share({
         title: post.title,
         text: `Read this guide by MP2TECH: ${post.title}`,
         url: shareUrl,
       })
-      .catch(() => {});
-  } else {
-    // Copy to clipboard with prompt
-    navigator.clipboard
-      .writeText(shareUrl)
-      .then(() => {
-        alert(`Direct Link Copied to Clipboard!\n\n${shareUrl}`);
-      })
       .catch(() => {
-        window.prompt("Share this direct guide URL:", shareUrl);
+        window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank");
       });
+  } else {
+    // Open WhatsApp directly
+    window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank");
   }
 }
 
