@@ -952,6 +952,7 @@ export function generateArticleStaticHtml(post) {
     <!-- Open Graph / WhatsApp / Facebook / LinkedIn / Instagram -->
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="MP2TECH Mumbai" />
+    <meta property="og:locale" content="en_IN" />
     <meta property="og:url" content="${articleUrl}" />
     <meta property="og:title" content="${escapeHtml(title)}" />
     <meta property="og:description" content="${escapeHtml(excerpt)}" />
@@ -970,10 +971,15 @@ export function generateArticleStaticHtml(post) {
     <meta name="twitter:description" content="${escapeHtml(excerpt)}" />
     <meta name="twitter:image" content="${ogImageUrl}" />
 
-    <!-- Instant Client-Side Redirect to Interactive Guide -->
-    <meta http-equiv="refresh" content="0; url=${blogRedirectUrl}" />
+    <!-- Smart Client-Side Redirect (Social Bots & WhatsApp stay on page for instant rich preview) -->
     <script>
-        window.location.replace("${blogRedirectUrl}");
+        (function() {
+            var ua = navigator.userAgent || '';
+            var isBot = /bot|crawler|spider|crawling|facebookexternalhit|whatsapp|twitterbot|linkedinbot|telegrambot|slackbot|applebot|pinterest|discordbot|bingbot|googlebot/i.test(ua);
+            if (!isBot) {
+                window.location.replace("${blogRedirectUrl}");
+            }
+        })();
     </script>
 </head>
 <body style="margin:0; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background:#0b1120; color:#f8fafc; display:flex; align-items:center; justify-content:center; min-height:100vh; padding:20px; box-sizing:border-box;">
