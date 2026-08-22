@@ -1,5 +1,22 @@
 [
   {
+    "id": "prod-3492",
+    "name": "Dyazo Adjustable Ergonomic Metal Laptop Stand for Desk",
+    "category": "laptops",
+    "brand": "Dyazo",
+    "priceEstimate": "₹338",
+    "rating": 4.4,
+    "reviewCount": 19973,
+    "badge": "Amazon's Choice",
+    "image": "https://images-na.ssl-images-amazon.com/images/P/B08LHTJTBB.01.LZZZZZZZ.jpg",
+    "amazonUrl": "https://www.amazon.in/dp/B08LHTJTBB/?tag=mp2tech20-21",
+    "highlights": [
+      "Multi-angle adjustable ergonomic design for comfortable viewing",
+      "Sturdy metallic build compatible with all laptops up to 15.6-inch",
+      "Open aluminum design offers passive cooling and heat dissipation"
+    ]
+  },
+  {
     "id": "prod-1053",
     "name": "Seagate One Touch 1TB External HDD with Password Protection",
     "category": "external-hard-drives",
