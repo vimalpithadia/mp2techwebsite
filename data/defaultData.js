@@ -61,7 +61,7 @@ export const DEFAULT_POSTS = [
     "categoryName": "Hardware Upgrades",
     "date": "August 05, 2026",
     "readTime": "4 min read",
-    "image": "img/blog2.jpg",
+    "image": "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=1200&h=630&q=85",
     "title": "SSD vs HDD: Why Storage Upgrades Revive Slow Computers",
     "excerpt": "Is your 3-year-old laptop feeling sluggish? Upgrading from a mechanical hard drive to an NVMe or SATA SSD can deliver a 5x to 10x speed boost without buying a new device.",
     "relatedProductIds": [
@@ -76,7 +76,7 @@ export const DEFAULT_POSTS = [
     "categoryName": "Maintenance & Care",
     "date": "July 28, 2026",
     "readTime": "6 min read",
-    "image": "img/blog4.jpg",
+    "image": "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=1200&h=630&q=85",
     "title": "How to Prevent Laptop Overheating in Mumbai's Humid Climate",
     "excerpt": "Dust accumulation and dried thermal paste cause high temperatures, thermal throttling, and sudden system crashes. Discover professional maintenance best practices.",
     "relatedProductIds": [
@@ -93,7 +93,7 @@ export const DEFAULT_POSTS = [
     "categoryName": "Refurbished Systems",
     "date": "July 15, 2026",
     "readTime": "5 min read",
-    "image": "img/blog3.jpg",
+    "image": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1200&h=630&q=85",
     "title": "Smart Buying Guide: Choosing Quality Refurbished Laptops & PCs",
     "excerpt": "Save up to 60% on enterprise-grade hardware with certified refurbished computers. Here is our checklist for verifying battery health, screen grade, and warranty.",
     "relatedProductIds": [
@@ -110,7 +110,7 @@ export const DEFAULT_POSTS = [
     "categoryName": "Diagnostics & Repairs",
     "date": "June 30, 2026",
     "readTime": "6 min read",
-    "image": "img/blog1.jpg",
+    "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&h=630&q=85",
     "title": "Chip-Level Motherboard Diagnostics: Why Component Repair Saves Money",
     "excerpt": "Authorized service centers often recommend replacing entire motherboards. Learn how specialized chip-level diagnostic testing fixes power ICs and saves thousands.",
     "relatedProductIds": [
@@ -127,7 +127,7 @@ export const DEFAULT_POSTS = [
     "categoryName": "Hardware Upgrades",
     "date": "June 18, 2026",
     "readTime": "4 min read",
-    "image": "img/blog2.jpg",
+    "image": "https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&w=1200&h=630&q=85",
     "title": "How Much RAM Do You Really Need in 2026 for Work & Multitasking?",
     "excerpt": "From browsing dozens of browser tabs to video conferencing and heavy accounting software, here is the realistic breakdown of 8GB vs 16GB vs 32GB memory configurations.",
     "relatedProductIds": [
