@@ -16,6 +16,7 @@
     <!-- Open Graph / WhatsApp / Facebook / LinkedIn / Instagram -->
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="MP2TECH Mumbai" />
+    <meta property="og:locale" content="en_IN" />
     <meta property="og:url" content="https://www.mp2tech.co.in/articles/ssd-vs-hdd-speed-boost-guide.html" />
     <meta property="og:title" content="SSD vs HDD: Why Storage Upgrades Revive Slow Computers" />
     <meta property="og:description" content="Is your 3-year-old laptop feeling sluggish? Upgrading from a mechanical hard drive to an NVMe or SATA SSD can deliver a 5x to 10x speed boost without buying a new device." />
@@ -34,10 +35,15 @@
     <meta name="twitter:description" content="Is your 3-year-old laptop feeling sluggish? Upgrading from a mechanical hard drive to an NVMe or SATA SSD can deliver a 5x to 10x speed boost without buying a new device." />
     <meta name="twitter:image" content="https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=1200&h=630&q=85" />
 
-    <!-- Instant Client-Side Redirect to Interactive Guide -->
-    <meta http-equiv="refresh" content="0; url=../blog.html?post=ssd-vs-hdd-speed-boost-guide" />
+    <!-- Smart Client-Side Redirect (Social Bots & WhatsApp stay on page for instant rich preview) -->
     <script>
-        window.location.replace("../blog.html?post=ssd-vs-hdd-speed-boost-guide");
+        (function() {
+            var ua = navigator.userAgent || '';
+            var isBot = /bot|crawler|spider|crawling|facebookexternalhit|whatsapp|twitterbot|linkedinbot|telegrambot|slackbot|applebot|pinterest|discordbot|bingbot|googlebot/i.test(ua);
+            if (!isBot) {
+                window.location.replace("../blog.html?post=ssd-vs-hdd-speed-boost-guide");
+            }
+        })();
     </script>
 </head>
 <body style="margin:0; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background:#0b1120; color:#f8fafc; display:flex; align-items:center; justify-content:center; min-height:100vh; padding:20px; box-sizing:border-box;">
