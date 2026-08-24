@@ -567,18 +567,33 @@ function setupSocialShareButtons(post, prefix = "single") {
 }
 
 /**
+ * Find post by slug, id, or normalized title alias
+ */
+export function findPost(identifier) {
+  if (!identifier) return null;
+  const target = String(identifier).trim().toLowerCase();
+  return (
+    allPosts.find((p) => {
+      if (p.slug && p.slug.toLowerCase() === target) return true;
+      if (p.id && (String(p.id) === target || `post-${p.id}`.toLowerCase() === target)) return true;
+      if (p.title) {
+        const generatedSlug = p.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+        if (generatedSlug === target) return true;
+      }
+      // Alias handling for post 9 (renamed slug)
+      if (target.includes("bottleneck") && (p.id === 9 || (p.slug && p.slug.includes("bottleneck")))) return true;
+      return false;
+    }) || null
+  );
+}
+
+/**
  * Open Single Article View
  */
 export function showArticle(identifier, updateHistory = true) {
-  const post = allPosts.find(
-    (p) =>
-      p.slug === String(identifier) ||
-      p.id === Number(identifier) ||
-      String(p.id) === String(identifier)
-  );
+  const post = findPost(identifier);
 
   if (!post) {
-    showAllArticlesView();
     return;
   }
 
@@ -662,17 +677,12 @@ export function showArticle(identifier, updateHistory = true) {
   allSection.style.display = "none";
   singleSection.style.display = "block";
 
-  // Update browser URL query parameter & address bar to direct article URL
+  // Update browser URL query parameter & document title
+  const slugOrId = post.slug || `post-${post.id}`;
   if (updateHistory && window.history && window.history.replaceState) {
-    const slugOrId = post.slug || `post-${post.id}`;
-    const newUrl = `articles/${encodeURIComponent(slugOrId)}.html`;
-    try {
-      window.history.replaceState({ postId: post.id, slug: post.slug }, post.title, newUrl);
-    } catch (e) {
-      window.history.replaceState({ postId: post.id, slug: post.slug }, post.title, `blog.html?post=${encodeURIComponent(slugOrId)}`);
-    }
-    document.title = `${post.title} | MP2TECH Diagnostic Guides`;
+    window.history.replaceState({ postId: post.id, slug: post.slug }, post.title, `blog.html?post=${encodeURIComponent(slugOrId)}`);
   }
+  document.title = `${post.title} | MP2TECH Diagnostic Guides`;
 
   // Scroll to top
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -691,7 +701,7 @@ export function showAllArticlesView(updateHistory = true) {
   if (allSection) allSection.style.display = "block";
 
   if (updateHistory && window.history && window.history.pushState) {
-    window.history.pushState({}, "Diagnostic Guides & Tech Tips | MP2TECH Mumbai", window.location.pathname);
+    window.history.pushState({}, "Diagnostic Guides & Tech Tips | MP2TECH Mumbai", "blog.html");
     document.title = "Diagnostic Guides & Tech Tips | MP2TECH Mumbai";
   }
 
@@ -706,12 +716,7 @@ export function sharePostDirect(event, identifier) {
     event.stopPropagation();
     event.preventDefault();
   }
-  const post = allPosts.find(
-    (p) =>
-      p.slug === String(identifier) ||
-      p.id === Number(identifier) ||
-      String(p.id) === String(identifier)
-  );
+  const post = findPost(identifier);
   if (!post) return;
 
   const shareUrl = getPostShareUrl(post);
@@ -766,14 +771,22 @@ export function quickSearch(term = "") {
 /**
  * Check URL query parameters on load to auto-display shared blog post
  */
-function handleDeepLinking() {
+function handleDeepLinking(canFallback = true) {
   const urlParams = new URLSearchParams(window.location.search);
   const postQuery = urlParams.get("post") || urlParams.get("article") || urlParams.get("id");
 
   if (postQuery) {
-    showArticle(postQuery, false);
+    const post = findPost(postQuery);
+    if (post) {
+      showArticle(postQuery, false);
+      return true;
+    } else if (canFallback) {
+      showAllArticlesView(false);
+    }
+    return false;
   } else {
     showAllArticlesView(false);
+    return true;
   }
 }
 
@@ -781,19 +794,32 @@ function handleDeepLinking() {
  * Initialize dynamic hub
  */
 export async function initAffiliateHub() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialPostQuery = urlParams.get("post") || urlParams.get("article") || urlParams.get("id");
+
   // Initial render
   renderProducts(currentDept, currentSubcategory, "", "default");
   renderBlogPosts("all", "");
 
-  // Deep linking initial check
-  handleDeepLinking();
+  // If a post query exists on load, display it or hold view without layout jump
+  if (initialPostQuery) {
+    const immediatePost = findPost(initialPostQuery);
+    if (immediatePost) {
+      showArticle(initialPostQuery, false);
+    } else {
+      const allSec = document.getElementById("allArticlesSection");
+      if (allSec) allSec.style.display = "none";
+    }
+  } else {
+    showAllArticlesView(false);
+  }
 
   // Handle browser back/forward buttons
   window.addEventListener("popstate", () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const postQuery = urlParams.get("post");
-    if (postQuery) {
-      showArticle(postQuery, false);
+    const currentParams = new URLSearchParams(window.location.search);
+    const q = currentParams.get("post") || currentParams.get("article") || currentParams.get("id");
+    if (q) {
+      showArticle(q, false);
     } else {
       showAllArticlesView(false);
     }
@@ -909,11 +935,27 @@ export async function initAffiliateHub() {
       if (Array.isArray(b) && b.length > 0) {
         allPosts = b;
         renderBlogPosts(currentBlogCategory, currentBlogSearch);
-        handleDeepLinking();
+        
+        // Re-check deep linking with newly fetched posts
+        const currentUrlParams = new URLSearchParams(window.location.search);
+        const query = currentUrlParams.get("post") || currentUrlParams.get("article") || currentUrlParams.get("id") || initialPostQuery;
+        if (query) {
+          const matchedPost = findPost(query);
+          if (matchedPost) {
+            showArticle(query, false);
+          } else {
+            showAllArticlesView(false);
+          }
+        }
       }
     }
   } catch (err) {
     console.info("Using embedded product catalog fallback");
+    if (initialPostQuery) {
+      const fallbackPost = findPost(initialPostQuery);
+      if (fallbackPost) showArticle(initialPostQuery, false);
+      else showAllArticlesView(false);
+    }
   }
 
   // Global helpers
@@ -925,3 +967,4 @@ export async function initAffiliateHub() {
   window.sharePostDirect = sharePostDirect;
   window.quickSearch = quickSearch;
 }
+
