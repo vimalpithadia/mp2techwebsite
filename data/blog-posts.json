@@ -1,5 +1,18 @@
 [
   {
+    "id": 10,
+    "slug": "laptop-keyboard-not-functioning-random-buttons-pressed",
+    "category": "diagnostics",
+    "categoryName": "Diagnostics & Repairs",
+    "date": "August 26, 2026",
+    "readTime": "4 min read",
+    "image": "https://images.pexels.com/photos/4065748/pexels-photo-4065748.jpeg",
+    "title": "Fixing phantom key presses and dead laptop keyboards",
+    "excerpt": "Experiencing ghost typing or a dead laptop keyboard? Follow our expert bench guide to isolate software glitches from hardware liquid damage.",
+    "body": "<p>At MP2TECH Mumbai, we frequently encounter laptops exhibiting chaotic behavior—where the keyboard either stops responding entirely or types random strings of characters continuously on its own. This frustrating symptom, commonly known as 'ghost typing,' is typically caused by localized liquid ingress, micro-short circuits in the flex cable, or corrupted Windows upper/lower keyboard filter drivers. In this guide, our engineering team shares the exact diagnostic protocol we use at our Kandivali West lab to resolve this issue permanently.</p><h3>1. First Inspection & Symptom Isolation</h3><p>Before opening the chassis, you must determine whether the failure is operating system-related or physical hardware damage. Turn off the laptop, enter the BIOS/UEFI settings screen (usually by tapping F2 or Del during startup), and check if random characters continue to appear. If the symptom persists in the BIOS environment, you can entirely rule out Windows driver corruption. Next, connect an external USB or Bluetooth keyboard. If the external unit works flawlessly while the built-in keyboard acts erratically, your issue is 100% hardware-based—either a shorted membrane matrix or a compromised keyboard controller IC on the motherboard.</p><h3>2. Deep Hardware / Software Testing</h3><p>If the ghost typing only happens inside Windows, boot into Safe Mode or use a live Linux USB drive to test the keyboard response. In Windows, open Device Manager, expand the 'Keyboards' section, right-click your standard PS/2 or HID keyboard device, and select 'Uninstall device'. Restart your machine to force Windows to rebuild the keyboard driver stack. If hardware testing confirms physical failure, carefully disassemble the laptop chassis, detach the keyboard ribbon cable from the motherboard ZIF connector, and inspect it under magnification for corrosion, oxidation, or moisture residue.</p><div class=\"blog-tip-box\"><strong>Specialist Diagnostic Tip:</strong> Never ignore sticky residue on the ribbon cable. Clean oxidized contacts gently with 99% isopropyl alcohol and a soft ESD brush before declaring the entire keyboard dead.</div><h3>3. Permanent Fix & Component Recommendations</h3><p>If cleaning the ZIF connector and ribbon cable fails to stop the continuous button pressing, the internal conductive carbon traces of the keyboard membrane have permanently shorted out, usually due to past liquid spills. Modern laptop keyboards are heat-welded or riveted directly into the top palmrest casing, requiring meticulous replacement. For backlit mechanical or modern ultrabook chassis, replacing the entire palmrest module is often required. Need hands-on hardware diagnosis in Mumbai? Contact MP2TECH for rapid on-site testing and motherboard repair.</p>",
+    "relatedProductIds": []
+  },
+  {
     "id": 9,
     "slug": "uncovering-hidden-pc-bottlenecks-lab-guide",
     "category": "diagnostics",
