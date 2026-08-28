@@ -1,5 +1,20 @@
 [
   {
+    "id": 12,
+    "slug": "root-cause-of-hinges-broken-in-laptop",
+    "category": "diagnostics",
+    "categoryName": "Diagnostics & Repairs",
+    "date": "August 28, 2026",
+    "readTime": "4 min read",
+    "image": "https://images.pexels.com/photos/8386711/pexels-photo-8386711.jpeg",
+    "title": "Diagnosing and fixing broken laptop hinges permanently",
+    "excerpt": "Discover why laptop hinges break and how our lab diagnoses structural housing failures. Prevent display panel damage with expert repair steps.",
+    "body": "<p>At MP2TECH Mumbai, we frequently encounter laptops brought in with severely damaged display bezels, cracked screens, or completely jammed lids caused by failing hinges. When a laptop hinge breaks, it is rarely a sudden failure of the metal hinge itself; rather, it is usually the result of cumulative mechanical stress transferred directly to fragile brass threaded inserts molded into the plastic palmrest or display back cover.</p><h3>1. First Inspection & Symptom Isolation</h3><p>Begin by carefully inspecting the torque resistance of both hinges while the display is detached or partially opened. Do not force a stiff or seized hinge, as applying leverage will instantly fracture the surrounding plastic chassis. Check for missing screws along the bottom base and bezel, and examine whether the gap between the top cover and bottom chassis widens when you lift the lid. This gap separation is the classic diagnostic indicator that internal screw bosses have torn away from their housing anchors.</p><h3>2. Deep Hardware / Software Testing</h3><p>Dismantle the bottom chassis and display assembly to evaluate the extent of the structural damage. Inspect the LCD back cover and palmrest for stress-whitened plastic or entirely ripped-out brass inserts. Test the mechanical movement of the steel hinge shaft: if the tension nut has seized due to oxidation or lack of lubrication, it exerts massive rotational torque exceeding the structural limits of the plastic mounting points. Furthermore, inspect the internal Wi-Fi antenna cables and display ribbon cable (eDP) to ensure they have not been pinched, stretched, or severed by shifting hinge brackets.</p><div class=\"blog-tip-box\"><strong>Specialist Diagnostic Tip:</strong> Never rely solely on superglue to fix broken hinge mounts. The cyclic torque of opening and closing a lid requires structural reinforcement using chemical-welding acrylic resin or metal-reinforced epoxy putty, combined with thermal-inserted brass anchors.</div><h3>3. Permanent Fix & Component Recommendations</h3><p>To deliver a permanent fix, you must first relieve the mechanical tension of the hinge by loosening its adjustment nut slightly. Next, rebuild any destroyed plastic screw bosses using structural epoxy or UV-curing plastic resin, ensuring proper alignment before clamping. Replace missing casing screws with exact OEM-spec fasteners. For severely warped lids or irreversible structural loss, replacing the entire LCD back cover or palmrest assembly is the only way to restore factory rigidity.</p><p>Need hands-on hardware diagnosis in Mumbai? Contact MP2TECH for rapid on-site testing and motherboard repair.</p>",
+    "relatedProductIds": [
+      "prod-3492"
+    ]
+  },
+  {
     "id": 11,
     "slug": "ssd-vs-hdd-advantages-upgrade-guide",
     "category": "upgrades",
