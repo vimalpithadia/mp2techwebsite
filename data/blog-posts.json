@@ -1,5 +1,18 @@
 [
   {
+    "id": 13,
+    "slug": "importance-of-high-quality-spike-guard-earthing",
+    "category": "maintenance",
+    "categoryName": "Maintenance & Care",
+    "date": "August 29, 2026",
+    "readTime": "4 min read",
+    "image": "https://images.pexels.com/photos/18358118/pexels-photo-18358118.jpeg",
+    "title": "Why a high-quality spike guard is vital for your PC and earthing",
+    "excerpt": "Protect your expensive laptop and desktop from power surges with a quality spike guard featuring a fuse and earthing indicator. Learn how to test AC power safely.",
+    "body": "<p>At MP2TECH Mumbai in Kandivali West, we receive dozens of dead laptops and fried motherboards every week, many of which trace back to unstable power grids and non-existent earthing. Mumbai's monsoon fluctuations and older residential wiring make using a standard multi-plug extension highly risky for high-end computing gear. Relying on cheap plastic power strips without internal MOV (Metal Oxide Varistor) protection, thermal fuses, or proper grounding indicators is an invitation to sudden hardware failure, blown capacitors, and compromised logic boards.</p><h3>1. First Inspection & Symptom Isolation</h3><p>Begin by visually inspecting your current power distribution setup. Cheap local extension boards often lack a certified circuit breaker or thermal fuse, meaning a sudden high-voltage spike passes straight into your expensive desktop PSU or laptop charger. Check your wall socket using a digital multimeter or look at your spike guard's built-in status lights. A proper diagnostic spike guard features three distinct indicators: Power (LED on), Protection Active (surge circuitry working), and Earthing/Ground OK. If the 'Earthing OK' bulb remains unlit, your wall socket is operating without a proper earth path, leaving sensitive components vulnerable to static discharge and stray leakage currents.</p><h3>2. Deep Hardware / Software Testing</h3><p>When earthing is missing or faulty, you may notice subtle hardware quirks: peripherals like USB mice or external hard drives may give micro-shocks when touched, audio interfaces can produce a persistent 50Hz hum, and laptops might register erratic touchpad behavior while plugged in. To test this thoroughly, unplug your system and measure the AC voltage between the Neutral and Earth terminals on your wall socket using a multimeter; it should ideally read close to 0V (under 2V). Any reading above 5V indicates a compromised earthing loop in your home or office wiring that requires an electrician's intervention before plugging in heavy electronics.</p><div class=\"blog-tip-box\"><strong>Specialist Diagnostic Tip:</strong> Never trust a two-pin direct connection or cheap adapters. Always invest in an ISI-certified surge protector with a heavy-duty copper wire rating, a replaceable glass or thermal fuse, and a clear 'All OK' earth-checking LED indicator to safeguard your investments.</div><h3>3. Permanent Fix & Component Recommendations</h3><p>To eliminate power-related hardware failures permanently, replace all uncertified power strips with heavy-duty industrial-grade spike guards equipped with fast-acting MOV surge suppression and a master circuit breaker switch. Ensure your building's main distribution board has a dedicated earth pit with resistance under 5 ohms. If your desktop power supply or laptop charger has already sustained damage due to a power surge, bring it to our lab for component-level testing.</p><p>Need hands-on hardware diagnosis in Mumbai? Contact MP2TECH for rapid on-site testing and motherboard repair.</p>",
+    "relatedProductIds": []
+  },
+  {
     "id": 12,
     "slug": "root-cause-of-hinges-broken-in-laptop",
     "category": "diagnostics",
