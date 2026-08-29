@@ -716,18 +716,53 @@ export function resetProductForm() {
 }
 
 export function updateProductLivePreview() {
-  const name = document.getElementById("prodName").value || "Sample SSD / RAM Hardware";
-  const brand = document.getElementById("prodBrand").value || "Brand Name";
-  const price = document.getElementById("prodPrice").value || "2,499";
-  const rating = document.getElementById("prodRating").value || "4.6";
-  const badge = document.getElementById("prodBadge").value || "Technician Verified";
-  const image = document.getElementById("prodImage").value || "img/service.jpg";
+  const name = document.getElementById("prodName")?.value || "Sample SSD / RAM Hardware";
+  const brand = document.getElementById("prodBrand")?.value || "Brand Name";
+  const price = document.getElementById("prodPrice")?.value || "2,499";
+  const rating = document.getElementById("prodRating")?.value || "4.6";
+  const reviews = document.getElementById("prodReviews")?.value || "1500";
+  const badge = document.getElementById("prodBadge")?.value || "Technician Verified";
+  const image = document.getElementById("prodImage")?.value || "img/service.jpg";
 
-  document.getElementById("prevProdName").textContent = name;
-  document.getElementById("prevProdBrand").textContent = brand;
-  document.getElementById("prevProdPrice").textContent = price.startsWith("₹") ? price : `₹${price}`;
-  document.getElementById("prevProdRating").textContent = rating;
-  document.getElementById("prevProdBadge").textContent = badge;
+  const nameEl = document.getElementById("prevProdName");
+  if (nameEl) nameEl.textContent = name;
+
+  const brandEl = document.getElementById("prevProdBrand");
+  if (brandEl) brandEl.textContent = brand;
+
+  const priceEl = document.getElementById("prevProdPrice");
+  if (priceEl) priceEl.textContent = price.startsWith("₹") ? price : `₹${price}`;
+
+  const ratingEl = document.getElementById("prevProdRating");
+  if (ratingEl) ratingEl.textContent = rating;
+
+  const badgeEl = document.getElementById("prevProdBadge");
+  if (badgeEl) badgeEl.textContent = badge;
+
+  // Format and render live review count (e.g. 67888 -> (67,888))
+  const reviewsEl = document.getElementById("prevProdReviews");
+  if (reviewsEl) {
+    const rawNum = Number(reviews.toString().replace(/[^0-9]/g, ""));
+    const formatted = rawNum > 0 ? rawNum.toLocaleString("en-IN") : reviews;
+    reviewsEl.textContent = `(${formatted})`;
+  }
+
+  // Render dynamic star icons
+  const starsEl = document.getElementById("prevProdStars");
+  if (starsEl) {
+    const numRating = parseFloat(rating) || 4.5;
+    let starsHtml = "";
+    for (let i = 1; i <= 5; i++) {
+      if (numRating >= i) {
+        starsHtml += '<i class="fa fa-star" style="color:#ff9900;"></i>';
+      } else if (numRating >= i - 0.5) {
+        starsHtml += '<i class="fa fa-star-half-o" style="color:#ff9900;"></i>';
+      } else {
+        starsHtml += '<i class="fa fa-star-o" style="color:#ff9900;"></i>';
+      }
+    }
+    starsEl.innerHTML = starsHtml;
+  }
   
   const imgEl = document.getElementById("prevProdImg");
   if (imgEl) {
@@ -1635,11 +1670,17 @@ function getCuratedPhotoForTopic(category, keyword = "", topic = "") {
   if (normalized.includes("refurbished") || normalized.includes("buy") || normalized.includes("used") || normalized.includes("laptop")) {
     return "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1200&q=80";
   }
+  if (normalized.includes("spike") || normalized.includes("power strip") || normalized.includes("surge") || normalized.includes("extension") || normalized.includes("socket") || normalized.includes("plug") || normalized.includes("adapter") || normalized.includes("charger") || normalized.includes("cable")) {
+    return "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=1200&q=80";
+  }
   if (normalized.includes("tool") || normalized.includes("screwdriver") || normalized.includes("repair") || normalized.includes("teardown")) {
     return "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80";
   }
 
   switch (category) {
+    case "adapters":
+    case "cables-accessories":
+      return "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=1200&q=80";
     case "upgrades":
       return "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=1200&q=80";
     case "repair":
@@ -2907,9 +2948,12 @@ export function initAdminStudio() {
   }
 
   // Product Form Live preview bindings
-  ["prodName", "prodBrand", "prodPrice", "prodRating", "prodBadge", "prodImage"].forEach((id) => {
+  ["prodName", "prodBrand", "prodCategory", "prodPrice", "prodRating", "prodReviews", "prodBadge", "prodImage"].forEach((id) => {
     const el = document.getElementById(id);
-    if (el) el.addEventListener("input", updateProductLivePreview);
+    if (el) {
+      el.addEventListener("input", updateProductLivePreview);
+      el.addEventListener("change", updateProductLivePreview);
+    }
   });
 
   // Blog Form Live preview bindings
