@@ -22,7 +22,7 @@ git pull origin dev
 ### 2. Feature Development
 Create and switch to a new feature branch:
 ```bash
-git checkout -b feature/whatsapp
+per
 ```
 
 Make changes and commit them:
