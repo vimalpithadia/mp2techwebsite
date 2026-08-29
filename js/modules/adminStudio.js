@@ -148,24 +148,148 @@ export function handleLogout() {
 }
 
 /**
+ * Extract URL, ASIN, and clean text snippet from any raw mobile input or link
+ */
+export function parseAmazonInputString(rawInput) {
+  if (!rawInput || typeof rawInput !== "string") {
+    return { url: "", textSnippet: "", directAsin: null };
+  }
+
+  const str = rawInput.trim();
+  
+  // 1. Extract any HTTP/HTTPS URL from string
+  const urlMatch = str.match(/https?:\/\/[^\s"'<>\)]+/i);
+  const url = urlMatch ? urlMatch[0] : "";
+  
+  // 2. Extract any text snippet outside the URL (e.g. from mobile share sheet)
+  const textSnippet = str.replace(url, "").replace(/https?:\/\//gi, "").replace(/[()]/g, "").trim();
+
+  // 3. Extract ASIN directly if present in URL or text
+  let directAsin = null;
+  const asinPathMatch = str.match(/(?:dp|gp\/product|asin|d)\/([A-Z0-9]{10})/i);
+  if (asinPathMatch) {
+    directAsin = asinPathMatch[1].toUpperCase();
+  } else {
+    const asinParamMatch = str.match(/[?&]asin=([A-Z0-9]{10})/i);
+    if (asinParamMatch) {
+      directAsin = asinParamMatch[1].toUpperCase();
+    } else {
+      const bAsinMatch = str.match(/\b(B[0-9A-Z]{9})\b/i);
+      if (bAsinMatch) {
+        directAsin = bAsinMatch[1].toUpperCase();
+      }
+    }
+  }
+
+  return { url, textSnippet, directAsin };
+}
+
+/**
+ * Multi-Tier Fast Amazon Short Link Expander & Unshortener (Resolves amzn.in/d/*, amzn.to/*, a.co/*, etc.)
+ */
+export async function resolveAmazonShortUrl(inputUrl) {
+  if (!inputUrl) return { resolvedUrl: "", asin: null, slugTitle: "" };
+
+  const parsed = parseAmazonInputString(inputUrl);
+  const url = parsed.url || inputUrl;
+
+  const isShortLink = /amzn\.in\/d\/|amzn\.to\/|a\.co\/|amzn\.eu\/|amzn\.asia\/|tinyurl\.com|bit\.ly/i.test(url);
+  
+  let resolvedUrl = url;
+  let detectedAsin = parsed.directAsin || null;
+  let slugTitle = "";
+
+  // Check if it's already a full Amazon URL with slug
+  const slugMatch = url.match(/(?:amazon\.[a-z.]+\/)?([^/]+)\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i);
+  if (slugMatch && !slugMatch[1].startsWith("dp")) {
+    slugTitle = decodeURIComponent(slugMatch[1]).replace(/[-_]/g, " ");
+    if (!detectedAsin) detectedAsin = slugMatch[2].toUpperCase();
+  }
+
+  // If already a full Amazon product URL with known ASIN, return immediately
+  if (detectedAsin && !isShortLink) {
+    return { resolvedUrl, asin: detectedAsin, slugTitle };
+  }
+
+  // If it is a short link, attempt fast multi-tier client unshortening
+  if (isShortLink) {
+    // Tier 1: unshorten.me JSON API (high speed, CORS enabled)
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const res = await fetch(`https://unshorten.me/json/${encodeURIComponent(url)}`, {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.resolved_url) {
+          resolvedUrl = json.resolved_url;
+        }
+      }
+    } catch (e) {
+      console.warn("Unshorten Tier 1 failed or timed out:", e.message);
+    }
+
+    // Check if Tier 1 resolved an ASIN or slug
+    let m = resolvedUrl.match(/(?:dp|gp\/product|asin|d)\/([A-Z0-9]{10})/i) || resolvedUrl.match(/\b(B[0-9A-Z]{9})\b/i);
+    if (m) detectedAsin = m[1].toUpperCase();
+
+    let sMatch = resolvedUrl.match(/(?:amazon\.[a-z.]+\/)?([^/]+)\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i);
+    if (sMatch && !sMatch[1].startsWith("dp")) {
+      slugTitle = decodeURIComponent(sMatch[1]).replace(/[-_]/g, " ");
+    }
+
+    // Tier 2: allorigins proxy fallback if Tier 1 did not get ASIN
+    if (!detectedAsin) {
+      try {
+        const controller2 = new AbortController();
+        const timeoutId2 = setTimeout(() => controller2.abort(), 4000);
+        const res2 = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, {
+          signal: controller2.signal
+        });
+        clearTimeout(timeoutId2);
+        if (res2.ok) {
+          const json2 = await res2.json();
+          if (json2.status && json2.status.url && json2.status.url !== url) {
+            resolvedUrl = json2.status.url;
+            m = resolvedUrl.match(/(?:dp|gp\/product|asin|d)\/([A-Z0-9]{10})/i) || resolvedUrl.match(/\b(B[0-9A-Z]{9})\b/i);
+            if (m) detectedAsin = m[1].toUpperCase();
+          }
+        }
+      } catch (e) {
+        console.warn("Unshorten Tier 2 fallback failed:", e.message);
+      }
+    }
+  }
+
+  return { resolvedUrl, asin: detectedAsin, slugTitle };
+}
+
+/**
  * Bulletproof Amazon Affiliate Tag Normalizer (Always guarantees mp2tech20-21)
  */
 export function ensureAffiliateTag(url, tag = "mp2tech20-21") {
   if (!url) return "";
-  const asinMatch = url.match(/(?:dp|gp\/product|d|asin)\/([A-Z0-9]{10})/i);
+  const cleanedUrlMatch = String(url).match(/https?:\/\/[^\s"'<>\)]+/i);
+  const targetUrl = cleanedUrlMatch ? cleanedUrlMatch[0] : String(url).trim();
+
+  const asinMatch = targetUrl.match(/(?:dp|gp\/product|asin)\/([A-Z0-9]{10})/i) || 
+                    targetUrl.match(/[?&]asin=([A-Z0-9]{10})/i) ||
+                    targetUrl.match(/\b(B[0-9A-Z]{9})\b/i);
   if (asinMatch) {
     return `https://www.amazon.in/dp/${asinMatch[1].toUpperCase()}/?tag=${tag}`;
   }
   try {
-    const u = new URL(url);
+    const u = new URL(targetUrl);
     u.searchParams.set("tag", tag);
     return u.toString();
   } catch (e) {
-    if (url.includes("tag=")) {
-      return url.replace(/tag=[^&]+/g, `tag=${tag}`);
+    if (targetUrl.includes("tag=")) {
+      return targetUrl.replace(/tag=[^&]+/g, `tag=${tag}`);
     }
-    const sep = url.includes("?") ? "&" : "?";
-    return `${url}${sep}tag=${tag}`;
+    const sep = targetUrl.includes("?") ? "&" : "?";
+    return `${targetUrl}${sep}tag=${tag}`;
   }
 }
 
@@ -1588,9 +1712,10 @@ Respond ONLY with a single valid JSON object (no markdown formatting, no backtic
   };
 
   const modelsToTry = [
-    "models/gemini-3.5-flash-lite",
-    "models/gemini-flash-lite-latest",
-    "models/gemini-2.5-flash"
+    "models/gemini-2.5-flash",
+    "models/gemini-2.0-flash",
+    "models/gemini-1.5-flash",
+    "models/gemini-flash-lite-latest"
   ];
 
   let rawResponseText = null;
@@ -1717,7 +1842,7 @@ Respond ONLY with a single valid JSON object (no markdown formatting, no backtic
 }
 
 /**
- * 1-Click AI Amazon Product Auto-Capture using Gemini AI
+ * 1-Click AI Amazon Product Auto-Capture using Gemini AI (With Short Link & Mobile Share Support)
  */
 export async function extractAmazonProductWithAI() {
   const input = document.getElementById("aiAmazonLinkInput");
@@ -1730,7 +1855,7 @@ export async function extractAmazonProductWithAI() {
   if (!rawInput) {
     if (feedback) {
       feedback.className = "ai-feedback-box error";
-      feedback.innerHTML = '<i class="fa fa-exclamation-circle"></i> Please paste an Amazon product link or product title first.';
+      feedback.innerHTML = '<i class="fa fa-exclamation-circle"></i> Please paste an Amazon product link, mobile share text, or product title first.';
       feedback.style.display = "flex";
     }
     input.focus();
@@ -1747,19 +1872,18 @@ export async function extractAmazonProductWithAI() {
     return;
   }
 
-  // Extract Slug and ASIN if available in URL
-  const slugMatch = rawInput.match(/(?:amazon\.[a-z.]+\/)?([^/]+)\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i);
-  const urlTitleSlug = slugMatch && !slugMatch[1].startsWith("dp") ? decodeURIComponent(slugMatch[1]).replace(/[-_]/g, " ") : "";
-  const asinMatch = rawInput.match(/(?:dp|gp\/product|d|asin)\/([A-Z0-9]{10})/i) || rawInput.match(/\b([B0-9][A-Z0-9]{9})\b/i);
-  const detectedAsin = asinMatch ? asinMatch[1].toUpperCase() : (slugMatch ? slugMatch[2].toUpperCase() : null);
+  // 1. Parse raw input (extract clean URL, text snippets from mobile shares, direct ASIN)
+  const parsed = parseAmazonInputString(rawInput);
+  let targetUrl = parsed.url;
+  let textSnippet = parsed.textSnippet;
+  let detectedAsin = parsed.directAsin;
+  let urlTitleSlug = "";
+  let resolvedUrl = targetUrl;
 
-  // Build clean Affiliate URL with tag=mp2tech20-21
-  const affiliateUrl = ensureAffiliateTag(rawInput);
-
-  // UI Loading State
+  // 2. UI Loading State - Phase 1: Resolving Link
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Extracting Specs & Formats...';
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Resolving Product Link...';
   }
   if (feedback) {
     feedback.className = "ai-feedback-box";
@@ -1767,29 +1891,65 @@ export async function extractAmazonProductWithAI() {
     feedback.style.background = "rgba(245, 158, 11, 0.12)";
     feedback.style.color = "#fbbf24";
     feedback.style.border = "1px solid rgba(245, 158, 11, 0.25)";
-    feedback.innerHTML = '<i class="fa fa-cog fa-spin"></i> Gemini AI is parsing hardware specifications, category, rating, and benchmark highlights...';
+    feedback.innerHTML = '<i class="fa fa-link fa-spin"></i> Expanding Amazon link, detecting catalog ASIN & mobile share info...';
+  }
+
+  // 3. Multi-tier Unshortening if short link (amzn.in/d/*, amzn.to/*, a.co/*, etc.)
+  if (targetUrl && (/amzn\.in|amzn\.to|a\.co|amzn\.eu|amzn\.asia|tinyurl|bit\.ly/i.test(targetUrl) || !detectedAsin)) {
+    try {
+      const resolution = await resolveAmazonShortUrl(targetUrl);
+      if (resolution.resolvedUrl) resolvedUrl = resolution.resolvedUrl;
+      if (resolution.asin) detectedAsin = resolution.asin;
+      if (resolution.slugTitle) urlTitleSlug = resolution.slugTitle;
+    } catch (err) {
+      console.warn("URL resolution error:", err);
+    }
+  }
+
+  // Extract Slug if available from full URL
+  if (!urlTitleSlug && resolvedUrl) {
+    const slugMatch = resolvedUrl.match(/(?:amazon\.[a-z.]+\/)?([^/]+)\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i);
+    if (slugMatch && !slugMatch[1].startsWith("dp")) {
+      urlTitleSlug = decodeURIComponent(slugMatch[1]).replace(/[-_]/g, " ");
+    }
+  }
+
+  // Build clean Affiliate URL with tag=mp2tech20-21
+  const initialAffiliateUrl = detectedAsin 
+    ? `https://www.amazon.in/dp/${detectedAsin}/?tag=mp2tech20-21`
+    : ensureAffiliateTag(resolvedUrl || rawInput);
+
+  // UI Loading State - Phase 2: Gemini AI Parsing
+  if (btn) {
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Extracting Specs & Formats...';
+  }
+  if (feedback) {
+    feedback.innerHTML = '<i class="fa fa-cog fa-spin"></i> Gemini AI is parsing hardware specifications, category, live INR price, and benchmark highlights...';
   }
 
   const systemPrompt = `You are a professional PC hardware technician and Amazon India (amazon.in) product catalog specialist for MP2TECH Store Mumbai.
 Given the following Amazon product information:
 - Raw Input / Link: "${rawInput}"
+${resolvedUrl && resolvedUrl !== rawInput ? `- Resolved Full Amazon URL: "${resolvedUrl}"` : ""}
 ${urlTitleSlug ? `- Extracted Product Title Slug from URL: "${urlTitleSlug}"` : ""}
 ${detectedAsin ? `- Amazon ASIN: "${detectedAsin}"` : ""}
+${textSnippet ? `- Product Share Snippet / Description: "${textSnippet}"` : ""}
 
 Extract, standardize, and format the product data to accurately match the exact Amazon India listing in JSON format.
 Guidelines:
-1. 'name': Full, standardized product title with model & capacity (50-80 chars, e.g. "Crucial BX500 480GB 3D NAND SATA 2.5-inch Internal SSD" or "Samsung 990 PRO 1TB PCIe 4.0 NVMe M.2 SSD").
-2. 'brand': Exact Brand Name (e.g. Samsung, Crucial, Corsair, Noctua, iFixit, Kingston, Western Digital).
+1. 'name': Full, standardized product title with model & capacity (50-80 chars, e.g. "Crucial BX500 480GB 3D NAND SATA 2.5-inch Internal SSD" or "Transcend TS0GUSD Micro SD to SD Adapter").
+2. 'brand': Exact Brand Name (e.g. Samsung, Crucial, Corsair, Noctua, iFixit, Kingston, Transcend, Western Digital, EVM, TP-Link, SanDisk).
 3. 'category': exactly one of the official Amazon India category IDs:
    - Components: "internal-ssds", "memory-ram", "motherboards", "fans-cooling", "power-supplies", "processors", "graphics-cards", "computer-cases", "internal-hard-drives", "io-port-cards", "computer-screws", "barebones"
    - Accessories: "keyboards-mice", "adapters", "cables-accessories", "usb-hubs", "laptop-accessories", "uninterrupted-power-supplies", "pc-gaming-peripherals", "cleaners-tools", "audio-video-accessories"
    - External Storage: "external-hard-drives", "external-ssds", "pen-drives"
    - Systems & Networking: "laptops", "desktops", "monitors", "networking-devices"
-4. 'price': Most accurate realistic current Amazon.in selling price in Indian Rupees (INR) as a clean string without rupee symbol (e.g. "2,499", "11,299", "899").
-5. 'rating': Accurate customer star rating out of 5 (e.g. 4.5, 4.6, 4.8).
-6. 'reviews': Accurate total customer review count (e.g. 18500, 42000).
+4. 'price': Most accurate realistic current Amazon.in selling price in Indian Rupees (INR) as a clean string without rupee symbol (e.g. "2,499", "11,299", "249", "899").
+5. 'rating': Accurate customer star rating out of 5 (e.g. 4.4, 4.5, 4.6, 4.8).
+6. 'reviews': Accurate total customer review count (e.g. 12500, 18500, 42000).
 7. 'badge': Best Seller, Amazon's Choice, or Technician Verified Upgrade.
-8. 'highlights': Array of exactly 3 key technical specifications / hardware features.
+8. 'asin': The 10-character Amazon ASIN (e.g. "${detectedAsin || "B008XT42JU"}"). If unknown, provide the best matching 10-char Amazon ASIN.
+9. 'highlights': Array of exactly 3 key technical specifications / hardware features.
 
 Respond ONLY with a single valid JSON object (no markdown backticks, no extra text):
 {
@@ -1800,6 +1960,7 @@ Respond ONLY with a single valid JSON object (no markdown backticks, no extra te
   "rating": 4.6,
   "reviews": 18500,
   "badge": "Technician Verified Upgrade",
+  "asin": "${detectedAsin || "B008XT42JU"}",
   "highlights": [
     "Key technical highlight 1",
     "Key technical highlight 2",
@@ -1816,9 +1977,10 @@ Respond ONLY with a single valid JSON object (no markdown backticks, no extra te
   };
 
   const modelsToTry = [
-    "models/gemini-3.5-flash-lite",
-    "models/gemini-flash-lite-latest",
-    "models/gemini-2.5-flash"
+    "models/gemini-2.5-flash",
+    "models/gemini-2.0-flash",
+    "models/gemini-1.5-flash",
+    "models/gemini-flash-lite-latest"
   ];
 
   let rawResponseText = null;
@@ -1876,6 +2038,17 @@ Respond ONLY with a single valid JSON object (no markdown backticks, no extra te
 
     const data = JSON.parse(cleanJsonStr);
 
+    // Final ASIN Resolution: Prefer detected ASIN from short link unshortener, or AI response
+    const finalAsin = detectedAsin || (data.asin && /^[A-Z0-9]{10}$/i.test(data.asin) ? data.asin.toUpperCase() : null);
+
+    // Build Canonical Affiliate URL
+    let finalAffiliateUrl = "";
+    if (finalAsin) {
+      finalAffiliateUrl = `https://www.amazon.in/dp/${finalAsin}/?tag=mp2tech20-21`;
+    } else {
+      finalAffiliateUrl = initialAffiliateUrl || ensureAffiliateTag(resolvedUrl || rawInput);
+    }
+
     // Populate Product Form Fields with Robust Normalization
     const nameEl = document.getElementById("prodName");
     const brandEl = document.getElementById("prodBrand");
@@ -1888,23 +2061,21 @@ Respond ONLY with a single valid JSON object (no markdown backticks, no extra te
     const imageEl = document.getElementById("prodImage");
     const highlightsEl = document.getElementById("prodHighlights");
 
-    if (nameEl) nameEl.value = data.name || rawInput;
-    if (brandEl) brandEl.value = data.brand || "Verified Brand";
-    
-    // Normalize Category into exact select values
     const normalizedCat = normalizeProductCategory(data.category || "storage");
-    if (catEl) catEl.value = normalizedCat;
 
-    if (priceEl) priceEl.value = normalizePrice(data.price || "2,499");
+    if (nameEl) nameEl.value = data.name || urlTitleSlug || textSnippet || rawInput;
+    if (brandEl) brandEl.value = data.brand || "Verified Brand";
+    if (catEl) catEl.value = normalizedCat;
+    if (priceEl) priceEl.value = normalizePrice(data.price || "1,999");
     if (ratingEl) ratingEl.value = normalizeRating(data.rating);
     if (reviewsEl) reviewsEl.value = normalizeReviews(data.reviews);
     if (badgeEl) badgeEl.value = data.badge || "Technician Verified";
-    if (urlEl) urlEl.value = affiliateUrl;
+    if (urlEl) urlEl.value = finalAffiliateUrl;
 
-    // Direct Amazon ASIN Image or fallback curated hardware image
+    // Direct Amazon Official ASIN CDN Image or fallback curated hardware image
     let productImgUrl = "";
-    if (detectedAsin) {
-      productImgUrl = `https://images-na.ssl-images-amazon.com/images/P/${detectedAsin}.01.LZZZZZZZ.jpg`;
+    if (finalAsin) {
+      productImgUrl = `https://images-na.ssl-images-amazon.com/images/P/${finalAsin}.01.LZZZZZZZ.jpg`;
     } else {
       productImgUrl = getCuratedPhotoForTopic(normalizedCat, data.brand || "", data.name || "");
     }
@@ -1927,13 +2098,13 @@ Respond ONLY with a single valid JSON object (no markdown backticks, no extra te
       feedback.style.background = "rgba(16, 185, 129, 0.15)";
       feedback.style.color = "#34d399";
       feedback.style.border = "1px solid rgba(16, 185, 129, 0.35)";
-      feedback.innerHTML = '<i class="fa fa-check-circle"></i> <strong>Product Captured!</strong> Review specs below and click "Add Product to Catalog".';
+      feedback.innerHTML = `<i class="fa fa-check-circle"></i> <strong>Product Captured!</strong> ${finalAsin ? `(ASIN: ${finalAsin}) ` : ''}Review specs below and click "Add Product to Catalog".`;
       feedback.style.display = "flex";
     }
 
     showToast("🛒 Amazon Product details captured!", "success");
 
-    // Smooth scroll to product form
+    // Smooth scroll to product form for mobile & desktop
     const formCard = document.getElementById("productFormCard");
     if (formCard) {
       formCard.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -2058,12 +2229,44 @@ export async function analyzeBulkAmazonLinksWithAI() {
     feedback.style.background = "rgba(245, 158, 11, 0.12)";
     feedback.style.color = "#fbbf24";
     feedback.style.border = "1px solid rgba(245, 158, 11, 0.25)";
-    feedback.innerHTML = `<i class="fa fa-cog fa-spin"></i> Gemini AI is parsing ${lines.length} Amazon hardware products in parallel...`;
+    feedback.innerHTML = `<i class="fa fa-link fa-spin"></i> Resolving short links & expanding ASINs for ${lines.length} items in parallel...`;
+  }
+
+  // Resolve short links in parallel before sending to Gemini
+  const resolvedItems = await Promise.all(
+    lines.map(async (line) => {
+      const parsed = parseAmazonInputString(line);
+      if (parsed.url && /amzn\.in|amzn\.to|a\.co|amzn\.eu|amzn\.asia|tinyurl|bit\.ly/i.test(parsed.url)) {
+        try {
+          const res = await resolveAmazonShortUrl(parsed.url);
+          return {
+            original: line,
+            resolvedUrl: res.resolvedUrl || parsed.url,
+            asin: res.asin || parsed.directAsin,
+            titleSlug: res.slugTitle,
+            snippet: parsed.textSnippet
+          };
+        } catch (e) {
+          return { original: line, resolvedUrl: parsed.url, asin: parsed.directAsin, titleSlug: "", snippet: parsed.textSnippet };
+        }
+      }
+      return {
+        original: line,
+        resolvedUrl: parsed.url,
+        asin: parsed.directAsin,
+        titleSlug: "",
+        snippet: parsed.textSnippet
+      };
+    })
+  );
+
+  if (feedback) {
+    feedback.innerHTML = `<i class="fa fa-cog fa-spin"></i> Gemini AI is parsing ${lines.length} Amazon hardware products with verified pricing & images...`;
   }
 
   const systemPrompt = `You are a professional PC hardware technician and Amazon India (amazon.in) catalog specialist for MP2TECH Store Mumbai.
 Given the following list of ${lines.length} Amazon product links or product queries:
-${lines.map((l, i) => `${i + 1}. ${l}`).join("\n")}
+${resolvedItems.map((item, i) => `${i + 1}. Input: "${item.original}"${item.asin ? ` [ASIN: ${item.asin}]` : ''}${item.titleSlug ? ` [Slug: ${item.titleSlug}]` : ''}${item.resolvedUrl ? ` [URL: ${item.resolvedUrl}]` : ''}`).join("\n")}
 
 Extract, standardize, and format each product accurately for the Amazon India catalog.
 Category must be exactly one of the official Amazon India category IDs:
@@ -2226,7 +2429,9 @@ async function executeGeminiBatchRequest(systemPrompt, apiKey, btn, feedback, ti
   };
 
   const modelsToTry = [
-    "models/gemini-3.5-flash-lite",
+    "models/gemini-2.5-flash",
+    "models/gemini-2.0-flash",
+    "models/gemini-1.5-flash",
     "models/gemini-flash-lite-latest"
   ];
 
@@ -2638,6 +2843,48 @@ export function initAdminStudio() {
     });
   }
 
+  // Direct Paste & Unshorten Listener on Amazon URL form field
+  const prodUrlInput = document.getElementById("prodAmazonUrl");
+  if (prodUrlInput) {
+    prodUrlInput.addEventListener("change", async function () {
+      const val = this.value.trim();
+      if (val && (/amzn\.in\/d\/|amzn\.to\/|a\.co\/|amzn\.eu\/|amzn\.asia\/|tinyurl|bit\.ly/i.test(val) || !val.includes("/dp/"))) {
+        try {
+          const res = await resolveAmazonShortUrl(val);
+          if (res.asin) {
+            this.value = `https://www.amazon.in/dp/${res.asin}/?tag=mp2tech20-21`;
+            const imgEl = document.getElementById("prodImage");
+            if (imgEl && (!imgEl.value || imgEl.value.includes("service.jpg"))) {
+              imgEl.value = `https://images-na.ssl-images-amazon.com/images/P/${res.asin}.01.LZZZZZZZ.jpg`;
+            }
+            updateProductLivePreview();
+            showToast(`Resolved ASIN: ${res.asin}`, "info");
+          }
+        } catch (e) {}
+      }
+    });
+  }
+
+  // 1-Tap Mobile Clipboard Paste Helper
+  window.pasteFromClipboardToAiInput = async function () {
+    const input = document.getElementById("aiAmazonLinkInput");
+    if (!input) return;
+    try {
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        const text = await navigator.clipboard.readText();
+        if (text && text.trim()) {
+          input.value = text.trim();
+          showToast("Pasted link from clipboard!", "info");
+          input.focus();
+          return;
+        }
+      }
+      input.focus();
+    } catch (e) {
+      input.focus();
+    }
+  };
+
   // Direct event listeners for AI Auto-Capture buttons
   const extractBtn = document.getElementById("extractAiProdBtn");
   if (extractBtn) {
@@ -2705,6 +2952,9 @@ export function initAdminStudio() {
 
   // AI Amazon Product Auto-Capture & Bulk Importer Window Bindings
   window.extractAmazonProductWithAI = extractAmazonProductWithAI;
+  window.resolveAmazonShortUrl = resolveAmazonShortUrl;
+  window.parseAmazonInputString = parseAmazonInputString;
+  window.pasteFromClipboardToAiInput = window.pasteFromClipboardToAiInput;
   window.switchAmazonAiMode = switchAmazonAiMode;
   window.populateBulkDemo = populateBulkDemo;
   window.analyzeBulkAmazonLinksWithAI = analyzeBulkAmazonLinksWithAI;
@@ -2725,6 +2975,8 @@ export function initAdminStudio() {
 // Immediate Top-Level Window Exports (ensures instant availability before DOMContentLoaded)
 if (typeof window !== "undefined") {
   window.extractAmazonProductWithAI = extractAmazonProductWithAI;
+  window.resolveAmazonShortUrl = resolveAmazonShortUrl;
+  window.parseAmazonInputString = parseAmazonInputString;
   window.generateArticleWithAI = generateArticleWithAI;
   window.saveGeminiApiKey = saveGeminiApiKey;
   window.getGeminiApiKey = getGeminiApiKey;
@@ -2736,6 +2988,24 @@ if (typeof window !== "undefined") {
   window.toggleAllBulkCandidates = toggleAllBulkCandidates;
   window.updateBulkSelectionCount = updateBulkSelectionCount;
   window.importSelectedBulkProducts = importSelectedBulkProducts;
+  window.pasteFromClipboardToAiInput = async function () {
+    const input = document.getElementById("aiAmazonLinkInput");
+    if (!input) return;
+    try {
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        const text = await navigator.clipboard.readText();
+        if (text && text.trim()) {
+          input.value = text.trim();
+          if (window.showToast) window.showToast("Pasted link from clipboard!", "info");
+          input.focus();
+          return;
+        }
+      }
+      input.focus();
+    } catch (e) {
+      input.focus();
+    }
+  };
   window.setAiAmazonLink = function(link) {
     const input = document.getElementById("aiAmazonLinkInput");
     if (input) {
