@@ -1667,11 +1667,14 @@ function getCuratedPhotoForTopic(category, keyword = "", topic = "") {
   if (normalized.includes("motherboard") || normalized.includes("chip") || normalized.includes("circuit") || normalized.includes("soldering")) {
     return "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80";
   }
-  if (normalized.includes("refurbished") || normalized.includes("buy") || normalized.includes("used") || normalized.includes("laptop")) {
-    return "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1200&q=80";
+  if (normalized.includes("spike") || normalized.includes("power strip") || normalized.includes("surge") || normalized.includes("extension") || normalized.includes("socket") || normalized.includes("plug") || normalized.includes("multi plug")) {
+    return "https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?auto=format&fit=crop&w=1200&q=80";
   }
-  if (normalized.includes("spike") || normalized.includes("power strip") || normalized.includes("surge") || normalized.includes("extension") || normalized.includes("socket") || normalized.includes("plug") || normalized.includes("adapter") || normalized.includes("charger") || normalized.includes("cable")) {
-    return "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=1200&q=80";
+  if (normalized.includes("micro sd") || normalized.includes("microsd") || normalized.includes("sd card") || normalized.includes("sd adapter") || normalized.includes("memory card")) {
+    return "https://images.unsplash.com/photo-1563770660941-20978e870e26?auto=format&fit=crop&w=1200&q=80";
+  }
+  if (normalized.includes("adapter") || normalized.includes("charger") || normalized.includes("power brick") || normalized.includes("cable") || normalized.includes("usb")) {
+    return "https://images.unsplash.com/photo-1616401784845-180882ba9ba8?auto=format&fit=crop&w=1200&q=80";
   }
   if (normalized.includes("tool") || normalized.includes("screwdriver") || normalized.includes("repair") || normalized.includes("teardown")) {
     return "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80";
@@ -1680,7 +1683,8 @@ function getCuratedPhotoForTopic(category, keyword = "", topic = "") {
   switch (category) {
     case "adapters":
     case "cables-accessories":
-      return "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=1200&q=80";
+    case "usb-hubs":
+      return "https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?auto=format&fit=crop&w=1200&q=80";
     case "upgrades":
       return "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=1200&q=80";
     case "repair":
@@ -2027,19 +2031,22 @@ export async function extractAmazonProductWithAI() {
     feedback.innerHTML = '<i class="fa fa-cog fa-spin"></i> Gemini AI is parsing hardware specifications, category, live INR price, and benchmark highlights...';
   }
 
-  const systemPrompt = `You are a real-time Amazon India (amazon.in) live product extraction specialist and hardware technician for MP2TECH Store Mumbai.
-Your job is to extract the 100% EXACT live listing details as shown on the authentic Amazon India (amazon.in) page.
+  const systemPrompt = `You are a real-time Amazon India (amazon.in) live product metadata extraction specialist for MP2TECH Store Mumbai.
+Your job is to act as an exact mirror of Amazon India and output the 100% VERBATIM live listing details.
 
-Input Product Reference:
-- Input Link / Raw Text: "${rawInput}"
+Product Reference:
+- Raw Link / Input: "${rawInput}"
 ${resolvedUrl && resolvedUrl !== rawInput ? `- Resolved Full Amazon URL: "${resolvedUrl}"` : ""}
 ${detectedAsin ? `- Amazon India ASIN: "${detectedAsin}"` : ""}
-${urlTitleSlug ? `- Extracted Product Slug from URL: "${urlTitleSlug}"` : ""}
-${searchKeyword ? `- Target Product Query / Keyword: "${searchKeyword}"` : ""}
-${textSnippet ? `- Shared Text / Message: "${textSnippet}"` : ""}
+${urlTitleSlug ? `- Extracted Product Slug: "${urlTitleSlug}"` : ""}
+${searchKeyword ? `- Target Product Query: "${searchKeyword}"` : ""}
+${textSnippet ? `- Shared Message: "${textSnippet}"` : ""}
 
-CRITICAL EXTRACTION RULES:
-1. 'name': MUST BE THE FULL, EXACT OFFICIAL PRODUCT TITLE from Amazon.in (Do NOT summarize or shorten; provide the complete authentic title e.g. "GM 3060 Extension Board 10Amp Output 250 Volts with 2 Mtr Extension Cord & Surge Protector | Master Switch, Safety Shutter, 4 International Sockets | Multi Plug Travel Adapter for Home Appliances" or "Crucial BX500 480GB 3D NAND SATA 2.5-inch Internal SSD").
+STRICT TITLE & SPECIFICATION EXTRACTION RULES:
+1. 'name': MUST BE THE FULL, 100% COMPLETE AND VERBATIM PRODUCT TITLE character-for-character from Amazon.in:
+   - Example exact title: "GM 3060 Extension Board 10Amp Output 250 Volts with 2 Mtr Extension Cord & Surge Protector | Master Switch, Safety Shutter, 4 International Sockets | Multi Plug Travel Adapter for Home Appliances"
+   - Do NOT add invented marketing words like "E-Book" or "Multicolour 4+1" unless it is the literal title on Amazon.in.
+   - Do NOT cut off the trailing parts of the title (e.g. "| Multi Plug Travel Adapter for Home Appliances"). Include the complete title from start to finish.
 2. 'brand': Exact Brand Name (e.g. GM, Goldmedal, Crucial, Samsung, Noctua, Belkin, Transcend, Western Digital, EVM, TP-Link, SanDisk).
 3. 'category': exactly one of the official Amazon India category IDs:
    - Components: "internal-ssds", "memory-ram", "motherboards", "fans-cooling", "power-supplies", "processors", "graphics-cards", "computer-cases", "internal-hard-drives", "io-port-cards", "computer-screws", "barebones"
@@ -2051,12 +2058,12 @@ CRITICAL EXTRACTION RULES:
 6. 'reviews': Exact live total customer review count on Amazon.in (e.g. 67888, 18500, 42000).
 7. 'badge': Exact badge on Amazon (e.g. "#1 Best Seller in Power Strips", "Amazon's Choice", or "Technician Verified Upgrade").
 8. 'asin': The exact 10-character Amazon ASIN (e.g. "${detectedAsin || "B01CCW2V02"}").
-9. 'image': Direct high-res Amazon media image URL if found (e.g. "https://m.media-amazon.com/images/I/...") or empty string.
-10. 'highlights': Array of exactly 3 to 4 key technical hardware features / bullet points directly from the product specifications.
+9. 'image': Direct high-res Amazon media CDN image URL if found (e.g. "https://m.media-amazon.com/images/I/...") or empty string.
+10. 'highlights': Array of exactly 3 to 4 key technical specifications / hardware features directly from the product page.
 
 Respond ONLY with a single valid JSON object (no markdown backticks, no extra text):
 {
-  "name": "Full Exact Product Title from Amazon.in",
+  "name": "GM 3060 Extension Board 10Amp Output 250 Volts with 2 Mtr Extension Cord & Surge Protector | Master Switch, Safety Shutter, 4 International Sockets | Multi Plug Travel Adapter for Home Appliances",
   "brand": "GM",
   "category": "adapters",
   "price": "495",
@@ -2064,11 +2071,11 @@ Respond ONLY with a single valid JSON object (no markdown backticks, no extra te
   "reviews": 67888,
   "badge": "#1 Best Seller in Power Strips",
   "asin": "${detectedAsin || "B01CCW2V02"}",
-  "image": "https://m.media-amazon.com/images/I/...",
+  "image": "https://m.media-amazon.com/images/I/61tj2lVzUOL._AC_SL1500_.jpg",
   "highlights": [
-    "Key specification 1",
-    "Key specification 2",
-    "Key specification 3"
+    "10Amp Output 250 Volts with 2 Mtr Extension Cord & Surge Protector",
+    "Master Switch, Safety Shutter, 4 International Sockets",
+    "Multi Plug Travel Adapter for Home Appliances"
   ]
 }`;
 
