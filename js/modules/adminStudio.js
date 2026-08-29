@@ -185,19 +185,22 @@ export function parseAmazonInputString(rawInput) {
 }
 
 /**
- * Multi-Tier Fast Amazon Short Link Expander & Unshortener (Resolves amzn.in/d/*, amzn.to/*, a.co/*, etc.)
+ * Multi-Tier Fast Amazon Short Link Expander & Unshortener
+ * Resolves amzn.in/d/*, link.amazon/*, amzlinks.in/*, amzn.to/*, a.co/*, amzn.eu/*, amzn.asia/*, etc.
  */
 export async function resolveAmazonShortUrl(inputUrl) {
-  if (!inputUrl) return { resolvedUrl: "", asin: null, slugTitle: "" };
+  if (!inputUrl) return { resolvedUrl: "", asin: null, slugTitle: "", searchKeyword: "" };
 
   const parsed = parseAmazonInputString(inputUrl);
   const url = parsed.url || inputUrl;
 
-  const isShortLink = /amzn\.in\/d\/|amzn\.to\/|a\.co\/|amzn\.eu\/|amzn\.asia\/|tinyurl\.com|bit\.ly/i.test(url);
+  const isShortLink = /amzn\.|a\.co|link\.amazon|amzlinks\.|amz\.run|amazon\.link|tinyurl|bit\.ly|cutt\.ly|t\.co/i.test(url) || 
+                      (!url.includes("/dp/") && !url.includes("/gp/product/"));
   
   let resolvedUrl = url;
   let detectedAsin = parsed.directAsin || null;
   let slugTitle = "";
+  let searchKeyword = "";
 
   // Check if it's already a full Amazon URL with slug
   const slugMatch = url.match(/(?:amazon\.[a-z.]+\/)?([^/]+)\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i);
@@ -208,7 +211,7 @@ export async function resolveAmazonShortUrl(inputUrl) {
 
   // If already a full Amazon product URL with known ASIN, return immediately
   if (detectedAsin && !isShortLink) {
-    return { resolvedUrl, asin: detectedAsin, slugTitle };
+    return { resolvedUrl, asin: detectedAsin, slugTitle, searchKeyword };
   }
 
   // If it is a short link, attempt fast multi-tier client unshortening
@@ -225,14 +228,32 @@ export async function resolveAmazonShortUrl(inputUrl) {
         const json = await res.json();
         if (json.success && json.resolved_url) {
           resolvedUrl = json.resolved_url;
+          
+          // Follow redirect chain if it resolved to another intermediate short link (e.g. link.amazon -> amzlinks.in)
+          if (/amzlinks\.|link\.amazon|amz\.run|tinyurl|bit\.ly/i.test(resolvedUrl)) {
+            try {
+              const controllerNext = new AbortController();
+              const timeoutIdNext = setTimeout(() => controllerNext.abort(), 3500);
+              const resNext = await fetch(`https://unshorten.me/json/${encodeURIComponent(resolvedUrl)}`, {
+                signal: controllerNext.signal
+              });
+              clearTimeout(timeoutIdNext);
+              if (resNext.ok) {
+                const jsonNext = await resNext.json();
+                if (jsonNext.success && jsonNext.resolved_url) {
+                  resolvedUrl = jsonNext.resolved_url;
+                }
+              }
+            } catch (e2) {}
+          }
         }
       }
     } catch (e) {
       console.warn("Unshorten Tier 1 failed or timed out:", e.message);
     }
 
-    // Check if Tier 1 resolved an ASIN or slug
-    let m = resolvedUrl.match(/(?:dp|gp\/product|asin|d)\/([A-Z0-9]{10})/i) || resolvedUrl.match(/\b(B[0-9A-Z]{9})\b/i);
+    // Check if Tier 1 resolved an ASIN
+    let m = resolvedUrl.match(/(?:dp|gp\/product|asin)\/([A-Z0-9]{10})/i) || resolvedUrl.match(/[?&]asin=([A-Z0-9]{10})/i);
     if (m) detectedAsin = m[1].toUpperCase();
 
     let sMatch = resolvedUrl.match(/(?:amazon\.[a-z.]+\/)?([^/]+)\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i);
@@ -240,8 +261,17 @@ export async function resolveAmazonShortUrl(inputUrl) {
       slugTitle = decodeURIComponent(sMatch[1]).replace(/[-_]/g, " ");
     }
 
-    // Tier 2: allorigins proxy fallback if Tier 1 did not get ASIN
-    if (!detectedAsin) {
+    // Check if resolved URL is an Amazon search / keyword query (e.g. /s?k=spike+guard)
+    try {
+      const u = new URL(resolvedUrl);
+      const kw = u.searchParams.get("k") || u.searchParams.get("keywords") || u.searchParams.get("field-keywords") || "";
+      if (kw) {
+        searchKeyword = decodeURIComponent(kw).replace(/\+/g, " ").trim();
+      }
+    } catch (e) {}
+
+    // Tier 2: allorigins proxy fallback if Tier 1 did not get ASIN or keyword
+    if (!detectedAsin && !searchKeyword) {
       try {
         const controller2 = new AbortController();
         const timeoutId2 = setTimeout(() => controller2.abort(), 4000);
@@ -253,8 +283,14 @@ export async function resolveAmazonShortUrl(inputUrl) {
           const json2 = await res2.json();
           if (json2.status && json2.status.url && json2.status.url !== url) {
             resolvedUrl = json2.status.url;
-            m = resolvedUrl.match(/(?:dp|gp\/product|asin|d)\/([A-Z0-9]{10})/i) || resolvedUrl.match(/\b(B[0-9A-Z]{9})\b/i);
+            m = resolvedUrl.match(/(?:dp|gp\/product|asin)\/([A-Z0-9]{10})/i) || resolvedUrl.match(/[?&]asin=([A-Z0-9]{10})/i);
             if (m) detectedAsin = m[1].toUpperCase();
+
+            try {
+              const u2 = new URL(resolvedUrl);
+              const kw2 = u2.searchParams.get("k") || u2.searchParams.get("keywords") || u2.searchParams.get("field-keywords") || "";
+              if (kw2) searchKeyword = decodeURIComponent(kw2).replace(/\+/g, " ").trim();
+            } catch (e3) {}
           }
         }
       } catch (e) {
@@ -263,7 +299,7 @@ export async function resolveAmazonShortUrl(inputUrl) {
     }
   }
 
-  return { resolvedUrl, asin: detectedAsin, slugTitle };
+  return { resolvedUrl, asin: detectedAsin, slugTitle, searchKeyword };
 }
 
 /**
@@ -1894,13 +1930,16 @@ export async function extractAmazonProductWithAI() {
     feedback.innerHTML = '<i class="fa fa-link fa-spin"></i> Expanding Amazon link, detecting catalog ASIN & mobile share info...';
   }
 
-  // 3. Multi-tier Unshortening if short link (amzn.in/d/*, amzn.to/*, a.co/*, etc.)
-  if (targetUrl && (/amzn\.in|amzn\.to|a\.co|amzn\.eu|amzn\.asia|tinyurl|bit\.ly/i.test(targetUrl) || !detectedAsin)) {
+  let searchKeyword = "";
+
+  // 3. Multi-tier Unshortening if short link (amzn.in/d/*, link.amazon/*, amzlinks.in/*, amzn.to/*, etc.)
+  if (targetUrl && (/amzn\.|a\.co|link\.amazon|amzlinks\.|amz\.run|amazon\.link|tinyurl|bit\.ly/i.test(targetUrl) || !detectedAsin)) {
     try {
       const resolution = await resolveAmazonShortUrl(targetUrl);
       if (resolution.resolvedUrl) resolvedUrl = resolution.resolvedUrl;
       if (resolution.asin) detectedAsin = resolution.asin;
       if (resolution.slugTitle) urlTitleSlug = resolution.slugTitle;
+      if (resolution.searchKeyword) searchKeyword = resolution.searchKeyword;
     } catch (err) {
       console.warn("URL resolution error:", err);
     }
@@ -1932,13 +1971,15 @@ Given the following Amazon product information:
 - Raw Input / Link: "${rawInput}"
 ${resolvedUrl && resolvedUrl !== rawInput ? `- Resolved Full Amazon URL: "${resolvedUrl}"` : ""}
 ${urlTitleSlug ? `- Extracted Product Title Slug from URL: "${urlTitleSlug}"` : ""}
+${searchKeyword ? `- Target Product Search Keyword / Category: "${searchKeyword}"` : ""}
 ${detectedAsin ? `- Amazon ASIN: "${detectedAsin}"` : ""}
 ${textSnippet ? `- Product Share Snippet / Description: "${textSnippet}"` : ""}
 
 Extract, standardize, and format the product data to accurately match the exact Amazon India listing in JSON format.
+${searchKeyword ? `Important: The input link is an Amazon India search/product link for '${searchKeyword}'. Return the top-selling, highest-rated genuine product matching '${searchKeyword}' (e.g. Goldmedal / GM / Belkin Surge Protector Spike Guard with sockets & USB) with its real Amazon ASIN, live market INR price, star rating, badge, and highlights.` : ''}
 Guidelines:
-1. 'name': Full, standardized product title with model & capacity (50-80 chars, e.g. "Crucial BX500 480GB 3D NAND SATA 2.5-inch Internal SSD" or "Transcend TS0GUSD Micro SD to SD Adapter").
-2. 'brand': Exact Brand Name (e.g. Samsung, Crucial, Corsair, Noctua, iFixit, Kingston, Transcend, Western Digital, EVM, TP-Link, SanDisk).
+1. 'name': Full, standardized product title with model & capacity (50-80 chars, e.g. "Crucial BX500 480GB 3D NAND SATA 2.5-inch Internal SSD" or "Goldmedal Curve Plus 205101 4-Outlet Surge Protector Spike Guard with 2 USB Ports").
+2. 'brand': Exact Brand Name (e.g. Samsung, Crucial, Corsair, Noctua, iFixit, Kingston, Transcend, Goldmedal, GM, Belkin, Western Digital, EVM, TP-Link, SanDisk).
 3. 'category': exactly one of the official Amazon India category IDs:
    - Components: "internal-ssds", "memory-ram", "motherboards", "fans-cooling", "power-supplies", "processors", "graphics-cards", "computer-cases", "internal-hard-drives", "io-port-cards", "computer-screws", "barebones"
    - Accessories: "keyboards-mice", "adapters", "cables-accessories", "usb-hubs", "laptop-accessories", "uninterrupted-power-supplies", "pc-gaming-peripherals", "cleaners-tools", "audio-video-accessories"
