@@ -1930,13 +1930,16 @@ export async function extractAmazonProductWithAI() {
     feedback.innerHTML = '<i class="fa fa-link fa-spin"></i> Expanding Amazon link, detecting catalog ASIN & mobile share info...';
   }
 
-  // 3. Multi-tier Unshortening if short link (amzn.in/d/*, amzn.to/*, a.co/*, etc.)
-  if (targetUrl && (/amzn\.in|amzn\.to|a\.co|amzn\.eu|amzn\.asia|tinyurl|bit\.ly/i.test(targetUrl) || !detectedAsin)) {
+  let searchKeyword = "";
+
+  // 3. Multi-tier Unshortening if short link (amzn.in/d/*, link.amazon/*, amzlinks.in/*, amzn.to/*, etc.)
+  if (targetUrl && (/amzn\.|a\.co|link\.amazon|amzlinks\.|amz\.run|amazon\.link|tinyurl|bit\.ly/i.test(targetUrl) || !detectedAsin)) {
     try {
       const resolution = await resolveAmazonShortUrl(targetUrl);
       if (resolution.resolvedUrl) resolvedUrl = resolution.resolvedUrl;
       if (resolution.asin) detectedAsin = resolution.asin;
       if (resolution.slugTitle) urlTitleSlug = resolution.slugTitle;
+      if (resolution.searchKeyword) searchKeyword = resolution.searchKeyword;
     } catch (err) {
       console.warn("URL resolution error:", err);
     }
@@ -1968,13 +1971,15 @@ Given the following Amazon product information:
 - Raw Input / Link: "${rawInput}"
 ${resolvedUrl && resolvedUrl !== rawInput ? `- Resolved Full Amazon URL: "${resolvedUrl}"` : ""}
 ${urlTitleSlug ? `- Extracted Product Title Slug from URL: "${urlTitleSlug}"` : ""}
+${searchKeyword ? `- Target Product Search Keyword / Category: "${searchKeyword}"` : ""}
 ${detectedAsin ? `- Amazon ASIN: "${detectedAsin}"` : ""}
 ${textSnippet ? `- Product Share Snippet / Description: "${textSnippet}"` : ""}
 
 Extract, standardize, and format the product data to accurately match the exact Amazon India listing in JSON format.
+${searchKeyword ? `Important: The input link is an Amazon India search/product link for '${searchKeyword}'. Return the top-selling, highest-rated genuine product matching '${searchKeyword}' (e.g. Goldmedal / GM / Belkin Surge Protector Spike Guard with sockets & USB) with its real Amazon ASIN, live market INR price, star rating, badge, and highlights.` : ''}
 Guidelines:
-1. 'name': Full, standardized product title with model & capacity (50-80 chars, e.g. "Crucial BX500 480GB 3D NAND SATA 2.5-inch Internal SSD" or "Transcend TS0GUSD Micro SD to SD Adapter").
-2. 'brand': Exact Brand Name (e.g. Samsung, Crucial, Corsair, Noctua, iFixit, Kingston, Transcend, Western Digital, EVM, TP-Link, SanDisk).
+1. 'name': Full, standardized product title with model & capacity (50-80 chars, e.g. "Crucial BX500 480GB 3D NAND SATA 2.5-inch Internal SSD" or "Goldmedal Curve Plus 205101 4-Outlet Surge Protector Spike Guard with 2 USB Ports").
+2. 'brand': Exact Brand Name (e.g. Samsung, Crucial, Corsair, Noctua, iFixit, Kingston, Transcend, Goldmedal, GM, Belkin, Western Digital, EVM, TP-Link, SanDisk).
 3. 'category': exactly one of the official Amazon India category IDs:
    - Components: "internal-ssds", "memory-ram", "motherboards", "fans-cooling", "power-supplies", "processors", "graphics-cards", "computer-cases", "internal-hard-drives", "io-port-cards", "computer-screws", "barebones"
    - Accessories: "keyboards-mice", "adapters", "cables-accessories", "usb-hubs", "laptop-accessories", "uninterrupted-power-supplies", "pc-gaming-peripherals", "cleaners-tools", "audio-video-accessories"
