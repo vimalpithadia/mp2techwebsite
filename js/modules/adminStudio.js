@@ -728,7 +728,27 @@ export function updateProductLivePreview() {
   document.getElementById("prevProdPrice").textContent = price.startsWith("₹") ? price : `₹${price}`;
   document.getElementById("prevProdRating").textContent = rating;
   document.getElementById("prevProdBadge").textContent = badge;
-  document.getElementById("prevProdImg").src = image;
+  
+  const imgEl = document.getElementById("prevProdImg");
+  if (imgEl) {
+    imgEl.src = image;
+    imgEl.onerror = function () {
+      const cat = document.getElementById("prodCategory")?.value || "adapters";
+      this.src = getCuratedPhotoForTopic(cat, brand, name);
+    };
+    imgEl.onload = function () {
+      // If Amazon returned a 1x1 blank pixel GIF, automatically switch to high-res hardware photo
+      if (this.naturalWidth === 1 && this.naturalHeight === 1) {
+        const cat = document.getElementById("prodCategory")?.value || "adapters";
+        const fallback = getCuratedPhotoForTopic(cat, brand, name);
+        this.src = fallback;
+        const inputImg = document.getElementById("prodImage");
+        if (inputImg && inputImg.value.includes("images-na.ssl-images-amazon.com")) {
+          inputImg.value = fallback;
+        }
+      }
+    };
+  }
 }
 
 /* ==========================================================================
@@ -1966,50 +1986,65 @@ export async function extractAmazonProductWithAI() {
     feedback.innerHTML = '<i class="fa fa-cog fa-spin"></i> Gemini AI is parsing hardware specifications, category, live INR price, and benchmark highlights...';
   }
 
-  const systemPrompt = `You are a professional PC hardware technician and Amazon India (amazon.in) product catalog specialist for MP2TECH Store Mumbai.
-Given the following Amazon product information:
-- Raw Input / Link: "${rawInput}"
-${resolvedUrl && resolvedUrl !== rawInput ? `- Resolved Full Amazon URL: "${resolvedUrl}"` : ""}
-${urlTitleSlug ? `- Extracted Product Title Slug from URL: "${urlTitleSlug}"` : ""}
-${searchKeyword ? `- Target Product Search Keyword / Category: "${searchKeyword}"` : ""}
-${detectedAsin ? `- Amazon ASIN: "${detectedAsin}"` : ""}
-${textSnippet ? `- Product Share Snippet / Description: "${textSnippet}"` : ""}
+  const systemPrompt = `You are a real-time Amazon India (amazon.in) live product extraction specialist and hardware technician for MP2TECH Store Mumbai.
+Your job is to extract the 100% EXACT live listing details as shown on the authentic Amazon India (amazon.in) page.
 
-Extract, standardize, and format the product data to accurately match the exact Amazon India listing in JSON format.
-${searchKeyword ? `Important: The input link is an Amazon India search/product link for '${searchKeyword}'. Return the top-selling, highest-rated genuine product matching '${searchKeyword}' (e.g. Goldmedal / GM / Belkin Surge Protector Spike Guard with sockets & USB) with its real Amazon ASIN, live market INR price, star rating, badge, and highlights.` : ''}
-Guidelines:
-1. 'name': Full, standardized product title with model & capacity (50-80 chars, e.g. "Crucial BX500 480GB 3D NAND SATA 2.5-inch Internal SSD" or "Goldmedal Curve Plus 205101 4-Outlet Surge Protector Spike Guard with 2 USB Ports").
-2. 'brand': Exact Brand Name (e.g. Samsung, Crucial, Corsair, Noctua, iFixit, Kingston, Transcend, Goldmedal, GM, Belkin, Western Digital, EVM, TP-Link, SanDisk).
+Input Product Reference:
+- Input Link / Raw Text: "${rawInput}"
+${resolvedUrl && resolvedUrl !== rawInput ? `- Resolved Full Amazon URL: "${resolvedUrl}"` : ""}
+${detectedAsin ? `- Amazon India ASIN: "${detectedAsin}"` : ""}
+${urlTitleSlug ? `- Extracted Product Slug from URL: "${urlTitleSlug}"` : ""}
+${searchKeyword ? `- Target Product Query / Keyword: "${searchKeyword}"` : ""}
+${textSnippet ? `- Shared Text / Message: "${textSnippet}"` : ""}
+
+CRITICAL EXTRACTION RULES:
+1. 'name': MUST BE THE FULL, EXACT OFFICIAL PRODUCT TITLE from Amazon.in (Do NOT summarize or shorten; provide the complete authentic title e.g. "GM 3060 Extension Board 10Amp Output 250 Volts with 2 Mtr Extension Cord & Surge Protector | Master Switch, Safety Shutter, 4 International Sockets | Multi Plug Travel Adapter for Home Appliances" or "Crucial BX500 480GB 3D NAND SATA 2.5-inch Internal SSD").
+2. 'brand': Exact Brand Name (e.g. GM, Goldmedal, Crucial, Samsung, Noctua, Belkin, Transcend, Western Digital, EVM, TP-Link, SanDisk).
 3. 'category': exactly one of the official Amazon India category IDs:
    - Components: "internal-ssds", "memory-ram", "motherboards", "fans-cooling", "power-supplies", "processors", "graphics-cards", "computer-cases", "internal-hard-drives", "io-port-cards", "computer-screws", "barebones"
    - Accessories: "keyboards-mice", "adapters", "cables-accessories", "usb-hubs", "laptop-accessories", "uninterrupted-power-supplies", "pc-gaming-peripherals", "cleaners-tools", "audio-video-accessories"
    - External Storage: "external-hard-drives", "external-ssds", "pen-drives"
    - Systems & Networking: "laptops", "desktops", "monitors", "networking-devices"
-4. 'price': Most accurate realistic current Amazon.in selling price in Indian Rupees (INR) as a clean string without rupee symbol (e.g. "2,499", "11,299", "249", "899").
-5. 'rating': Accurate customer star rating out of 5 (e.g. 4.4, 4.5, 4.6, 4.8).
-6. 'reviews': Accurate total customer review count (e.g. 12500, 18500, 42000).
-7. 'badge': Best Seller, Amazon's Choice, or Technician Verified Upgrade.
-8. 'asin': The 10-character Amazon ASIN (e.g. "${detectedAsin || "B008XT42JU"}"). If unknown, provide the best matching 10-char Amazon ASIN.
-9. 'highlights': Array of exactly 3 key technical specifications / hardware features.
+4. 'price': Exact live selling price on Amazon.in in Indian Rupees (INR) as a clean string without rupee symbol (e.g. "495", "2,499", "11,299", "249").
+5. 'rating': Exact live customer star rating out of 5 (e.g. 4.4, 4.5, 4.6).
+6. 'reviews': Exact live total customer review count on Amazon.in (e.g. 67888, 18500, 42000).
+7. 'badge': Exact badge on Amazon (e.g. "#1 Best Seller in Power Strips", "Amazon's Choice", or "Technician Verified Upgrade").
+8. 'asin': The exact 10-character Amazon ASIN (e.g. "${detectedAsin || "B01CCW2V02"}").
+9. 'image': Direct high-res Amazon media image URL if found (e.g. "https://m.media-amazon.com/images/I/...") or empty string.
+10. 'highlights': Array of exactly 3 to 4 key technical hardware features / bullet points directly from the product specifications.
 
 Respond ONLY with a single valid JSON object (no markdown backticks, no extra text):
 {
-  "name": "Clean product title with model and capacity",
-  "brand": "Brand Name",
-  "category": "internal-ssds",
-  "price": "2,499",
-  "rating": 4.6,
-  "reviews": 18500,
-  "badge": "Technician Verified Upgrade",
-  "asin": "${detectedAsin || "B008XT42JU"}",
+  "name": "Full Exact Product Title from Amazon.in",
+  "brand": "GM",
+  "category": "adapters",
+  "price": "495",
+  "rating": 4.4,
+  "reviews": 67888,
+  "badge": "#1 Best Seller in Power Strips",
+  "asin": "${detectedAsin || "B01CCW2V02"}",
+  "image": "https://m.media-amazon.com/images/I/...",
   "highlights": [
-    "Key technical highlight 1",
-    "Key technical highlight 2",
-    "Key technical highlight 3"
+    "Key specification 1",
+    "Key specification 2",
+    "Key specification 3"
   ]
 }`;
 
-  const payload = {
+  const payloadWithSearch = {
+    contents: [
+      {
+        parts: [{ text: systemPrompt }]
+      }
+    ],
+    tools: [
+      {
+        google_search: {}
+      }
+    ]
+  };
+
+  const payloadStandard = {
     contents: [
       {
         parts: [{ text: systemPrompt }]
@@ -2028,27 +2063,35 @@ Respond ONLY with a single valid JSON object (no markdown backticks, no extra te
   let lastError = null;
 
   for (const model of modelsToTry) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${apiKey}`;
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+    // Try with Google Search grounding first, then fallback to standard
+    for (const bodyPayload of [payloadWithSearch, payloadStandard]) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${apiKey}`;
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(bodyPayload)
+        });
 
-      if (response.ok) {
-        const json = await response.json();
-        if (json.candidates && json.candidates[0] && json.candidates[0].content && json.candidates[0].content.parts[0]) {
-          rawResponseText = json.candidates[0].content.parts[0].text;
-          break;
+        if (response.ok) {
+          const json = await response.json();
+          if (json.candidates && json.candidates[0] && json.candidates[0].content && json.candidates[0].content.parts) {
+            // Find text part from candidate
+            const textPart = json.candidates[0].content.parts.find(p => p.text);
+            if (textPart && textPart.text) {
+              rawResponseText = textPart.text;
+              break;
+            }
+          }
+        } else {
+          const errJson = await response.json().catch(() => ({}));
+          lastError = errJson.error ? errJson.error.message : `HTTP ${response.status}`;
         }
-      } else {
-        const errJson = await response.json().catch(() => ({}));
-        lastError = errJson.error ? errJson.error.message : `HTTP ${response.status}`;
+      } catch (e) {
+        lastError = e.message;
       }
-    } catch (e) {
-      lastError = e.message;
     }
+    if (rawResponseText) break;
   }
 
   if (!rawResponseText) {
@@ -2113,9 +2156,11 @@ Respond ONLY with a single valid JSON object (no markdown backticks, no extra te
     if (badgeEl) badgeEl.value = data.badge || "Technician Verified";
     if (urlEl) urlEl.value = finalAffiliateUrl;
 
-    // Direct Amazon Official ASIN CDN Image or fallback curated hardware image
+    // Direct Amazon Official ASIN CDN Image, AI image, or fallback curated hardware image
     let productImgUrl = "";
-    if (finalAsin) {
+    if (data.image && typeof data.image === "string" && data.image.startsWith("http") && !data.image.includes("...")) {
+      productImgUrl = data.image;
+    } else if (finalAsin) {
       productImgUrl = `https://images-na.ssl-images-amazon.com/images/P/${finalAsin}.01.LZZZZZZZ.jpg`;
     } else {
       productImgUrl = getCuratedPhotoForTopic(normalizedCat, data.brand || "", data.name || "");
