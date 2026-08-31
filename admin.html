@@ -921,18 +921,23 @@
                         <!-- GOOGLE GEMINI AI CONFIGURATION -->
                         <div class="sync-box" style="background: #0f172a; border: 1.5px solid #334155; margin-top: 24px;">
                             <h3 style="color:#38bdf8;"><i class="fa fa-key"></i> Google Gemini AI API Configuration</h3>
-                            <p>Your Gemini API Key powers the 1-Click AI Auto-Blogger. Keys are saved securely in your browser's private storage (<code>localStorage</code>) and are never exposed publicly.</p>
+                            <p>Your Gemini API Key powers the 1-Click AI Auto-Blogger &amp; Live Product Scraper. Keys are stored <strong>100% securely inside your browser's private local storage (<code>localStorage</code>)</strong> and are never published or committed to public GitHub repositories.</p>
                             
                             <div class="form-group" style="margin-bottom: 14px;">
                                 <label for="geminiApiKeyInput" style="color:#cbd5e1;">Google Gemini API Key</label>
-                                <input type="password" id="geminiApiKeyInput" placeholder="Enter Gemini API Key..." style="background:#1e293b; color:#fff; border-color:#334155;" />
-                                <span class="form-hint">Default API key configured. You can update or replace this key anytime.</span>
+                                <input type="password" id="geminiApiKeyInput" placeholder="Paste your new Gemini API Key here (AIzaSy...)..." style="background:#1e293b; color:#fff; border-color:#334155;" autocomplete="off" />
+                                <span class="form-hint">Stored strictly in local client storage. Get or rotate keys at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:#38bdf8; text-decoration:underline;">Google AI Studio</a>.</span>
                             </div>
 
-                            <button type="button" onclick="window.saveGeminiApiKey()" class="btn-primary" style="background:#0284c7; padding: 9px 18px; font-size: 13.5px;">
-                                <i class="fa fa-floppy-o"></i> Save Gemini API Key
-                            </button>
-                            <span id="geminiKeySaveStatus" style="margin-left:12px; font-size:13px; color:#34d399; font-weight:600;"></span>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                                <button type="button" onclick="window.saveGeminiApiKey()" class="btn-primary" style="background:#0284c7; padding: 10px 20px; font-size: 13.5px; font-weight:700;">
+                                    <i class="fa fa-floppy-o"></i> Save API Key
+                                </button>
+                                <button type="button" onclick="window.testGeminiApiKey()" class="btn-secondary" style="padding: 10px 20px; font-size: 13.5px; font-weight:700; background:#1e293b; color:#fbbf24; border-color:#d97706;">
+                                    <i class="fa fa-bolt"></i> Test &amp; Verify Connection
+                                </button>
+                            </div>
+                            <div id="geminiKeySaveStatus" style="margin-top:12px; font-size:13px; font-weight:600;"></div>
                         </div>
 
                         <div class="panel-header" style="margin-top: 30px;">
@@ -954,7 +959,7 @@
 
     <!-- Scripts -->
     <script type="module">
-        import * as AdminStudio from "./js/modules/adminStudio.js?v=20260829_live_v3";
+        import * as AdminStudio from "./js/modules/adminStudio.js?v=20260831_security_v1";
         window.AdminStudio = AdminStudio;
         Object.assign(window, AdminStudio);
         window.extractAmazonProductWithAI = AdminStudio.extractAmazonProductWithAI;
@@ -971,6 +976,7 @@
         window.setAiTopic = AdminStudio.setAiTopic;
         window.saveGeminiApiKey = AdminStudio.saveGeminiApiKey;
         window.getGeminiApiKey = AdminStudio.getGeminiApiKey;
+        window.testGeminiApiKey = AdminStudio.testGeminiApiKey;
         
         if (document.readyState === "loading") {
             document.addEventListener("DOMContentLoaded", AdminStudio.initAdminStudio);

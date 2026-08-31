@@ -1498,17 +1498,13 @@ async function commitFileToGitHub(token, branch, path, content, message) {
 // --------------------------------------------------------------------------
 // AI Engines & Normalizers (Powered by Google Gemini AI)
 // --------------------------------------------------------------------------
+// GOOGLE GEMINI API KEY MANAGEMENT (SECURE CLIENT-SIDE LOCAL STORAGE ONLY)
+// --------------------------------------------------------------------------
 const GEMINI_KEY_STORAGE = "mp2tech_gemini_api_key";
-const DEFAULT_KEY_B64 = "QVEuQWI4Uk42SXpoNDl6dFZPWW1XQ0pzSnVvVDVsaFd5bFZMN1VDTGJ1SGZBeHFrNG81R3c=";
 
 export function getGeminiApiKey() {
   const stored = localStorage.getItem(GEMINI_KEY_STORAGE);
-  if (stored && stored.trim()) return stored.trim();
-  try {
-    return atob(DEFAULT_KEY_B64);
-  } catch (e) {
-    return "";
-  }
+  return (stored && stored.trim()) ? stored.trim() : "";
 }
 
 export function saveGeminiApiKey() {
@@ -1519,10 +1515,73 @@ export function saveGeminiApiKey() {
   if (key) {
     localStorage.setItem(GEMINI_KEY_STORAGE, key);
     if (status) {
-      status.textContent = "✓ Key saved securely in browser!";
-      setTimeout(() => { status.textContent = ""; }, 4000);
+      status.style.color = "#34d399";
+      status.innerHTML = '<i class="fa fa-check-circle"></i> Key saved securely in your private browser storage!';
+      setTimeout(() => { status.innerHTML = ""; }, 4500);
     }
-    showToast("Gemini API Key saved successfully!", "success");
+    showToast("Gemini API Key saved securely!", "success");
+  } else {
+    localStorage.removeItem(GEMINI_KEY_STORAGE);
+    if (status) {
+      status.style.color = "#f87171";
+      status.innerHTML = '<i class="fa fa-info-circle"></i> Key removed from local storage.';
+      setTimeout(() => { status.innerHTML = ""; }, 4000);
+    }
+    showToast("Gemini API Key removed", "info");
+  }
+}
+
+export async function testGeminiApiKey() {
+  const input = document.getElementById("geminiApiKeyInput");
+  const status = document.getElementById("geminiKeySaveStatus");
+  const key = (input && input.value.trim()) || getGeminiApiKey();
+
+  if (!key) {
+    if (status) {
+      status.style.color = "#f87171";
+      status.innerHTML = '<i class="fa fa-exclamation-circle"></i> Please enter your API key first.';
+    }
+    showToast("Please enter an API Key to test", "error");
+    return;
+  }
+
+  if (status) {
+    status.style.color = "#fbbf24";
+    status.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Contacting Google Gemini API to verify credentials...';
+  }
+
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: "Hello, reply with: OK" }] }]
+      })
+    });
+
+    if (res.ok) {
+      localStorage.setItem(GEMINI_KEY_STORAGE, key);
+      if (status) {
+        status.style.color = "#34d399";
+        status.innerHTML = '<i class="fa fa-check-circle"></i> <strong>Connection Verified!</strong> Your Gemini API Key is working perfectly.';
+      }
+      showToast("✓ Gemini API Key verified & saved!", "success");
+    } else {
+      const errJson = await res.json().catch(() => ({}));
+      const errMsg = errJson.error ? errJson.error.message : `HTTP ${res.status}`;
+      if (status) {
+        status.style.color = "#f87171";
+        status.innerHTML = `<i class="fa fa-times-circle"></i> <strong>Verification Failed:</strong> ${errMsg}`;
+      }
+      showToast("API Key verification failed", "error");
+    }
+  } catch (err) {
+    if (status) {
+      status.style.color = "#f87171";
+      status.innerHTML = `<i class="fa fa-times-circle"></i> Network error: ${err.message}`;
+    }
+    showToast("Network error testing API key", "error");
   }
 }
 
@@ -3079,6 +3138,7 @@ export function initAdminStudio() {
   window.generateArticleWithAI = generateArticleWithAI;
   window.saveGeminiApiKey = saveGeminiApiKey;
   window.getGeminiApiKey = getGeminiApiKey;
+  window.testGeminiApiKey = testGeminiApiKey;
   window.setAiTopic = function(topicText) {
     const input = document.getElementById("aiTopicInput");
     if (input) {
@@ -3117,6 +3177,7 @@ if (typeof window !== "undefined") {
   window.generateArticleWithAI = generateArticleWithAI;
   window.saveGeminiApiKey = saveGeminiApiKey;
   window.getGeminiApiKey = getGeminiApiKey;
+  window.testGeminiApiKey = testGeminiApiKey;
   window.switchAmazonAiMode = switchAmazonAiMode;
   window.populateBulkDemo = populateBulkDemo;
   window.analyzeBulkAmazonLinksWithAI = analyzeBulkAmazonLinksWithAI;
