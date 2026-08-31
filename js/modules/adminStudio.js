@@ -1534,7 +1534,8 @@ export function saveGeminiApiKey() {
 export async function testGeminiApiKey() {
   const input = document.getElementById("geminiApiKeyInput");
   const status = document.getElementById("geminiKeySaveStatus");
-  const key = (input && input.value.trim()) || getGeminiApiKey();
+  const rawKey = (input && input.value) || getGeminiApiKey();
+  const key = (rawKey || "").replace(/["'\s]/g, "").trim();
 
   if (!key) {
     if (status) {
@@ -1550,38 +1551,55 @@ export async function testGeminiApiKey() {
     status.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Contacting Google Gemini API to verify credentials...';
   }
 
-  try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: "Hello, reply with: OK" }] }]
-      })
-    });
+  let verified = false;
+  let lastError = null;
 
-    if (res.ok) {
-      localStorage.setItem(GEMINI_KEY_STORAGE, key);
-      if (status) {
-        status.style.color = "#34d399";
-        status.innerHTML = '<i class="fa fa-check-circle"></i> <strong>Connection Verified!</strong> Your Gemini API Key is working perfectly.';
+  const testModels = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-2.5-flash"];
+
+  for (const model of testModels) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: "Hello, reply with: OK" }] }]
+        })
+      });
+
+      if (res.ok) {
+        verified = true;
+        break;
+      } else {
+        const errJson = await res.json().catch(() => ({}));
+        lastError = errJson.error ? (errJson.error.message || JSON.stringify(errJson.error)) : `HTTP ${res.status}`;
       }
-      showToast("✓ Gemini API Key verified & saved!", "success");
-    } else {
-      const errJson = await res.json().catch(() => ({}));
-      const errMsg = errJson.error ? errJson.error.message : `HTTP ${res.status}`;
-      if (status) {
-        status.style.color = "#f87171";
-        status.innerHTML = `<i class="fa fa-times-circle"></i> <strong>Verification Failed:</strong> ${errMsg}`;
-      }
-      showToast("API Key verification failed", "error");
+    } catch (e) {
+      lastError = e.message;
     }
-  } catch (err) {
+  }
+
+  if (verified) {
+    localStorage.setItem(GEMINI_KEY_STORAGE, key);
+    if (input) input.value = key;
+    if (status) {
+      status.style.color = "#34d399";
+      status.innerHTML = '<i class="fa fa-check-circle"></i> <strong>Connection Verified!</strong> Your Gemini API Key is active, working, and saved securely.';
+    }
+    showToast("✓ Gemini API Key verified & saved!", "success");
+  } else {
+    let helpMsg = lastError || "Could not reach Google Gemini API";
+    if (helpMsg.toLowerCase().includes("api key not valid") || helpMsg.toLowerCase().includes("api_key_invalid")) {
+      helpMsg = "API key not recognized by Google. If you added 'Application restrictions' (like HTTP referrers) in Google Cloud Console, please set them to 'None' or add your domain. Also verify you copied the entire key from <a href='https://aistudio.google.com/apikey' target='_blank' style='color:#38bdf8;text-decoration:underline;'>Google AI Studio</a>.";
+    } else if (helpMsg.toLowerCase().includes("disabled") || helpMsg.toLowerCase().includes("not enabled")) {
+      helpMsg = "Generative Language API is disabled in your Google Cloud project. Enable it at <a href='https://console.cloud.google.com/apis/library/generativelanguage.googleapis.com' target='_blank' style='color:#38bdf8;text-decoration:underline;'>Google Cloud Console</a>.";
+    }
+
     if (status) {
       status.style.color = "#f87171";
-      status.innerHTML = `<i class="fa fa-times-circle"></i> Network error: ${err.message}`;
+      status.innerHTML = `<i class="fa fa-times-circle"></i> <strong>Verification Failed:</strong> ${helpMsg}`;
     }
-    showToast("Network error testing API key", "error");
+    showToast("API Key verification failed. Check details in Settings.", "error");
   }
 }
 
