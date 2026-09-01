@@ -1,5 +1,22 @@
 [
   {
+    "id": "prod-2725-1",
+    "name": "ARCTIC MX-4 - Thermal Compound Paste - Carbon Based High Performance - Heatsink Paste - Thermal Compound CPU for All Coolers - ACTCP00002B,Grey",
+    "category": "fans-cooling",
+    "brand": "Arctic",
+    "priceEstimate": "₹489",
+    "rating": 4.7,
+    "reviewCount": 100000,
+    "badge": "Amazon's Choice",
+    "image": "https://m.media-amazon.com/images/I/51fVtU+cDIL._SL1500_.jpg",
+    "amazonUrl": "https://www.amazon.in/dp/B09V1D45PJ/?tag=mp2tech20-21",
+    "highlights": [
+      "Exceptional thermal conductivity for maximum heat transfer efficiency",
+      "Non-curing and non-conductive formulation ensures long-term stability and safety",
+      "Easy to apply with included spatula, suitable for CPUs, GPUs, and consoles"
+    ]
+  },
+  {
     "id": "prod-3160",
     "name": "TP-Link TL-UH700 7-Port USB 3.0 Hub, Black",
     "category": "adapters",
