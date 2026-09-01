@@ -1,5 +1,59 @@
 [
   {
+    "id": "prod-3160",
+    "name": "TP-Link TL-UH700 7-Port USB 3.0 Hub, Black",
+    "category": "adapters",
+    "brand": "TP-Link",
+    "priceEstimate": "₹0",
+    "rating": 4.5,
+    "reviewCount": 6196,
+    "badge": "Technician Verified",
+    "image": "https://images-na.ssl-images-amazon.com/images/P/B00LI4O9EA.01.LZZZZZZZ.jpg",
+    "amazonUrl": "https://www.amazon.in/dp/B00LI4O9EA/?tag=mp2tech20-21",
+    "highlights": [
+      "USB 3.0 ports offer transfer speeds of up to 5Gbps, 10 times faster than standard USB 2.0",
+      "7 data transfer ports mean you don't have to switch between devices",
+      "Designed to Charge Fast. Delivers up to 5V/1.5A output",
+      "Sophisticated circuit design with multiple protections for your devices against over-heating, over-current, over-voltage and short circuits. A built-in surge protector"
+    ]
+  },
+  {
+    "id": "prod-6024",
+    "name": "DELL WM118 Wireless Optical Mouse",
+    "category": "keyboards-mice",
+    "brand": "Dell",
+    "priceEstimate": "₹649",
+    "rating": 4.6,
+    "reviewCount": 16784,
+    "badge": "Technician Verified",
+    "image": "https://images-na.ssl-images-amazon.com/images/P/B07JPX9CR7.01.LZZZZZZZ.jpg",
+    "amazonUrl": "https://www.amazon.in/dp/B07JPX9CR7/?tag=mp2tech20-21",
+    "highlights": [
+      "2.4 GHz wireless connectivity",
+      "Optical movement detection technology, 1000 DPI",
+      "3 buttons and a scrolling wheel",
+      "Plug-and-Play setup"
+    ]
+  },
+  {
+    "id": "prod-4218",
+    "name": "Dell MS116 1000DPI Wired Optical Mouse, Black",
+    "category": "keyboards-mice",
+    "brand": "Dell",
+    "priceEstimate": "₹300",
+    "rating": 4.4,
+    "reviewCount": 10228,
+    "badge": "Technician Verified",
+    "image": "https://images-na.ssl-images-amazon.com/images/P/B01HJI0FS2.01.LZZZZZZZ.jpg",
+    "amazonUrl": "https://www.amazon.in/dp/B01HJI0FS2/?tag=mp2tech20-21",
+    "highlights": [
+      "1000 DPI optical sensor",
+      "Wired USB connectivity",
+      "Three buttons and a scroll wheel",
+      "Ambidextrous and comfortable design"
+    ]
+  },
+  {
     "id": "prod-3465",
     "name": "TP-LINK WiFi Dongle 300 Mbps Mini Wireless Network USB Wi-Fi Adapter for PC Desktop Laptop(Supports Windows 11/10/8.1/8/7/XP, Mac OS 10.9-10.15 and Linux, WPS, Soft AP Mode, USB 2.0) (TL-WN823N),Black",
     "category": "adapters",
